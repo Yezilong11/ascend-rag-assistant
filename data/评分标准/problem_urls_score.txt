@@ -1,0 +1,4 @@
+序号	竞赛名称	网址	错误信息
+12	全国大学生机械创新设计大赛	http://umic.ckcest.cn/	请求失败: HTTPConnectionPool(host='umic.ckcest.cn', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("HTTPConnection(host='umic.ckcest.cn', port=80): Failed to resolve 'umic.ckcest.cn' ([Errno 11001] getaddrinfo failed)"))
+20	中美青年创客大赛	https://chinaus-maker.cscse.edu.cn/	请求失败: HTTPSConnectionPool(host='chinaus-maker.cscse.edu.cn', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLError(1, '[SSL: UNSAFE_LEGACY_RENEGOTIATION_DISABLED] unsafe legacy renegotiation disabled (_ssl.c:1032)')))
+39	全国高等院校数智化企业经营沙盘大赛	http://spbk.seentao.com	请求失败: HTTPConnectionPool(host='spbk.seentao.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("HTTPConnection(host='spbk.seentao.com', port=80): Failed to resolve 'spbk.seentao.com' ([Errno 11001] getaddrinfo failed)"))
