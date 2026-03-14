@@ -1,0 +1,2 @@
+序号	竞赛名称	网址	错误信息
+20	中美青年创客大赛	http://www.chinaus-maker.org.cn/	请求失败: HTTPConnectionPool(host='www.chinaus-maker.org.cn', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("HTTPConnection(host='www.chinaus-maker.org.cn', port=80): Failed to resolve 'www.chinaus-maker.org.cn' ([Errno 11002] getaddrinfo failed)"))
