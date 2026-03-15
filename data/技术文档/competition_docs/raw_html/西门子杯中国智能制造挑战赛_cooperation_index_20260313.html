@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- core CSS -->
+    <link href="/Contents/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/Contents/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/Contents/css/animate.min.css" rel="stylesheet">
+    <link href="/Contents/js/plugins/layer/theme/default/layer.css" rel="stylesheet" />
+    <link href="/Contents/css/prettyPhoto.css" rel="stylesheet">
+    <link href="/Contents/css/main.css" rel="stylesheet">
+    <link href="/Contents/css/responsive.css" rel="stylesheet">
+    <link rel="icon" href="/Contents/favicon.png" mce_href="/Contents/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/Contents/favicon.png" mce_href="/Contents/favicon.png" type="image/x-icon">
+    <link href="/Contents/css/bootstrap-icons-1.13.1/bootstrap-icons.min.css" rel="stylesheet" />
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+    
+    <title>“西门子杯”中国智能制造挑战赛</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    
+</head>
+<body>
+    
+
+
+
+<header id="header" style="position:fixed;width:100%;z-index:999;background-color:#1065c2">
+    <div class="top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <nav class="navbar navbar-inverse" role="banner" style="background-color:#1065c2;padding:0px 0px 0px 0px;min-height:0px">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="sr-only"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+                        <div class="collapse navbar-collapse navbar-left">
+                            <ul class="nav navbar-nav" style="margin-top:0px">
+                                <li class="dropdown " style="margin-left:0px">
+                                    <a href="/home/index" class="dropdown-toggle" data-toggle="popover">首页<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/home/index#docker11">新工程师</a></li>
+                                        <li><a href="/home/index#docker21">人才类别</a></li>
+                                        <li><a href="/home/index#docker31">领导寄语</a></li>
+                                        <li><a href="/home/index#docker51">各界支持</a></li>
+                                        <li><a href="/home/index#docker61">参赛情况</a></li>
+                                        <li><a href="/home/index#docker71">优秀高校</a></li>
+                                        <li><a href="/home/index#docker81">优秀队伍</a></li>
+                                        <li><a href="/home/index#docker91">服务项目</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown " style="margin-left:0px">
+                                    <a href="/aboutcompetition/index?id=comDesc" class="dropdown-toggle" data-toggle="popover">赛事介绍<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/aboutcompetition/index?id=comDesc">大赛简介</a></li>
+                                        <li><a href="/aboutcompetition/index?id=devHistory">发展历史</a></li>
+                                        <li><a href="/aboutcompetition/index?id=zwh">组委会</a></li>
+                                        <li><a href="/aboutcompetition/index?id=zjz">专家组</a></li>
+                                        
+                                        <li><a href="/aboutcompetition/index?id=cbdw">承办单位</a></li>
+                                        <li><a href="/aboutcompetition/index?id=review">往届赛事</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown " style="margin-left:0px">
+                                    <a href="/itemguide/index" class="dropdown-toggle" data-toggle="popover">参赛指南<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/joinflow/index">参赛说明</a></li>
+                                        <li><a href="/itemguide/index?id=zwh">赛项选择</a></li>
+                                        <li><a href="/guide/index">学习备赛</a></li>
+                                    </ul>
+                                </li>
+
+
+                                    <li class="dropdown " style="margin-left:0px">
+                                        <a href="/project/index" class="dropdown-toggle" data-toggle="popover">赛题资料<i class="fa fa-angle-down"></i></a>
+                                        <ul class="dropdown-menu">
+                                                    <li><a href="/Project/PorjectResourceDetail?id=1">智能制造工程设计与应用类赛项：流程行业自动化方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=2">智能制造工程设计与应用类赛项：离散行业自动化方向（逻辑算法）</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=15">智能制造工程设计与应用类赛项：离散行业自动化方向（工程实践）</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=3">智能制造工程设计与应用类赛项：离散行业运动控制方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=4">智能制造工程设计与应用类赛项：信息化网络化方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=11">智能制造工程设计与应用类赛项：智能装备设计与数字孪生制造方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=10">智能制造工程设计与应用类赛项：精益智造与协作机器人方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=18">智能制造工程设计与应用类赛项：工业嵌入式系统开发方向（试）</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=19">智能制造工程设计与应用类赛项：智能产线数字孪生设计与开发方向（试）</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=20">智能制造工程设计与应用类赛项：智能制造通识方向（试）</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=5">智能制造创新研发类赛项：自由探索方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=16">智能制造创新研发类赛项：工业硬件研发方向</a></li>
+                                                    <li><a href="/Project/PorjectResourceDetail?id=21">工程思政类赛项：可持续发展与ESG方向（筹）</a></li>
+                                        </ul>
+                                    </li>
+                                <li class="dropdown " style="margin-left:0px">
+                                    <a href="/competition/index" class="dropdown-toggle" data-toggle="popover">通知动态<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/competition/index">大赛通知</a></li>
+                                        <li><a href="/competition/index#govSupport">省厅支持</a></li>
+                                        <li><a href="/competition/index#recent-works">媒体报道</a></li>
+                                    </ul>
+                                </li>
+                                
+                                    <li class="dropdown " style="margin-left:0px">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">全国赛区<i class="fa fa-angle-down"></i></a>
+                                        <ul class="dropdown-menu" style="min-width:260px">
+                                                <li><a href="#">2026/06开通</a></li>
+                                        </ul>
+                                    </li>
+
+                                <li class="dropdown active" style="margin-left:0px">
+                                    <a href="/cooperation/index" class="dropdown-toggle" data-toggle="popover">企业合作<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/cooperation/index#docker11">合作项目</a></li>
+                                        <li><a href="/cooperation/index#docker21">合作企业</a></li>
+                                        <li><a href="/cooperation/index#docker31">赛题合作</a></li>
+                                        <li><a href="/cooperation/index#docker41">合作案例</a></li>
+                                        <li><a href="/cooperation/index#docker51">联系方式</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown " style="margin-left:0px">
+                                    <a href="#" class="dropdown-toggle" data-toggle="popover">成绩查询<i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/search/index">团队环节查询</a></li>
+                                        <li><a href="/search/personal">个人环节查询</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                
+
+                <div class="col-md-1">
+                    <div id="headerFunc">
+                        
+                        
+                        <a class="a-link" href="http://bbs.siemenscup-cimc.org.cn/forum.php">论坛</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div id="headerFunc">
+                            <a href="/team/index" class="a-link">我要参赛</a>|
+                                <a href="/login/login" class="a-link">登录</a>  | 
+                                <a href="/login/Register" class="a-link">注册</a>
+                                                <a style="float:right" href="javascript:void(0)" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-trigger="focus"
+                           data-content="竞赛设备指定供应商：<br /><a href='http://www.dpro.net.cn/' target='_blank'>北京德普罗尔科技有限公司</a> <br />西门子工厂自动化工程有限公司<br />联系人：王志强 <br />zhiqiang.wang@dpro.net.cn" class="a-link"> 了解设备 </a>
+
+                    </div>
+                </div>
+            </div>
+        </div><!--/.container-->
+    </div><!--/.top-bar-->
+</header><!--/header-->
+
+<script src="/Contents/js/jquery-2.1.1.min.js"></script>
+<script>
+
+    $(function () {
+        localStorage.setItem("mailCount",)
+        $("#mailCount").hide()
+        setInterval(function () { 
+            if (localStorage.getItem("mailCount") > 0) {
+                $("#mailCount").text(localStorage.getItem("mailCount"));
+                $("#mailCount").show()
+            } else {
+                $("#mailCount").hide()
+            }
+
+        }, 1000);
+    })
+
+
+    function emails() {
+        openIframe({
+            title: '站内信',
+            url: '/PopLayer/Emails',
+            width: "70%",
+            height: "80%",
+            end: function () {
+
+            }
+        });
+    }
+
+    function readMail() {
+        if ($("#mailCount").text() > 0) {
+            $("#mailCount")
+            $("#mailCount").show();
+        }
+    }
+</script>
+<section>    </section>
+<section style="margin-bottom:30px">
+    <div class="container">
+        <div id="docker1" name="docker" class="center wow fadeInDown">
+            <h2>合作项目</h2>
+        </div>
+        <div class="row">
+            <div class="col-md-4 wow fadeInDown" style="font-size:23px;font-weight:500;">
+                <span style="border-bottom:2px solid #ff0000"><a target="_blank" href="http://www.industry.siemens.com.cn/topics/cn/zh/sce/Pages/siemens-sce.aspx">西门子自动化教育合作项目</a></span>
+            </div>
+            <div class="col-md-4 wow fadeInDown" style="font-size:23px;font-weight:500">
+                <span style="border-bottom:2px solid #ff0000"><a target="_blank" href="https://solidedge.siemens.com/zh-hans/">西门子 Solid Edge 校园推广</a></span>
+            </div>
+            <div class="col-md-4 wow fadeInDown" style="font-size:23px;font-weight:500">
+                <span style="border-bottom:2px solid #ff0000"><a target="_blank" href="https://www.mornsun.cn">“你有梦，我来源”金升阳电源赞助</a></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div id="docker2" name="docker" class="center wow fadeInDown">
+            <h2>合作企业</h2>
+        </div>
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.siemens.com/cn/zh.html"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-04.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.tesla.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-05.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="campus.qianxin.com"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-06.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-07.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-08.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.jsmachine.com.cn/zh-CN/index.html"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-09.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.sankyo-hz.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-10.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.cmpbook.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-11.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.hzxddt.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-12.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-13.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.tm-robot.com.cn/zh-hans"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-15.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.mornsun.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-16.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://lceda.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-lceda.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.gigadevice.com.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-giga.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-19.png"></a>
+            </div>
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-17.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.anyka.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-18.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.futrblue.com"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-20.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.shhanm.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-21.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.deepzero.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-22.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.xsjsoft.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-23.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-24.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.kbyun.com"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-25.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=" "><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-26.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.dpro.net.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-27.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.automate-cn.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-28.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.cetgroupco.com/cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-29.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.jianlijixie.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-30.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.julong.cc/index.aspx"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-31.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.irest.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-32.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="http://www.controlease.com/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-33.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href="https://www.fujitec.com.cn/"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/logo-34.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-28.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-29.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-30.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-31.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-32.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-33.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-34.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-35.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-36.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-37.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-38.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-39.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-40.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-41.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-42.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-43.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-44.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-45.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-46.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-47.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-48.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-49.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-50.png"></a>
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+            <div class="col-md-2 wow fadeInDown">
+                <a target="_blank" href=""><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="/Contents/images/partners/CoopLogo/CIMC%e5%90%88%e4%bd%9clogo-51.png"></a>
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+               
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+              
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+             
+            </div>
+            <div class="col-md-2 wow fadeInDown">
+            
+            </div>
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+        <div class="row" style="padding-top:20px">
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+
+
+
+            <div class="col-md-1 wow fadeInDown">
+                &nbsp;
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+
+
+<section>
+    <div class="container">
+        <div class="features">
+            <div id="docker3" name="docker" class="center wow fadeInDown">
+                <h2>企业赛题合作</h2>
+            </div>
+            <div class="col-md-12 col-sm-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                <div class="feature-wrap">
+                    <img src="/Contents/images/cooperation/CIMC-32.png" style="width:100%" />
+                </div>
+            </div><!--/.col-md-4-->
+        </div><!--/.services-->
+    </div><!--/.container-->
+</section>
+
+<section>
+    <div class="container">
+        <div class="features">
+            <div id="docker4" name="docker" class="center wow fadeInDown">
+                <h2>企业赛题合作案例（一）</h2>
+            </div>
+            <div class="col-md-12 col-sm-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                <div class="feature-wrap">
+                    <img src="/Contents/images/cooperation/CIMC-33new.png" style="width:100%" />
+                </div>
+                <div class="feature-wrap">
+                    <img src="/Contents/images/cooperation/CIMC-34.png" style="width:100%" />
+                </div>
+            </div><!--/.col-md-4-->
+        </div><!--/.services-->
+    </div><!--/.container-->
+</section>
+
+<section>
+    <div class="container">
+        <div class="features">
+            <div class="center wow fadeInDown">
+                <h2>企业赛题合作案例（二）</h2>
+            </div>
+            <div class="col-md-12 col-sm-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                <div class="feature-wrap">
+                <img src="/Contents/images/cooperation/CIMC-35new.png" style="width:100%" />
+            </div>
+            <div class="feature-wrap">
+                <img src="/Contents/images/cooperation/CIMC-36new.png" style="width:100%" />
+            </div>
+        </div><!--/.col-md-4-->
+        </div><!--/.services-->
+    </div><!--/.container-->
+</section>
+
+<section>
+    <div class="container">
+        <div class="features">
+            <div id="docker5" name="docker" class="center wow fadeInDown">
+                <h2>合作联系方式</h2>
+            </div>
+            <div class="col-md-12 col-sm-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                <div class="feature-wrap ">
+                    <div class="center wow fadeInDown">
+                        <p style="font-weight:900;color:#347CCE;font-size:2rem">大赛合作 & 校企联盟 & 工程认证</p>
+                        <p>更多咨询，欢迎联系全国竞赛秘书处</p>
+                        <p>Tel:15801122380</p>
+                        <p>Email:siemenscup@163.com</p>
+                        <p>Address:北京化工大学 北京市朝阳区北三环东路15号</p>
+                        <p>Website:www.siemenscup-cimc-org.cn</p>
+                    </div>
+                </div>
+            </div><!--/.col-md-4-->
+        </div><!--/.services-->
+    </div><!--/.container-->
+</section>
+
+
+
+
+<section id="bottom">
+    <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+        <div class="row">
+            
+
+            <div class="col-md-3 col-sm-6">
+                <div class="widget">
+                    
+                    <h3>主办单位</h3>
+                    <ul>
+                        <li><a target="_blank" href="http://www.csf-sim.org.cn/">中国仿真学会</a></li>
+                        <li><a target="_blank" href="https://www.siemens.com/cn/zh/home.html/">西门子(中国)有限公司</a></li>
+                    </ul>
+                </div>
+            </div><!--/.col-md-3-->
+
+            <div class="col-md-3 col-sm-6">
+                <div class="widget">
+                    <h3>全国竞赛秘书处</h3>
+                    <ul>
+                        <li>挂靠单位：北京化工大学</li>
+                        <li>地    址：北京市朝阳区北三环东路15号 </li>
+                        <li>邮    编：100029</li>
+                        <li>电    话：15801122380</li>
+                        <li>接听时间：工作日9:00-17:00</li>
+
+                        <li>邮    箱：siemenscup@163.com</li>
+                    </ul>
+                </div>
+            </div><!--/.col-md-3-->
+
+            <div class="col-md-3 col-sm-6">
+                <div class="widget">
+                    <h3>中国教育</h3> 
+                    <ul>
+                        <li><a target="_blank" href="http://jyt.hubei.gov.cn">湖北省教育厅</a></li>
+                        <li><a target="_blank" href="http://jyt.ah.gov.cn">安徽省教育厅</a></li>
+                        <li><a target="_blank" href="http://edu.shandong.gov.cn">山东省教育厅</a></li>
+                        <li><a target="_blank" href="http://jyt.ln.gov.cn">辽宁省教育厅</a></li>
+                        <li><a target="_blank" href="http://www.hee.gov.cn/">河北省教育厅</a></li>
+                        <li><a target="_blank" href="http://edu.sh.gov.cn">上海市教委</a></li> 
+                        <li><a href="javascript:showEduCn()">查看更多...</a></li> 
+                    </ul>
+                </div>
+            </div><!--/.col-md-3-->
+            <div class="col-md-3 col-sm-6">
+                <div class="widget">
+                    <h3>大赛微信公众号</h3>
+                    <ul>
+                        <li><img width="120" height="120" src="/Contents/images/home/codePic.jpg" /></li>
+                        <li> </li>
+                        <li> </li>
+                    </ul>
+                    <h3>网站技术支持：</h3>
+                    <ul>
+                        <li>智新工联（北京）科技有限公司</li>
+                    </ul>
+                </div>
+            </div><!--/.col-md-3-->
+        </div>
+    </div>
+</section><!--/#bottom--> 
+
+<footer id="footer" class="midnight-blue" style="">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <ul class="pull-left">
+                    <li>© 2006-2024 中国智能制造挑战赛 版权所有 </li>
+                </ul>
+                <ul class="pull-left">
+                    <li><a href="https://beian.miit.gov.cn/#/Integrated/recordQuery" rel="noreferrer" target="_blank">ICP证：京ICP备2024087768号</a></li>
+                    <li><img src="//g.csdnimg.cn/common/csdn-footer/images/badge.png" alt="" style="width:20px;height:20px"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011302007359" rel="noreferrer" target="_blank">公安备案号11011302007359</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer><!--/#footer-->
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?a95b5282babf0b251aa33de3a0221d5f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+    <script src="/Contents/js/jquery-2.1.1.min.js"></script>
+    <script src="/Contents/js/jquery.cookie.js"></script>
+    <script src="/Contents/js/jquery.form.min.js"></script>
+    <script src="/Contents/js/bootstrap.min.js"></script>
+    <script src="/Contents/js/jquery.prettyPhoto.js"></script>
+    <script src="/Contents/js/jquery.isotope.min.js"></script>
+    <script src="/Contents/js/plugins/layer/layer.js"></script>
+    <script src="/Contents/js/main.js"></script>
+    <script src="/Contents/js/wow.min.js"></script>
+    <script src="/Contents/js/common.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            var body = $("body");
+            $("[name='docker']").each(function () {
+                body.append($("<p style='position:absolute;top:" + ($(this).offset().top - 100) + "px' id= '" + $(this).attr("id") + "1" + "'></p>"));
+            });
+        });
+    </script>
+
+
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+
+         
+        function payUser() {
+            openIframe({
+                title: '缴费',
+                url: '/Trade/GetUserPayInfo',
+                width: "450px",
+                height: "80%",
+                end: function () {
+
+                }
+            });
+        }
+
+        function showEduCn() {
+            layer.open({
+                type: 1,
+                skin: 'layui-layer-demo', //样式类名
+                area: ['420px', '240px'], //宽高
+                title: "中国教育",
+                anim: 2,
+                content: "<div class='row' style='margin-left:0px;margin-right:0px'>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.ah.gov.cn'>安徽省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jw.beijing.gov.cn'>北京市教育委员会</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.fj.gov.cn'>福建省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.gansu.gov.cn'>甘肃省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://edu.gd.gov.cn'>广东省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.gxzf.gov.cn'>广西壮族自治区教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.guizhou.gov.cn'>贵州省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://edu.hainan.gov.cn'>海南省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://www.hee.gov.cn/'>河北省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.henan.gov.cn'>河南省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.hlj.gov.cn/index'>黑龙江省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.hubei.gov.cn'>湖北省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.hunan.gov.cn'>湖南省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.jl.gov.cn'>吉林省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.jiangsu.gov.cn/'>江苏省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.jiangxi.gov.cn'>江西省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.ln.gov.cn'>辽宁省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://www.nmgov.edu.cn'>内蒙古自治区教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.nx.gov.cn'>宁夏回族自治区教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://www.qhedu.cn/index.html'>青海省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://edu.shandong.gov.cn'>山东省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.shanxi.gov.cn'>山西省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jyt.shaanxi.gov.cn'>陕西省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://edu.sh.gov.cn'>上海市教育委员会</a></div><div class='col-md-6'><a  target='_blank' href='http://edu.sc.gov.cn'>四川省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jy.tj.gov.cn'>天津市教育委员会</a></div><div class='col-md-6'><a  target='_blank' href='http://edu.xizang.gov.cn'>西藏自治区教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.xinjiang.gov.cn'>新疆维吾尔自治区教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://www.ynjy.cn/web'>云南省教育厅</a></div>" +
+                         "<div class='col-md-6'><a  target='_blank' href='http://jyt.zj.gov.cn'>浙江省教育厅</a></div><div class='col-md-6'><a  target='_blank' href='http://jw.cq.gov.cn'>重庆市教育委员会</a></div>" +
+                         "</div>"
+            });
+        }
+    </script>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?4fbd91e623b31f1bb2c004050234c57f";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+</body>
+</html>

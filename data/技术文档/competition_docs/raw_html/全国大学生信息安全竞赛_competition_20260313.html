@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="apple-touch-icon" href="/favicon.ico"/>
+
+    <title>全国大学生信息安全竞赛官方网站</title>
+
+    <!-- Styles -->
+        <link href="http://www.ciscn.cn/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/bootstrap-datetimepicker/datetimepicker.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/unslider.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/unslider.dots.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/style.css?23df8hn" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/typeaheadjs.css" rel="stylesheet">
+    <!-- JavaScripts -->
+        <script src="http://www.ciscn.cn/assets/js/jquery.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/bootstrap.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/validator.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/unslider.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/bootstrap-datetimepicker/moment.js"></script>
+    <script src="http://www.ciscn.cn/assets/bootstrap-datetimepicker/datetimepicker.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/layer.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/bootstrap-treeview.min.js"></script>
+    <script src="http://www.ciscn.cn/laravel-u-editor/ueditor.config.js"></script>
+<script src="http://www.ciscn.cn/laravel-u-editor/ueditor.all.min.js"></script>
+<script src="http://www.ciscn.cn/laravel-u-editor/lang/zh-cn/zh-cn.js"></script>    <style>
+        html {
+            background: #292929;
+        }
+        .fa-btn {
+            margin-right: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .nav-tabs.nav-justified > li {
+                display: table-cell;
+                width: 1%;
+                background: url(http://www.ciscn.cn/assets/images/r-line.jpg) no-repeat right center;
+            }
+
+            .nav-tabs.nav-justified > li:last-child {
+                background: none;
+            }
+
+            .nav-tabs.nav-justified > li > a {
+                border: none;
+                color: #494949;
+                font-size: 15px;
+                font-weight: bold;
+            }
+
+            .navbar-default .navbar-nav > li > a:hover {
+                color: #777;
+                background: #fff;
+            }
+        }
+
+        .navbar-default {
+            padding-bottom: 0 !important;
+            margin: 0 !important;
+            border: none;
+        }
+
+        .navbar-header {
+            margin-left: 9.3vw;
+        }
+
+        .home-header-right {
+            display: flex !important;
+            align-content: center;
+            align-items: center;
+            margin-right: 9.3vw !important;
+        }
+        .logo-container {
+            height: unset !important;
+            padding: 0 !important;
+            margin: 1.77vh 0;
+        }
+        .vip-count {
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            color: #666666 !important;
+            border: 1px solid #dbdbdb !important;
+            border-radius: 16px !important;
+            background: #FFF !important;
+            padding: 6px 13px !important;
+            position: relative !important;
+            cursor: pointer !important;
+            margin-top: 0 !important;;
+        }
+
+        .btn-item {
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            color: #fff !important;
+            padding: 0 !important;
+            height: 20px !important;
+        }
+
+        .split-line {
+            width: 1px;
+            height: 14px;
+            margin: 0 8.5px;
+            border: 1px solid #9ec8e8;
+        }
+
+        .btn-item:hover, .btn-item:focus, .btn-item:active {
+            color: #fff !important;
+            background: none !important;
+        }
+
+        .btn-list {
+            display: flex !important;
+            align-items: center !important;
+            background: #1886d9 !important;
+            margin-right: 0 !important;
+        }
+
+        .ul-li {
+            display: flex !important;
+            align-items: center !important;
+            height: 30px;
+            margin-right: 15px;
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 16px;
+        }
+
+        #spark-navbar-collapse {
+            width: 100% !important;
+            padding: 0;
+            border: none !important;
+        }
+
+        .menu-list {
+            display: flex !important;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100% !important;
+            height: 5.2vh !important;
+            background: #000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .menu-list li {
+            height: 100%;
+            list-style-type: none;
+            border-right: 1px solid #5e5e5e;
+        }
+        .menu-list li:last-child{
+            border: none;
+        }
+        .menu-list a {
+            height: 5.2vh;
+            line-height: 5.2vh;
+            padding: 0 25px !important;
+            background: #000 !important;
+            font-size: 14px;
+            font-weight: 500;
+            color: #888888 !important;
+            text-decoration: none;
+        }
+        .menu-list li:hover, .menu-list li:active {
+            text-decoration: none !important;
+            color: #FFF !important;
+        }
+        .menu-list li a:hover, .menu-list li a:active {
+            color: #FFF !important;
+        }
+        .menu-active {
+            color: #FFF !important;
+            border-bottom: 4px solid #1886D9 !important;
+        }
+        .menu-active a {
+            color: #FFF !important;
+        }
+
+        html {
+            -ms-overflow-style: -ms-autohiding-scrollbar !important;
+        }
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+            /*width: 5px;*/
+            width: 0;
+            height: 5px;
+            /*width: 0;*/
+        }
+
+        /* 滚动槽 */
+        ::-webkit-scrollbar-track {
+            background: #022e3e;
+        }
+
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #045e72;
+        }
+
+        /* 边角 */
+        ::-webkit-scrollbar-corner {
+            background: #023e4c;
+        }
+
+        /* 滚动条两端的按钮 */
+        ::-webkit-scrollbar-button {
+            background: #023e4c;
+        }
+
+        /* 设置滚动条的样式 */
+        .message-count {
+            position: absolute;
+            margin: -5px 0 0 -8px;
+            background: none;
+            color: red;
+        }
+        /* Chrome/Opera/Safari */
+        ::-webkit-input-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* Firefox 19+ */
+        ::-moz-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* IE 10+ */
+        :-ms-input-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* Firefox 18- */
+        :-moz-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+        .home-logo {
+            width: 22.23vw !important;
+        }
+        th, td {
+            text-align: center;
+        }
+    </style>
+        </head>
+<body id="app-layout">
+<div class="new-container" style="background:#fff;padding:0;">
+    <nav class="navbar navbar-default">
+        <div class="new-container">
+            <div class="navbar-header">
+                <div class="navbar-brand navbar-logo logo-container"><img src="http://www.ciscn.cn/assets/images/logo.jpg"
+                                                                          class="img-responsive home-logo"></div>
+                <!-- Collapsed Hamburger -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#spark-navbar-collapse">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- Branding Image -->
+            <!--a class="navbar-brand" href="http://www.ciscn.cn">
+                    全国大学生信息安全竞赛官方网站
+                    </a-->
+            </div>
+            <div class="navbar-collapse">
+                <!-- Right Side Of Navbar -->
+                <ul class="nav navbar-nav navbar-right js-pc home-header-right">
+                    <!-- Authentication Links -->
+                    <li class="vip-count ul-li">
+                        会员数: 126271
+                    </li>
+                    <li><a href="#" class="js-zc vip-count ul-li"
+                           id="showQuestions">
+                            <span class="glyphicon glyphicon-qrcode" style="margin-right: 4px;"></span>
+                                                        微信公众号</a>
+                        <img src="http://www.ciscn.cn/assets/images/questions.jpg"
+                             style="position: absolute;z-index: 9999;display: none" height="180px">
+                    </li>
+                                                                                            <li class="js-zc vip-count btn-list ul-li">
+                            <a href="http://www.ciscn.cn/register" class="btn-item">注册</a>
+                            <div class="split-line"></div>
+                            <a href="http://www.ciscn.cn/login" class="btn-item">登录</a>
+                        </li>
+                                    </ul>
+            </div>
+            <div class="collapse navbar-collapse" id="spark-navbar-collapse">
+                            <!-- <div class="text-right" style="width:50%;float:right;margin-right:-10px;">
+                    <a href="http://v.butel.com/PageShare?id=32115" target="_blank" style="text-decoration:none;"><span id="ctf-live">[视频直播]&nbsp;颁奖典礼暨网络空间安全人才创新创业发展论坛</span></a>
+                </div> -->
+                    <ul class="menu-list">
+                        <li><a href="/home">首页</a></li>
+                    <!-- <li><a href="/governingorg">领导机构</a></li> -->
+                        <li><a href="/competition/securityCompetition?compet_id=42">长城杯作品赛报名入口</a></li>
+                        <li><a href="http://ccb.itsec.gov.cn/" target="_blank">长城杯官网</a></li>
+                        <li><a href="/competitioncharter">竞赛章程</a></li>
+                        <li><a href="/competition">竞赛目录</a></li>
+
+                        <li><a href="/award">获奖展示</a></li>
+                        <li><a href="/excellents">优秀作品</a></li>
+                        <!-- 2022需求屏蔽 -->
+                    <!-- <li><a href="/interview">访谈集萃</a></li> 高校-->
+                        <li><a href="/school">参赛高校</a></li>
+                        <!-- <li><a href="/supportedby">支持单位</a></li> -->
+                    <!-- <li><a href="/forum">发展论坛</a></li> 论坛-->
+                        <li><a href="/experts">专家库</a></li>
+                    </ul>
+                        </div>
+        </div>
+    </nav>
+    <main style="min-height: calc(100vh - 15.2vh - 120px); overflow: auto;">
+        <style>
+.nav-tabs{ border-bottom: none; }
+.nav-pills>li{margin-right:6px;margin-bottom: 0; background: url(http://www.ciscn.cn/assets/images/l-bj.png)no-repeat right center #f3f3f3;}
+.nav-pills>li.active{ background: url(http://www.ciscn.cn/assets/images/l-bj1.png)no-repeat right center #0155d2;}
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+  color: #fff;
+  background-color: #176ded;
+  border-radius: 0;
+ background: url(http://www.ciscn.cn/assets/images/l-bj1.png)no-repeat right center #0155d2;
+}
+.nav-pills>li>a:hover {
+  color: #fff;
+  background-color: #176ded;
+  border-radius: 0;
+ background: url(http://www.ciscn.cn/assets/images/l-bj1.png)no-repeat right center #0155d2;
+}
+@media (min-width: 1100px)
+{
+.nav-pills>li a{ padding: 8px 30px; font-size: 16px; color: #d4d4d4;margin-right: 0;}
+}
+.form-horizontal{ margin-top: 40px;}
+@media (min-width: 768px)
+{
+.form-horizontal .control-label {
+  padding-top: 0px;
+}
+}
+@media (max-width: 1099px)
+{
+.col-md-1{padding:0;}
+.col-md-2{padding:0;}
+.col-md-4{padding:0;}
+.col-sm-2{padding:0;width: 100%; text-align: left;}
+.col-sm-10{padding:0;}
+.form-group {
+  margin-bottom:5px;
+}
+.nav-pills>li a{ padding: 8px 19px; font-size: 16px; color: #d4d4d4;margin-right: 0;}
+
+}
+    .panel-default {
+        margin: 3.7vh 0;
+    }
+    .welcome {
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 3px 20px 0 rgba(0,0,0,0.1);
+        padding: 5.34vh 2.76vw !important;
+    }
+.flag {
+    position: absolute;
+    width: 50px;
+    height: 20px;
+    border-radius: 0 0 13px 0;
+    margin-top: 0;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    color: #ffffff;
+    line-height: 18px;
+}
+.flag.going {
+    background: linear-gradient(90deg,#f98856, #f1a431);
+}
+.flag.end {
+    background: linear-gradient(90deg,#788994, #afcbce);
+}
+.flag.early {
+    background: linear-gradient(90deg,#5697f9, #49cdef);
+}
+    .left-container {
+        display: inline-block;
+        vertical-align: top;
+        width: 13.85vw;
+        min-height: 18.5vh;
+        margin-right: 1.25vw;
+    }
+    .right-container {
+        display: inline-block;
+        vertical-align: top;
+        width: 38vw;
+    }
+    .form-group {
+        text-align: left;
+        margin: 7px 0 !important;
+    }
+    .form-group.title {
+        text-align: left;
+        font-size: 20px;
+        font-weight: 700;
+        color: #333333;
+        margin: 0 0 2.1vh 0 !important;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .form-group .name ,.form-group .content {
+        display: inline-block;
+        vertical-align: top;
+    }
+    .form-group .content {
+        text-indent: 10px;
+    }
+    .description {
+        /*height: 6.4vh;*/
+        text-overflow: ellipsis;
+        /*white-space: nowrap;*/
+        overflow: hidden;
+        margin-top: 0 !important;
+        word-break:break-all;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+    .form-group-line {
+        width: 100%;
+        height: 1px;
+        background: #D5D5D5;
+        margin-top: 2.98vh;
+    }
+    .btn-detail {
+        float: right;
+        width: 4.69vw;
+        height: 3.2vh;
+        background: #1886d9;
+        border-radius: 15px;
+        border: none;
+        color: #fff;
+        font-size: 12px;
+    }
+    .container {
+        width: 62.5vw !important;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="container">
+            <div class="panel panel-default">
+
+                 <div class="tab-content">
+                 <div class="tab-pane text-center active" id="going">
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/202511132o9AZPCo0Q.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=44">第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为深入践行总体国家安全观，积极落实国家网络空间安全人才战略，实现以赛促学、以赛促教、以赛促用，提质增效，推动网络空间安全人才培养和产学研用生态发展，中国信息安全测评中心和教育部高等学校网络空间安全专业教学指导委员会联合主办第...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=44`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20250520766HLre20W.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=43">第十八届全国大学生信息安全竞赛&mdash;作品赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，由西安交通大学承办的&ldquo;第十八届全国大学生信息安全竞赛&mdash;作品赛&rdquo;（...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            西安交通大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=43`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/202504018w3ebb8RHe.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=42">第二届&ldquo;长城杯&rdquo;铁人三项赛 （作品赛）</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，中国信息安全测评中心、北京师范大学、中国电信集团有限公司、中...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            中国信息安全测评中心、北京师范大学、中国电信集团有限公司、中国移动通信集团有限公司
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=42`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20241104kUSnH7it5x.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=41">第十八届全国大学生  信息安全竞赛（创新实践能力赛）暨第二届&ldquo;长城杯&rdquo;铁人三项赛（防护赛）</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为深入践行总体国家安全观，积极落实国家网络空间安全人才战略，实现以赛促学、以赛促教、以赛促用，提质增效，推动网络空间安全人才培养和产学研用生态发展， 教育部高等学校网络空间安全专业教学指导委员会（以下简称&ldquo;网安教指委&rdquo;）和中国信...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会主办
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=41`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20240407rqcQm9DYo9.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=39">第十七届全国大学生信息安全竞赛信息安全作品赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，由西北工业大学承办的&ldquo;第十七届全国大学生信息安全竞赛&mdash;作品赛&rdquo;（...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            西北工业大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=39`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/202404107ZTYHr9xGB.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=40">第十七届全国大学生信息安全竞赛创新实践能力赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为积极响应国家网络空间安全人才战略，加快攻防兼备创新人才培养步伐，实现以赛促学、以赛促教、以赛促用，推动网络空间安全人才培养和产学研用生态发展，由中国互联网发展基金会网络安全专项基金资助，四川大学承办的第十七届全国大学生信息...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            四川大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=40`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20230503DfIIVAj7d4.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=37">第十六届全国大学生信息安全竞赛信息安全作品赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，由浙江大学承办的&ldquo;第十六届全国大学生信息安全竞赛&mdash;作品赛&rdquo;（以下...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            浙江大学 杭州电子科技大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=37`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20230503vIpJQSgcgl.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=38">第十六届全国大学生信息安全竞赛创新实践能力赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为积极响应国家网络空间安全人才战略，加快攻防兼备创新人才培养步伐，实现以赛促学、以赛促教、以赛促用，推动网络空间安全人才培养和产学研用生态发展，由国防科技大学与中国科学技术大学联合承办的第十六届全国大学生信息安全竞赛&mdash;&mdash;创新实...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                            国防科技大学电子对抗学院、中国科学技术大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=38`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20220512NPLIRLeqTI.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=35">第十五届全国大学生信息安全竞赛信息安全作品赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                             为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，由湖南大学承办的&ldquo;第十五届全国大学生信息安全竞赛&mdash;作品赛&rdquo;...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                             湖南大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=35`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                            <div class="welcome" style="font-size: 15px;border: 1px solid #e5e5e5; margin-bottom: 20px;overflow: hidden;padding: 10px;">
+                            <div class="left-container" >
+                                                                    <div class="flag end">已结束</div>
+                                
+                                <img src="http://www.ciscn.cn/uploads/compet/20220512C9OFHme9LH.png" class="img-responsive" style="display: block; height: 100%; width: 100%;" />
+                            </div>
+                            <div class="right-container">
+                                <div>
+                                    <div class="form-group title">
+                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=36">第十五届全国大学生信息安全竞赛创新实践能力赛</a>
+                                    </div>
+                                    <div class="form-group description">
+                                        为积极响应国家网络空间安全人才战略，加快攻防兼备创新人才培养步伐，提升学生攻防兼备的网络创新实践能力，培养学生的创新意识与团队合作精神，普及信息安全知识，增强学生信息安全意识，提高学生的网络空间安全创新能力与实践技能，推动网...
+                                    </div>
+                                    <div class="form-group-line"></div>
+                                    <div class="form-group">
+                                        <div class="name">主办单位:</div>
+                                        <div class="content">
+                                            中国互联网发展基金会
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="name">承办单位:</div>
+                                        <div class="content">
+                                             南开大学
+                                        </div>
+                                        <button class="btn-detail" onclick="location.href=`http://www.ciscn.cn/competition/securityCompetition?compet_id=36`;">查看详情</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                    </div>
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"><ul class="pagination"><li class="disabled"><span>&laquo;</span></li> <li class="active"><span>1</span></li><li><a href="http://www.ciscn.cn/competition?page=2">2</a></li><li><a href="http://www.ciscn.cn/competition?page=3">3</a></li><li><a href="http://www.ciscn.cn/competition?page=4">4</a></li> <li><a href="http://www.ciscn.cn/competition?page=2" rel="next">&raquo;</a></li> <div class="btn-group" style='display:inline-block;padding-left: 20px;border-radius: 4px;'>
+                                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                每页条数&nbsp;&nbsp;10 条
+                                            </button>
+                                            <ul class="dropdown-menu" style="width: 270px">
+                                                <a class="dropdown-item"  href="javascript:pagesizeChange(10)">10&nbsp;条</a>&nbsp;
+                                                <a class="dropdown-item" href="javascript:pagesizeChange(20)">20&nbsp;条</a>&nbsp;
+                                                <a class="dropdown-item" href="javascript:pagesizeChange(30)">30&nbsp;条</a>&nbsp;
+                                                <a class="dropdown-item" href="javascript:pagesizeChange(40)">40&nbsp;条</a>&nbsp;
+                                                <a class="dropdown-item" href="javascript:pagesizeChange(50)">50&nbsp;条</a>&nbsp;
+                                                <a class="dropdown-item"  href="javascript:pagesizeChange(100)">100&nbsp;条</a>&nbsp;
+                                            </ul>
+                                        </div></ul></div>
+                    <div class="col-md-4"></div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </main>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('#myTab a:first').tab('show');//初始化显示哪个tab
+        $('#myTab a').click(function (e) {
+            e.preventDefault();//阻止a链接的跳转行为
+            $(this).tab('show');//显示当前选中的链接及关联的content
+        })
+    })
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".menu-list > li").each(function(){
+            var aurl = $(this).children('a')[0];
+            if(aurl == undefined){
+                return false;
+            }
+            if(aurl.href == undefined){
+                return false;
+            }
+            url = new URL(aurl.href);
+            if(aurl.href === String(location.origin + location.pathname)
+                || (location.href.split(location.origin)[1] === "/" && aurl.href.endsWith('/home'))){
+                // 当访问地址不带/home的时候，也默认高亮首页菜单
+                $(this).addClass("menu-active");
+            }
+        });
+    })
+function AddFavorite(title, url) {
+  try {
+      window.external.addFavorite(url, title);
+  }
+catch (e) {
+     try {
+       window.sidebar.addPanel(title, url, "");
+    }
+     catch (e) {
+         alert("抱歉，您所使用的浏览器无法完成此操作。\n\n加入收藏失败，请使用Ctrl+D进行添加");
+     }
+  }
+}
+
+function showXSpaceAppQRCode(type) {
+    var qrcodeimg = type=='ios'?'xspaceappqrcode-ios.png':'xspaceappqrcode-android.png';
+
+    layer.open({
+        type: 1,
+        title: false,
+        closeBtn: 0,
+        area: ['312px', '312px'],
+        skin: 'layui-layer-rim', //加上边框
+        shadeClose: true,
+        content: '<img style="width:300px; height:300px;" src="/assets/images/' + qrcodeimg + '">'
+    });
+}
+
+function blinklink() {
+    if (!document.getElementById('ctf-live').style.color) {
+        document.getElementById('ctf-live').style.color = "red";
+    }
+
+    if (document.getElementById('ctf-live').style.color == "red") {
+        document.getElementById('ctf-live').style.color = "blue";
+    } else if (document.getElementById('ctf-live').style.color == "blue") {
+        document.getElementById('ctf-live').style.color = "green";
+    } else {
+        document.getElementById('ctf-live').style.color = "red";
+    }
+    timer = setTimeout("blinklink()", 200);
+}
+function stoptimer() {
+    clearTimeout(timer);
+}
+function pagesizeChange(pagesize){
+    if(window.location.href.indexOf('pagesize') != -1){
+        window.location.href =  window.location.href.replace(/pagesize=\d*/, 'pagesize=' + pagesize)
+    }else{
+        window.location.href = window.location.href + '&pagesize=' + pagesize
+    }
+}
+$(function(){
+    $("#showQuestions").mouseover(function(){
+        $(this).next().show();
+    });
+     $("#showQuestions").mouseout(function(){
+        $(this).next().hide();
+    });
+})
+//blinklink()
+</script>
+<div class="foot">
+    <div class="cont text-center">
+        <span><a href="http://www.ciscn.cn/helper">使用帮助</a></span>
+            <span>|</span>
+        <!-- <span><a href="http://www.ciscn.cn/sitemap">网站地图</a></span>
+            <span>|</span> -->
+        <span><a href="http://www.ciscn.cn/contact">联系我们</a></span>
+            <span>|</span>
+        <span style="margin-right:0;"><a href="javascript:void(0);" onclick="AddFavorite('common.SITE_TITLE','http://ciscn.com')">收藏本站</a></span>
+    
+    </div>
+    <p><span>技术支持与保障</span><a href="https://360.net" target="_blank" style="color:#FFF;">360数字安全集团</a>&nbsp;●&nbsp;
+    <a href="https://360.net" target="_blank" style="color:#FFF;">国卫信安</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    备案号：<a href="https://beian.miit.gov.cn/">京ICP备15033807号-5</a></p>
+    <div class="copyr">
+        <p>中国互联网发展基金会主办</p>
+    </div>
+</div>
+</div>
+</body>
+</html>

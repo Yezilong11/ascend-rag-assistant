@@ -1,0 +1,375 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>嵌入式芯片与系统设计竞赛首页-嵌入式芯片与系统设计竞赛官网-嵌入式暨智能互联大赛官网</title>
+<base href="https://www.socchina.net:443/">
+	<link rel="shortcut icon" href="images/bitbug_favicon.png" type="image/x-icon">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="嵌入式大赛,嵌入式暨智能互联大赛,智能互联创新大赛,嵌入式芯片与系统设计竞赛">
+    <meta name="description" content="嵌入式暨智能互联大赛目前成功举办到第三届，有301所高校的1618支队伍成功参与，作品领域紧靠物联网、人工智能、大数据等前沿科技领域">
+
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" type="text/css" href="css/m2016.css">
+    <link rel="stylesheet" type="text/css" href="css/hy_center.css">
+	<link rel="stylesheet" type="text/css" href="./css/index_two.css" />
+    <link rel="stylesheet" type="text/css" href="css/base.css">
+    <link rel="stylesheet" type="text/css" href="public/extend.css">
+    <link rel="stylesheet" type="text/css" href="css/animate.css">
+    <link rel="stylesheet" href="layui2/css/layui.css">	
+
+
+    
+    <link rel="stylesheet" type="text/css" href="./css/libs.min.css" />
+    <style>
+        .img-box{
+            position: fixed;
+            left: 0px;
+            right: 0px;
+            top: 0px;
+            bottom: 0px;
+        }
+        .img-box img{
+            width: 100%;
+            height: 100%;
+        }
+        .dw-box{
+            position: relative;
+            z-index: 9;
+            width: 1440px;
+            margin: auto;
+        }
+        .tit-box{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding:100px 0px 80px;
+            align-items: center;
+        }
+        .tit-box img{
+            width: 32px;
+            height: 32px;
+        }
+        .tit-box h4{
+            font-size: 34px;
+            color: #fff;
+            font-weight: bold;
+            padding-left: 10px
+        }
+        .ul-list{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 50px -30px 50px -30px;
+        }
+        .ul-list li{
+            width: 33.33%;
+        }
+        .ul-list li .li-box{
+            background-color: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 10px;
+            padding: 60px 30px 60px;
+            text-align: center;
+            box-shadow: 0 0 5px #e5e5e5;
+            border: 1px solid #eee;
+            margin: 0px 35px;
+            cursor: pointer;
+        }
+        .ul-list li .li-box h4{
+            font-size: 30px;
+            font-weight: bold;
+            color: #333;
+            padding-top: 25px;
+        }
+        .ul-list li .li-box p{
+            font-size: 18px;
+            color: #999;
+            padding-top: 15px;
+        }
+        .ul-list li .li-box .ion1{
+            background: url("./../../../images/tb-1.png") no-repeat;
+            background-size: 100% 100%;
+            width: 85px;
+            height: 85px;
+            margin: auto;
+        }
+        .ul-list li .li-box:hover .ion1{
+            background: url("./../../../images/tb-1-on.png") no-repeat;
+            background-size: 100% 100%;
+        }
+        .ul-list li .li-box .ion2{
+            background: url("./../../../images/tb-2.png") no-repeat;
+            background-size: 100% 100%;
+            width: 85px;
+            height: 85px;
+            margin: auto;
+        }
+        .ul-list li .li-box:hover .ion2{
+            background: url("./../../../images/tb-2-on.png") no-repeat;
+            background-size: 100% 100%;
+        }
+        .ul-list li .li-box .ion3{
+            background: url("./../../../images/tb-3.png") no-repeat;
+            background-size: 100% 100%;
+            width: 85px;
+            height: 85px;
+            margin: auto;
+        }
+        .ul-list li .li-box:hover .ion3{
+            background: url("./../../../images/tb-3-on.png") no-repeat;
+            background-size: 100% 100%;
+        }
+        .ul-list li .li-box:hover{
+            background-color: #fff;
+        }
+        .ul-list li .li-box:hover h4{
+            color: #1563c6;
+        }
+/*        .you-xf{*/
+/*            position: fixed;*/
+/*            bottom: 6%;*/
+/*            right: 15px;*/
+/*            transform: translateY(-50%);*/
+/*        }*/
+/*        .you-xf .img-li{*/
+/*            background: #fff;*/
+/*            text-align: center;*/
+/*            margin: 3px 0;*/
+/*            box-shadow: 0 0 8px #d8d8d8;*/
+/*            border-radius: 50px*/
+/*}*/
+        .you-xf .img-li .al{
+            position: relative;
+            display: block;
+            width: 74px;
+            height: 64px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .you-xf .img-li .al img{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: -20px 0 0 -20px;
+            width: 40px;
+            height: 40px;
+        }
+        .cslc_box{
+            background-color: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 10px;
+            padding: 30px 0px;
+        }
+        .sh_box{
+            box-shadow: none;
+            border-radius: 0px;
+            padding: 25px 0px !important;
+        }
+        .top_tit{
+            margin-bottom: 20px !important;
+        }
+        .footer-box{
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            margin-bottom: 10px;
+        }
+        .footer-box p{
+            text-align: center;
+            color: #fff;
+        }
+        .footer-box a{
+            color: #fff;
+        }
+    </style>
+
+<script type="text/javascript">
+ 	var SYS_URL = '/admin';
+</script>
+
+<script type="text/javascript" src="js/ie.js"></script>
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="layui2/layui.js"></script>
+<script type="text/javascript" src="js/SysCommon.js"></script>
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.reveal.js"></script>
+<script type="text/javascript" src="js/jquery.touchSlider.js"></script>
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script src="js/jquery-1.10.2.min.js" type="text/javascript"></script>
+<script src="./js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="./js/jquery.SuperSlide.2.1.1.js"></script>
+<script src="./js/home.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	try {
+	    var urlhash = window.location.hash;
+	        if (!urlhash.match("fromapp")) {
+	            if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i))) {
+	                 var url = window.location.href;
+	                 var uri = 'https://www.socchina.net:443/';
+	                 var api = url.substring(uri.length-3,url.length);
+	                
+	                 
+	                 // 本地版本
+	                 var spl = url.split(uri);
+	                 if(spl.length > 1){
+	                	 api = spl[1];
+	                 }
+	                 if (api.indexOf('wx') != 0){
+	                     window.location = 'https://www.socchina.net:443/' + 'wx/' +  api;
+	                 } else {
+	                     window.location = "https://www.socchina.net:443/wx/index";
+	                 }
+	            }
+	        }
+	    } 
+	    catch (err) {
+	}
+    
+	
+	var url = window.location.href;
+ 	if(navigator.appName == "Microsoft Internet Explorer"&&parseInt(navigator.appVersion.split(";")[1].replace(/[ ]/g, "").replace("MSIE",""))<9){
+        //alert("您的浏览器版本过低，请使用IE9及以上版本");
+        if(url.indexOf('nonsupport') == -1){
+        	window.location.href = 'https://www.socchina.net:443/nonsupport';
+        }
+    }else{
+    	if(url.indexOf('nonsupport') != -1){
+    		window.location.href = 'https://www.socchina.net:443/';
+    	}
+    }
+ 	
+ 	// 监听图片错误，如果路径错误，就补全路径
+ 	document.addEventListener("error", function(e){
+ 		var elem = e.target;
+ 		if(elem.tagName.toLowerCase() === 'img'){
+ 			var notFoundImgSrc = $(elem).attr("src")
+			if(notFoundImgSrc.indexOf("http://socoss.socchina.net/") < 0){
+				var src = notFoundImgSrc.substring(notFoundImgSrc.indexOf("file/"));
+				elem.src = "http://socoss.socchina.net/" + src;
+			}
+ 			
+ 		}
+ 	}, true)
+ 	
+</script>
+</head>
+<body class="gray-bg">
+	
+<div class="img-box">
+    <img src="images/bgJob_two.jpg" />
+</div>
+<div class="dw-box">
+    <div class="tit-box">
+        <img src="images/bitbug_favicon.png" />
+        <h4>全国大学生嵌入式芯片与系统设计竞赛</h4>
+    </div>
+    <!-- <div class=" cslc_box animated">
+        <div class="top_tit">
+            <h2 class="biaot">赛事规模</h2>
+            <p>SCALE OF THE EVENT</p>
+        </div>
+        <ul class="sh_box clearfix action_d scroll-left">
+            <li>
+                <img src="images/icon1.png" />
+                <h2>43385</h2>
+                <p>参赛人数</p>
+            </li>
+            <li>
+                <img src="images/icon2.png" />
+                <h2>15844</h2>
+                <p>参赛团队</p>
+            </li>
+            <li>
+                <img src="images/icon3.png" />
+                <h2>792</h2>
+                <p>参赛学校</p>
+            </li>
+            <li>
+                <img src="images/icon4.png" />
+                <h2>19</h2>
+                <p>赛题方向</p>
+            </li>
+        </ul>
+    </div> -->
+    <ul class="ul-list" >
+        <li onclick="toPage(1)">
+            <div class="li-box" >
+                <div class="ion1"></div>
+                <h4>应用赛道</h4> 
+                <p>（2月-8月）</p>
+            </div>
+        </li>
+        <li  onclick="toPage(2)">
+            <div class="li-box">
+                <div class="ion2"></div>
+                <h4>设计专项赛</h4>
+                <p>（6月-12月）</p>
+            </div>
+        </li>
+        <li onclick="toPage(3)">
+            <div class="li-box">
+                <div class="ion3"></div>
+                <h4>FPGA创新设计赛道</h4>
+                <p>（6月-12月）</p>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+
+
+
+
+
+
+<div class="footer-box">
+    <p>Copyright © 2018 南京集成电路产业服务中心有限公司版权所有 All Rights Reserved <a href="https://beian.miit.gov.cn">苏ICP备17012569号-2</a> </p>
+</div>
+
+<script>
+
+    /**
+     * 跳转页面
+     */
+    function toPage(index) {
+        const env = 'pro'; // 这里设置环境变量，可以是 'pro'、'dev' 或 'test'
+        const urls = {
+            1: {
+                pro: "https://www.socchina.net/home?trackType=2",
+                dev: 'https://www.socchina.net/home?trackType=2', // 假设开发环境的端口是8080
+                test: "http://testtest.socchina.net/home?trackType=2" // 测试环境的URL
+            },
+            2: {
+                pro: "http://devise.socchina.net/home?trackType=1",
+                dev: 'http://localhost/home?trackType=1',
+                test: "http://testtest.socchina.net/home?trackType=1"
+            },
+            3: {
+                pro: "http://fpgachina.cn",
+                dev: "http://127.0.0.1:8080",
+                test: "http://test.fpgachina.cn" // 假设测试环境的URL
+            }
+        };
+
+        if (urls.hasOwnProperty(index) && urls[index].hasOwnProperty(env)) {
+            const url = urls[index][env];
+            window.location.href = url;
+        } else {
+            console.error("当前环境异常");
+            // 这里可以添加更多的错误处理逻辑，比如抛出一个错误或显示一个错误消息
+        }
+    }
+</script>
+
+</body>
+</html>

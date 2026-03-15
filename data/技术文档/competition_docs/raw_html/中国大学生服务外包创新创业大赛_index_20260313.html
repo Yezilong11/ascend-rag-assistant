@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>大学生服务外包——创新创业大赛</title>
+    <meta name="keywords" content="大学生，服务外包，创新，创业，大赛">
+    <meta name="description" content="这是一个大学生拓展个人能力的舞台">
+    <base href="">
+    <link rel="stylesheet" href="/static/css/site.css">
+    <script src="/static/js/jquery-3.6.4.min.js"></script>
+    <script src="/static/js/jquery-migrate-3.4.0.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.js"></script>
+    <script src="/static/js/respond.js"></script>
+    <![endif]-->
+    <style>
+        .contestarea {
+            position: absolute;
+            top: 180px;
+            left: 500px;
+            opacity: 80%;
+            border-radius: 16px;
+            padding: 12px;
+            color: #fff;
+            background: #0d6aad;
+            line-height: 32px;
+            font-size: 14px;
+        }
+        /* 轮播核心样式 - 命名空间隔离 */
+        .fwwb-carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .fwwb-carousel-wrapper {
+            display: flex;
+            width: 200%; /* 关键修改：两张图，总宽度改为200% */
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+        .fwwb-carousel-item {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .fwwb-carousel-item img {
+            width: 100vw; /* 宽度等于视口宽度，适配任意屏幕 */
+            height: 495px; /* 固定banner高度，保证视觉统一 */
+            object-fit: cover;
+            margin: 0 auto;
+            /* 移除强制最小宽度，避免横向滚动 */
+            min-width: unset;
+            min-height: unset;
+            display: block; /* 消除图片底部空白 */
+        }
+        /* 圆点指示器：贴合网站浅色系风格 */
+        .fwwb-carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 8px;
+            z-index: 99; /* 高于banner内容，低于导航 */
+        }
+        .fwwb-carousel-indicators li {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .fwwb-carousel-indicators li.active {
+            background-color: #ffffff;
+            width: 22px;
+            border-radius: 6px;
+            transform: translateY(-2px);
+        }
+        .fwwb-carousel-indicators li:hover:not(.active) {
+            background-color: #ffffff;
+            transform: scale(1.1);
+        }
+        /* 响应式：适配网站断点 */
+        @media (max-width: 768px) {
+            .fwwb-carousel-indicators {
+                bottom: 10px;
+            }
+            .fwwb-carousel-indicators li {
+                width: 8px;
+                height: 8px;
+            }
+            .fwwb-carousel-indicators li.active {
+                width: 18px;
+            }
+            /* 移动端也强制显示中间区域 */
+            .fwwb-carousel-item img {
+                object-position: center center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+<div class="header">
+    <div class="logo">
+        <img src="/static/images/logo.jpg"/>
+    </div>
+    <div class="navi">
+        <ul>
+            <li><a href="/">首页</a></li>
+            <li><a href="/public/index">大赛公告</a></li>
+            <li>
+                <a href="/topic/index">本届赛题</a>
+            </li>
+            <li><a href="/organization/index">组织机构</a></li>
+            <li><a href="/news/index">大赛新闻</a></li>
+
+            <li>
+                <a href="/activity/index">大赛花絮</a>
+            </li>
+            <li><a href="/video/index">大赛视频</a></li>
+            <li><a href="/about/index">关于大赛</a></li>
+        </ul>
+    </div>
+</div>    <div class="banner-box">
+
+        <div class="banner-container">
+            <div class="fwwb-carousel">
+                <div class="fwwb-carousel-wrapper">
+                    <!-- 替换为网站实际banner图片地址 -->
+                    <div class="fwwb-carousel-item">
+                        <img src="/static/images/banner.jpg" alt="基金会banner1">
+                    </div>
+                    <div class="fwwb-carousel-item">
+                        <img src="/static/images/banner-2.jpg" alt="基金会banner2">
+                    </div>
+                </div>
+                <!-- 圆点指示器 -->
+                <ul class="fwwb-carousel-indicators">
+                    <li class="active" data-index="0"></li>
+                    <li data-index="1"></li>
+                </ul>
+            </div>
+            <div class="login">
+                <h3>用户登录</h3>
+                <form action="/team/doLogin" method="post">
+                    <div class="form-row">
+                        <input type="text" placeholder="请输入手机号码" name="userId" id="userId" value=""
+                               class="field">
+                    </div>
+                    <div class="form-row">
+                        <input type="password" placeholder="请输入密码" name="userPass" id="userPass" class="field">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" class="field" id="mCode" name="mCode" style="width:197px;vertical-align:middle;"
+                               placeholder="验证码"/>
+                        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" id="imgCode" style="vertical-align:middle;height: 45px;" />
+                    </div>
+                    <div class="form-row opt-line clearfix">
+                        <div class="opt-left">
+                        </div>
+                        <div class="opt-right"><a href="/team/forgetPass" target="_blank">忘记密码？</a></div>
+                    </div>
+                    <div class="form-row">
+                        <input type="submit" value="登录" class="login-btn">
+                    </div>
+                    <div class="form-row opt-line clearfix">
+                        <div class="opt-left"><a href="/university/login">高校登录</a> /
+                            <a href="/university/register">高校注册</a></div>
+                        <div class="opt-right"><a href="/team/register" target="_blank">没有团队账号，前往注册？</a></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!--新闻资讯与大赛公告-->
+
+        <div class="public">
+            <div class="item-title clearfix">
+                <ul class="item" style="width:140px;">
+                    <li class="current"><a href="#" class="current">大赛公告</a></li>
+                </ul>
+            </div>
+            <div class="top-news">
+                <div class="pic-list">
+                    <div class="shutter">
+                        <div class="shutter-img">
+                                <a href="/news/show/529"
+                                   data-shutter-title="第十五届中国大学生服务外包创新创业大赛在锡圆满收官"><img src="/attached/image/20240814/20240814103050_239.jpg" alt="第十五届中国大学生服务外包创新创业大赛在锡圆满收官"></a>
+                                <a href="/news/show/226"
+                                   data-shutter-title="第九届服创大赛获奖团队奖金发放信息公示"><img src="/attached/image/20180826/20180826171419_136.jpg" alt="第九届服创大赛获奖团队奖金发放信息公示"></a>
+
+                        </div>
+                        <ul class="shutter-btn bt2">
+                            <li class="prev"></li>
+                            <li class="next"></li>
+                        </ul>
+                        <div class="shutter-desc">
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-list">
+                    <ul>
+                            <li><h6><span class="time">2026-02-11</span><a
+                                            href="/news/show/598"
+                                            target="_blank">第十七届服创大赛《参赛手册》、《A类赛题手册》、《
+                                            ...</a></h6>
+                                <div>
+                                        <a href="/news/show/598"
+                                           target="_blank">1、第十七届服创《参赛手册》、《A类赛题手册》、《D类赛题手册》等报名系列材料2、第十七届服创大赛A类赛题企业数据及资料下载地址：https...</a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2026-02-26</span><a
+                                            href="/news/show/599"
+                                            target="_blank">第十七届服创大赛A类赛题企业数据及资料（2026年
+                                            ...</a></h6>
+                                <div>
+                                        <a href="/news/show/599"
+                                           target="_blank">1-a26参赛相关资料（提供时间：2.25）2-a27参赛相关资料（提供时间：2.25）3-a13基于AI的大学生职业规划智能体-JD采样数...</a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2026-03-11</span><a
+                                            href="/news/show/608"
+                                            target="_blank">关于增加A类竞赛QQ群的通知</a></h6>
+                                <div>
+                                        <a href="/news/show/608"
+                                           target="_blank">各参赛团队：A类竞赛群已满，新增A类竞赛2群，QQ群号：1050063750。大赛组委会2026年3月11日</a>
+                                </div>
+                            </li>
+                    </ul>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <!--大赛新闻-->
+        <div class="public">
+            <div class="item-title clearfix">
+                <ul class="item" style="width:140px;">
+                    <li class="current"><a href="#" class="current">大赛新闻</a></li>
+                </ul>
+            </div>
+            <div class="top-news">
+                <div class="line_news">
+                    <ul>
+                            <li><h6><span class="time">2026-01-11</span><a
+                                            href="/news/show/595"
+                                            target="_blank">关于中国大学生服务外包创新创业大赛开通D赛道的说明</a></h6>
+                                <div>
+                                        <a href="/news/show/595"
+                                           target="_blank"></a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2026-01-11</span><a
+                                            href="/news/show/594"
+                                            target="_blank">关于服创大赛指定江苏万维艾斯网络智能产业创新中心有限
+                                            ...</a></h6>
+                                <div>
+                                        <a href="/news/show/594"
+                                           target="_blank"></a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2024-08-12</span><a
+                                            href="/news/show/529"
+                                            target="_blank">第十五届中国大学生服务外包创新创业大赛在锡圆满收官</a></h6>
+                                <div>
+                                        <a href="/news/show/529"
+                                           target="_blank">2024年8月7日-9日，第十五届中国大学生服务外包创新创业大赛决赛在江苏无锡举行。经过预审、区域赛决赛和全国总决赛的激烈角逐，重庆大学、东...</a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2022-08-08</span><a
+                                            href="/news/show/392"
+                                            target="_blank">第十三届中国大学生服务外包创新创业大赛在锡落幕，感谢
+                                            ...</a></h6>
+                                <div>
+                                        <a href="/news/show/392"
+                                           target="_blank">8月7日，第十三届中国大学生服务外包创新创业大赛在无锡落幕。最终经过激烈的网络答辩，来自南京大学，电子科技大学、中南大学等的24支代表队分获...</a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2021-08-25</span><a
+                                            href="/news/show/347"
+                                            target="_blank">​第十二届中国大学生服务外包创新创业大赛圆满收官</a></h6>
+                                <div>
+                                        <a href="/news/show/347"
+                                           target="_blank">8月24日上午，第十二届中国大学生服务外包创新创业大赛在无锡圆满收官。中国工程院院士、江南大学校长陈卫，副市长周常青出席活动并颁奖。江苏省商...</a>
+                                </div>
+                            </li>
+                            <li><h6><span class="time">2021-06-10</span><a
+                                            href="/news/show/340"
+                                            target="_blank">第十二届中国大学生服务外包创新创业大赛江北新区-中兴
+                                            ...</a></h6>
+                                <div>
+                                        <a href="/news/show/340"
+                                           target="_blank">2021年6月2日，第十二届中国大学生服务外包创新创业大赛江北新区-中兴通讯东部区域赛决赛在南京江北新区隆重开幕。本次活动由南京大学健康医疗...</a>
+                                </div>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--视频花絮-->
+        <div class="public">
+            <div class="item-title">
+                <ul class="item" id="exciting">
+                    <li><a href="#" class="current">大赛视频</a></li>
+                    <li><a href="#">大赛花絮</a></li>
+                </ul>
+            </div>
+            <div class="top-video vp">
+                <div class="p-list">
+                    <div id="mediaplayer"></div>
+                    <div class="video-name">第十四届服创大赛宣传视频</div>
+                </div>
+                <div class="v-list">
+                    <ul>
+                            <li><a href="/video/play/4440db8c-64fe-4367-b158-ceffa75e14ba">
+                                    <div><img src="/attached/image/20181011/20181011223343_853.png" alt=""></div>
+                                    <div>访谈VCR</div>
+                                </a>
+                            </li>
+                            <li><a href="/video/play/7e4c4cfa-1671-4826-9342-1304bfe77568">
+                                    <div><img src="/attached/image/20181128/20181128150249_653.png" alt=""></div>
+                                    <div>中国大学生服务外包创新创业大赛</div>
+                                </a>
+                            </li>
+                            <li><a href="/video/play/eb1897f7-f751-4c89-8901-c5438c4d89c1">
+                                    <div><img src="/attached/image/20181010/20181010084950_94.png" alt=""></div>
+                                    <div>中国大学生服务外包创新创业大赛赛歌</div>
+                                </a>
+                            </li>
+                            <li><a href="/video/play/af980267-0885-4a5d-b639-a5a2bbf6c506">
+                                    <div><img src="/attached/image/20260204/20260204212141_757.png" alt=""></div>
+                                    <div>支持单位-银联商务</div>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="album vp" style="display:none;">
+                <ul>
+                        <li><a href="/activity/show/21" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219113633_828.jpg" alt="第十一届大赛决赛颁奖5"></div>
+                                <div>第十一届大赛决赛颁奖5</div>
+                            </a></li>
+                        <li><a href="/activity/show/20" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219113343_164.jpg" alt="第十一届大赛决赛颁奖4"></div>
+                                <div>第十一届大赛决赛颁奖4</div>
+                            </a></li>
+                        <li><a href="/activity/show/19" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219113056_903.jpg" alt="第十一届大赛决赛颁奖3"></div>
+                                <div>第十一届大赛决赛颁奖3</div>
+                            </a></li>
+                        <li><a href="/activity/show/18" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219113017_63.jpg" alt="第十一届大赛决赛颁奖2"></div>
+                                <div>第十一届大赛决赛颁奖2</div>
+                            </a></li>
+                        <li><a href="/activity/show/17" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219111909_54.jpg" alt="第十一届大赛决赛颁奖1"></div>
+                                <div>第十一届大赛决赛颁奖1</div>
+                            </a></li>
+                        <li><a href="/activity/show/16" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219111648_449.jpg" alt="第十一届大赛创新创业线上主题分享"></div>
+                                <div>第十一届大赛创新创业线上主题分享</div>
+                            </a></li>
+                        <li><a href="/activity/show/15" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219111219_299.jpg" alt="第十一届大赛决赛线上答辩"></div>
+                                <div>第十一届大赛决赛线上答辩</div>
+                            </a></li>
+                        <li><a href="/activity/show/14" target="_blank">
+                                <div><img src="/attached/image/20210219/20210219110247_587.jpg" alt="第十一届大赛决赛颁奖典礼"></div>
+                                <div>第十一届大赛决赛颁奖典礼</div>
+                            </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="sign-box">
+        <div style="margin:0 auto;width:1190px;position:relative;">
+            <div class="contestarea">
+                <p>东部区域赛：江苏、上海、浙江、福建、江西、安徽、香港、澳门、台湾9个省(自治区、直辖市、特别行政区)</p>
+                <p>中部区域赛：湖南、湖北、河南、广东、广西、云南、贵州、海南8个省(自治区、直辖市)</p>
+                <p>西部区域赛：陕西、四川、重庆、宁夏、青海、甘肃、新疆、西藏 8个省(自治区、直辖市)</p>
+                <p>北部区域赛：北京、天津、山东、河北、山西、内蒙古、辽宁、吉林、黑龙江9个省(自治区、直辖市)</p>
+            </div>
+            <div style="position:absolute;top:250px;left:230px;">
+                <a href="/team/register" target="_blank"><img src="/static/images/sign.png" alt=""></a>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="public">
+                <div class="unit">
+                    <div class="category">
+                       A类赛项支持单位
+                    </div>
+                    <div class="unit-list">
+                        <ul>
+                                <li><a href="https://aistudio.baidu.com/index" target="_blank" title="百度飞桨">
+                                        <img src="/attached/image/20221123/20221123100309_554.jpg"  >
+                                        <span>
+                                                百度飞桨
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://jiutian.10086.cn/edu/#/home" target="_blank" title="中国移动（浙江）创新研究院有限公司">
+                                        <img src="/attached/image/20221123/20221123101024_318.jpg"  >
+                                        <span>
+                                                中国移动（浙江）创新研..
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://mastergo.com/?utm_source=fwwb&utm_medium=fguanwnagtiaozhuan&utm_campaign=&utm_term=fuchuangguanwang&utm_content=" target="_blank" title="尽微致广">
+                                        <img src="/attached/image/20221123/20221123174932_820.jpg"  >
+                                        <span>
+                                                尽微致广
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.chaoxing.com" target="_blank" title="北京世纪超星信息技术发展有限责任公司">
+                                        <img src="/attached/image/20221123/20221123153239_55.jpg"  >
+                                        <span>
+                                                北京世纪超星信息技术发..
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.ruijie.com.cn" target="_blank" title="锐捷网络（苏州）有限公司">
+                                        <img src="/attached/image/20221123/20221123153401_869.jpg"  >
+                                        <span>
+                                                锐捷网络（苏州）有限公司
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="http://www.91isoft.com/" target="_blank" title="天津市融创软通科技股份有限公司">
+                                        <img src="/attached/image/20221123/20221123153440_301.jpg"  >
+                                        <span>
+                                                天津市融创软通科技股份..
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.xuelangyun.com/" target="_blank" title="无锡雪浪数制科技有限公司">
+                                        <img src="/attached/image/20221123/20221123153544_495.jpg"  >
+                                        <span>
+                                                无锡雪浪数制科技有限公司
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.yunphant.com" target="_blank" title="杭州云象网络技术有限公司">
+                                        <img src="/attached/image/20221123/20221123161917_958.jpg"  >
+                                        <span>
+                                                杭州云象网络技术有限公司
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="http://www.webace-i3c.com/#/" target="_blank" title="江苏万维艾斯网络智能产业创新中心有限公司">
+                                        <img src="/attached/image/20221123/20221123162017_919.jpg"  >
+                                        <span>
+                                                江苏万维艾斯网络智能产..
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.zte.com.cn/china/" target="_blank" title="中兴通讯股份有限公司">
+                                        <img src="/attached/image/20221123/20221123162058_391.jpg"  >
+                                        <span>
+                                                中兴通讯股份有限公司
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.dbappsecurity.com.cn/" target="_blank" title="安恒信息">
+                                        <img src="/attached/image/20221123/20221123163344_405.jpg"  >
+                                        <span>
+                                                安恒信息
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.intsig.com/" target="_blank" title="合合信息">
+                                        <img src="/attached/image/20221123/20221123163555_198.jpg"  >
+                                        <span>
+                                                合合信息
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.archermind.com/" target="_blank" title="诚迈科技">
+                                        <img src="/attached/image/20241205/20241205162708_246.jpg"  >
+                                        <span>
+                                                诚迈科技
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="http://earthmountain.com.cn" target="_blank" title="地球山">
+                                        <img src="/attached/image/20241205/20241205163511_7.jpg"  >
+                                        <span>
+                                                地球山
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://uniontech.com" target="_blank" title="统信软件">
+                                        <img src="/attached/image/20241205/20241205163814_133.jpg"  >
+                                        <span>
+                                                统信软件
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.longshine.com" target="_blank" title="朗新">
+                                        <img src="/attached/image/20241205/20241205164417_408.jpg"  >
+                                        <span>
+                                                朗新
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://www.juntong.ai/" target="_blank" title="君同未来">
+                                        <img src="/attached/image/20241205/20241205165643_952.jpg"  >
+                                        <span>
+                                                君同未来
+                                            </span>
+                                    </a>
+                                </li>
+                                <li><a href="https://cethik.cetc.com.cn/" target="_blank" title="中电海康">
+                                        <img src="/attached/image/20241209/20241209135154_457.jpg"  >
+                                        <span>
+                                                中电海康
+                                            </span>
+                                    </a>
+                                </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+        </div>
+
+    </div>
+    <div class="content">
+        <div class="public">
+                <div class="unit">
+                    <div class="category">
+                        D类赛项支持单位
+                    </div>
+                    <div class="unit-list">
+                        <ul>
+                                <li><a href="https://tencentarena.com/aiarena/zh" target="_blank" title="腾讯开悟">
+                                        <img src="/attached/image/20260211/20260211203906_966.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯开悟
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://pvp.qq.com/" target="_blank" title="王者荣耀">
+                                        <img src="/attached/image/20260208/20260208171257_121.svg"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                王者荣耀
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://ailab.tencent.com/ailab/zh/index" target="_blank" title="腾讯AI平台部">
+                                        <img src="/attached/image/20260208/20260208161909_583.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯AI平台部
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://www.tencent.com/zh-cn" target="_blank" title="新文创总部">
+                                        <img src="/attached/image/20260208/20260208171437_960.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                新文创总部
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://cloud.tencent.com/" target="_blank" title="腾讯云">
+                                        <img src="/attached/image/20260208/20260208170550_600.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯云
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://ur.tencent.com/" target="_blank" title="腾讯高校合作">
+                                        <img src="/attached/image/20260208/20260208164045_327.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯高校合作
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://gameinstitute.qq.com/" target="_blank" title="腾讯游戏学堂">
+                                        <img src="/attached/image/20260208/20260208164738_263.jpg"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯游戏学堂
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://join.qq.com/qingyun.html" target="_blank" title="腾讯青云计划">
+                                        <img src="/attached/image/20260208/20260208163952_226.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯青云计划
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://tcamp.qq.com/" target="_blank" title="腾讯青少年营地">
+                                        <img src="/attached/image/20260304/20260304143118_903.jpg"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯青少年营地
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://hunyuan.tencent.com/" target="_blank" title="腾讯混元">
+                                        <img src="/attached/image/20260208/20260208164131_849.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯混元
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://www.codebuddy.ai/" target="_blank" title="codebuddy">
+                                        <img src="/attached/image/20260208/20260208162232_30.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                codebuddy
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://yuanbao.tencent.com/" target="_blank" title="腾讯元宝">
+                                        <img src="/attached/image/20260208/20260208170348_613.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯元宝
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://yuanqi.tencent.com/" target="_blank" title="腾讯元器">
+                                        <img src="/attached/image/20260208/20260208170513_274.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                腾讯元器
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://www.unitree.com/cn/" target="_blank" title="宇树科技">
+                                        <img src="/attached/image/20260208/20260208171816_119.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                宇树科技
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="http://www.xinhuapub.com/" target="_blank" title="新华出版社">
+                                        <img src="/attached/image/20260208/20260208171344_784.jpg"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                新华出版社
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                                <li><a href="https://www.delilegal.com/" target="_blank" title="得理">
+                                        <img src="/attached/image/20260208/20260208163403_128.png"   alt="支持单位">
+                                         <!--
+                                          <span>
+                                                得理
+                                            </span>
+                                          -->
+                                    </a>
+                                </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+        </div>
+
+    </div>
+
+    <div class="content">
+        <div class="public">
+                <div class="unit">
+                    <div class="category">
+                       赞助企业
+                    </div>
+                    <div class="unit-list">
+                        <ul>
+                                <li><a href="https://www.fwwb.org.cn/news/show/596" target="_blank" title="银联商务">
+                                        <img src="/attached/image/20260204/20260204215329_385.png"  width="180" height="140">
+                                        <span>
+                                                 银联商务
+                                            </span>
+                                    </a>
+                                </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+        </div>
+
+    </div>
+
+    <div class="content">
+        <div class="public">
+            <div class="col">
+                <div class="more"><a href="/experts/index"><img src="/static/images/more.jpg"
+                                                                       alt="更多"></a></div>
+                专家
+            </div>
+            <div class="expert">
+                <ul>
+                        <li><a href="/experts/show/10">
+                                <div><img src="/attached/image/20180901/20180901131540_226.png" alt=""></div>
+                                <div class="name">孙家广</div>
+                                <div class="position">中国工程院院士，清华大学信息学院院长兼软件学院院长</div>
+                            </a>
+
+                        </li>
+                        <li><a href="/experts/show/9">
+                                <div><img src="/attached/image/20180826/20180826203001_14.jpg" alt=""></div>
+                                <div class="name">顾明</div>
+                                <div class="position">国家服务外包人力资源研究院常务副院长</div>
+                            </a>
+
+                        </li>
+                        <li><a href="/experts/show/11">
+                                <div><img src="/attached/image/20180821/20180821192801_212.jpg" alt=""></div>
+                                <div class="name">吴小俊</div>
+                                <div class="position">教授、博士生导师、江南大学科研院院长</div>
+                            </a>
+
+                        </li>
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+<div class="content">
+    <div class="copy">
+        <div class="et">
+            <div class="copyright">
+                <img src="/static/images/logo2.jpg" alt="">
+            </div>
+            <div class="sponsor">
+                <h4>分赛区</h4>
+                <ul>
+                    <li>东部区域赛：江苏、上海、浙江、福建、江西、安徽、香港、澳门、台湾</li>
+                    <li>中部区域赛：湖南、湖北、河南、广东、广西、云南、贵州、海南</li>
+                    <li>西部区域赛：陕西、四川、重庆、宁夏、青海、甘肃、新疆、西藏</li>
+                    <li>北部区域赛：北京、天津、山东、河北、山西、内蒙古、辽宁、吉林、黑龙江</li>
+                </ul>
+            </div>
+
+            <div class="weixin">
+                <img width="160" src="/static/images/weixin.png" alt="订阅号">
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    Copyright@2018.All Right Reserved.信息版权所有 ICP备案号：<a href="http://beian.miit.gov.cn" target="_blank">京ICP备2022028733号-2</a> &nbsp;&nbsp;&nbsp;&nbsp;<a href="/about/index">关于我们</a>&nbsp;&nbsp;&nbsp;&nbsp;<a>联系我们</a>
+</div></div>
+<!--下面是对联广告的html代码结构-->
+    <div class="duilian duilian_left">
+        <div class="duilian_con">
+                <a href="https://www.fwwb.org.cn/news/show/598" target="_blank"><img src="/attached/image/20260211/20260211162653_635.jpg"></a>
+        </div>
+        <a href="#" class="duilian_close">X关闭</a>
+    </div>
+    <div class="duilian duilian_right">
+        <div class="duilian_con">
+                <a href="https://www.fwwb.org.cn/news/show/598" target="_blank"><img src="/attached/image/20260211/20260211162706_416.jpg"></a>
+        </div>
+        <a href="#" class="duilian_close">X关闭</a>
+    </div>
+<script type="text/javascript">
+    $(function () {
+        var duilian = $("div.duilian");
+        var duilian_close = $("a.duilian_close");
+
+        var screen_w = screen.width;
+        if (screen_w > 1024) {
+            duilian.show();
+        }
+        $(window).scroll(function () {
+            var scrollTop = $(window).scrollTop();
+            duilian.stop().animate({top: scrollTop + 200});
+        });
+        duilian_close.click(function () {
+            $(this).parent().hide();
+            return false;
+        });
+
+    })
+    $(function() {
+
+        const $carousel = $('.fwwb-carousel');
+        const $wrapper = $carousel.find('.fwwb-carousel-wrapper');
+        const $indicators = $carousel.find('.fwwb-carousel-indicators li');
+        const itemCount = $indicators.length; // 自动识别图片数量（现在是2）
+        let currentIndex = 0;
+        let carouselTimer;
+        let isAnimating = false;
+
+        // 切换核心函数
+        function switchTo(index) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // 循环边界处理（适配两张图的循环）
+            index = index < 0 ? itemCount - 1 : index >= itemCount ? 0 : index;
+
+            // 执行切换
+            $wrapper.css('transform', 'translateX(-'+(index * 100)+'vw)');
+            $indicators.removeClass('active').eq(index).addClass('active');
+            currentIndex = index;
+
+            // 动画结束重置标记
+            setTimeout(() => isAnimating = false, 700);
+        }
+
+        // 自动轮播
+        function startAutoPlay() {
+            carouselTimer = setInterval(() => switchTo(currentIndex + 1), 5000);
+        }
+
+        // 暂停轮播
+        function stopAutoPlay() {
+            clearInterval(carouselTimer);
+        }
+
+        // 绑定事件
+        $indicators.click(function () {
+            const targetIndex = parseInt($(this).data('index'));
+            targetIndex !== currentIndex && switchTo(targetIndex);
+        });
+        $carousel.hover(stopAutoPlay, startAutoPlay);
+
+        // 初始化
+        startAutoPlay();
+    })
+</script>
+
+<script src="/static/js/velocity.js"></script>
+<script src="/static/js/shutter.js"></script>
+<script type="text/javascript" src="/static/ckplayer/ckplayer.js" charset="UTF-8"></script>
+<script>
+    $(function () {
+        $("#imgCode").attr("src","team/mCode.jpg?"+Math.random())
+        $("#imgCode").click(function(){
+            $(this).attr("src","team/mCode.jpg?"+Math.random())
+        });
+        $("#exciting li a").mouseover(
+            function () {
+                $("#exciting li a").removeClass("current");
+                $(this).addClass("current");
+                var x = $("#exciting li a").index(this);
+                $(".vp").hide();
+                $(".vp:eq(" + x + ")").show();
+            });
+        $('.shutter-desc p').text($('.shutter-img a:last').attr('data-shutter-title'))
+        $('.shutter').shutter({
+            shutterW: 578, // 容器宽度
+            shutterH: 391, // 容器高度
+            isAutoPlay: true, // 是否自动播放
+            playInterval: 5000, // 自动播放时间
+            curDisplay: 1, // 当前显示页
+            fullPage: false // 是否全屏展示
+        });
+    });
+    $(function () {
+
+        var videoObject = {
+            container: '#mediaplayer', //容器的ID或className
+            loop: false, //播放结束是否循环播放
+            autoplay: false,//是否自动播放
+            variable: 'player',//该属性必需设置，值等于下面的new chplayer()的对象
+            flashplayer: false,//如果强制使用flashplayer则设置成true
+            poster: '/attached/image/20221123/20221123112543_781.jpg', //封面图片
+            video: '/attached/video/20221123/20221123111705_632.mp4'//视频地址
+        };
+        var player = new ckplayer(videoObject);
+
+    })
+
+</script>
+
+</body>
+
+</html>

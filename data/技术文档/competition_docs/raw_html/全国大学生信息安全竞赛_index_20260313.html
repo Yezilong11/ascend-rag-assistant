@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="apple-touch-icon" href="/favicon.ico"/>
+
+    <title>全国大学生信息安全竞赛官方网站</title>
+
+    <!-- Styles -->
+        <link href="http://www.ciscn.cn/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/bootstrap-datetimepicker/datetimepicker.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/unslider.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/unslider.dots.css" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/style.css?23df8hn" rel="stylesheet">
+    <link href="http://www.ciscn.cn/assets/css/typeaheadjs.css" rel="stylesheet">
+    <!-- JavaScripts -->
+        <script src="http://www.ciscn.cn/assets/js/jquery.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/bootstrap.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/validator.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/unslider.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/bootstrap-datetimepicker/moment.js"></script>
+    <script src="http://www.ciscn.cn/assets/bootstrap-datetimepicker/datetimepicker.min.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/layer.js"></script>
+    <script src="http://www.ciscn.cn/assets/js/bootstrap-treeview.min.js"></script>
+    <script src="http://www.ciscn.cn/laravel-u-editor/ueditor.config.js"></script>
+<script src="http://www.ciscn.cn/laravel-u-editor/ueditor.all.min.js"></script>
+<script src="http://www.ciscn.cn/laravel-u-editor/lang/zh-cn/zh-cn.js"></script>    <style>
+        html {
+            background: #292929;
+        }
+        .fa-btn {
+            margin-right: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .nav-tabs.nav-justified > li {
+                display: table-cell;
+                width: 1%;
+                background: url(http://www.ciscn.cn/assets/images/r-line.jpg) no-repeat right center;
+            }
+
+            .nav-tabs.nav-justified > li:last-child {
+                background: none;
+            }
+
+            .nav-tabs.nav-justified > li > a {
+                border: none;
+                color: #494949;
+                font-size: 15px;
+                font-weight: bold;
+            }
+
+            .navbar-default .navbar-nav > li > a:hover {
+                color: #777;
+                background: #fff;
+            }
+        }
+
+        .navbar-default {
+            padding-bottom: 0 !important;
+            margin: 0 !important;
+            border: none;
+        }
+
+        .navbar-header {
+            margin-left: 9.3vw;
+        }
+
+        .home-header-right {
+            display: flex !important;
+            align-content: center;
+            align-items: center;
+            margin-right: 9.3vw !important;
+        }
+        .logo-container {
+            height: unset !important;
+            padding: 0 !important;
+            margin: 1.77vh 0;
+        }
+        .vip-count {
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            color: #666666 !important;
+            border: 1px solid #dbdbdb !important;
+            border-radius: 16px !important;
+            background: #FFF !important;
+            padding: 6px 13px !important;
+            position: relative !important;
+            cursor: pointer !important;
+            margin-top: 0 !important;;
+        }
+
+        .btn-item {
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            color: #fff !important;
+            padding: 0 !important;
+            height: 20px !important;
+        }
+
+        .split-line {
+            width: 1px;
+            height: 14px;
+            margin: 0 8.5px;
+            border: 1px solid #9ec8e8;
+        }
+
+        .btn-item:hover, .btn-item:focus, .btn-item:active {
+            color: #fff !important;
+            background: none !important;
+        }
+
+        .btn-list {
+            display: flex !important;
+            align-items: center !important;
+            background: #1886d9 !important;
+            margin-right: 0 !important;
+        }
+
+        .ul-li {
+            display: flex !important;
+            align-items: center !important;
+            height: 30px;
+            margin-right: 15px;
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 16px;
+        }
+
+        #spark-navbar-collapse {
+            width: 100% !important;
+            padding: 0;
+            border: none !important;
+        }
+
+        .menu-list {
+            display: flex !important;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100% !important;
+            height: 5.2vh !important;
+            background: #000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .menu-list li {
+            height: 100%;
+            list-style-type: none;
+            border-right: 1px solid #5e5e5e;
+        }
+        .menu-list li:last-child{
+            border: none;
+        }
+        .menu-list a {
+            height: 5.2vh;
+            line-height: 5.2vh;
+            padding: 0 25px !important;
+            background: #000 !important;
+            font-size: 14px;
+            font-weight: 500;
+            color: #888888 !important;
+            text-decoration: none;
+        }
+        .menu-list li:hover, .menu-list li:active {
+            text-decoration: none !important;
+            color: #FFF !important;
+        }
+        .menu-list li a:hover, .menu-list li a:active {
+            color: #FFF !important;
+        }
+        .menu-active {
+            color: #FFF !important;
+            border-bottom: 4px solid #1886D9 !important;
+        }
+        .menu-active a {
+            color: #FFF !important;
+        }
+
+        html {
+            -ms-overflow-style: -ms-autohiding-scrollbar !important;
+        }
+        /* 设置滚动条的样式 */
+        ::-webkit-scrollbar {
+            /*width: 5px;*/
+            width: 0;
+            height: 5px;
+            /*width: 0;*/
+        }
+
+        /* 滚动槽 */
+        ::-webkit-scrollbar-track {
+            background: #022e3e;
+        }
+
+        /* 滚动条滑块 */
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #045e72;
+        }
+
+        /* 边角 */
+        ::-webkit-scrollbar-corner {
+            background: #023e4c;
+        }
+
+        /* 滚动条两端的按钮 */
+        ::-webkit-scrollbar-button {
+            background: #023e4c;
+        }
+
+        /* 设置滚动条的样式 */
+        .message-count {
+            position: absolute;
+            margin: -5px 0 0 -8px;
+            background: none;
+            color: red;
+        }
+        /* Chrome/Opera/Safari */
+        ::-webkit-input-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* Firefox 19+ */
+        ::-moz-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* IE 10+ */
+        :-ms-input-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+
+        /* Firefox 18- */
+        :-moz-placeholder {
+            color: #d5d5d5;
+            font-weight: 400;
+        }
+        .home-logo {
+            width: 22.23vw !important;
+        }
+        th, td {
+            text-align: center;
+        }
+    </style>
+        </head>
+<body id="app-layout">
+<div class="new-container" style="background:#fff;padding:0;">
+    <nav class="navbar navbar-default">
+        <div class="new-container">
+            <div class="navbar-header">
+                <div class="navbar-brand navbar-logo logo-container"><img src="http://www.ciscn.cn/assets/images/logo.jpg"
+                                                                          class="img-responsive home-logo"></div>
+                <!-- Collapsed Hamburger -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#spark-navbar-collapse">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- Branding Image -->
+            <!--a class="navbar-brand" href="http://www.ciscn.cn">
+                    全国大学生信息安全竞赛官方网站
+                    </a-->
+            </div>
+            <div class="navbar-collapse">
+                <!-- Right Side Of Navbar -->
+                <ul class="nav navbar-nav navbar-right js-pc home-header-right">
+                    <!-- Authentication Links -->
+                    <li class="vip-count ul-li">
+                        会员数: 126271
+                    </li>
+                    <li><a href="#" class="js-zc vip-count ul-li"
+                           id="showQuestions">
+                            <span class="glyphicon glyphicon-qrcode" style="margin-right: 4px;"></span>
+                                                        微信公众号</a>
+                        <img src="http://www.ciscn.cn/assets/images/questions.jpg"
+                             style="position: absolute;z-index: 9999;display: none" height="180px">
+                    </li>
+                                                                                            <li class="js-zc vip-count btn-list ul-li">
+                            <a href="http://www.ciscn.cn/register" class="btn-item">注册</a>
+                            <div class="split-line"></div>
+                            <a href="http://www.ciscn.cn/login" class="btn-item">登录</a>
+                        </li>
+                                    </ul>
+            </div>
+            <div class="collapse navbar-collapse" id="spark-navbar-collapse">
+                            <!-- <div class="text-right" style="width:50%;float:right;margin-right:-10px;">
+                    <a href="http://v.butel.com/PageShare?id=32115" target="_blank" style="text-decoration:none;"><span id="ctf-live">[视频直播]&nbsp;颁奖典礼暨网络空间安全人才创新创业发展论坛</span></a>
+                </div> -->
+                    <ul class="menu-list">
+                        <li><a href="/home">首页</a></li>
+                    <!-- <li><a href="/governingorg">领导机构</a></li> -->
+                        <li><a href="/competition/securityCompetition?compet_id=42">长城杯作品赛报名入口</a></li>
+                        <li><a href="http://ccb.itsec.gov.cn/" target="_blank">长城杯官网</a></li>
+                        <li><a href="/competitioncharter">竞赛章程</a></li>
+                        <li><a href="/competition">竞赛目录</a></li>
+
+                        <li><a href="/award">获奖展示</a></li>
+                        <li><a href="/excellents">优秀作品</a></li>
+                        <!-- 2022需求屏蔽 -->
+                    <!-- <li><a href="/interview">访谈集萃</a></li> 高校-->
+                        <li><a href="/school">参赛高校</a></li>
+                        <!-- <li><a href="/supportedby">支持单位</a></li> -->
+                    <!-- <li><a href="/forum">发展论坛</a></li> 论坛-->
+                        <li><a href="/experts">专家库</a></li>
+                    </ul>
+                        </div>
+        </div>
+    </nav>
+    <main style="min-height: calc(100vh - 15.2vh - 120px); overflow: auto;">
+            <style>
+        .panel {
+            webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            border: 1px solid #ddd;
+        }
+
+        .panel-default > .panel-heading {
+            /*border-radius: 0;*/
+                    }
+
+        .panel-title > .small, .panel-title > .small > a, .panel-title > a, .panel-title > small, .panel-title > small > a {
+            color: inherit;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .panel-default > .panel-heading {
+            color: #fff;
+            font-weight: bolder;
+            background: none !important;
+        }
+
+        .panel-title img {
+            margin-right: 12px;
+            vertical-align: -4px;
+        }
+
+        @media (min-width: 1100px) {
+            .panel-body2 {
+                padding: 40px 0;
+            }
+        }
+
+        @media (max-width: 1099px) {
+            .panel-body2 {
+                padding: 10px 0;
+            }
+        }
+
+        .panel-body2 a {
+            color: #333333;
+            text-decoration: underline;
+        }
+
+        .navbar {
+            margin-bottom: 0px;
+        }
+
+        .navbar-default {
+            background: #fff;
+            box-shadow: none;
+            border-radius: 0;
+            border: none;
+            border-bottom: none;
+        }
+
+        .container1 {
+            padding: 0;
+        }
+    </style>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            border: 0;
+        }
+
+        .all {
+            width: 100%;
+            height: 47.9vh;
+            padding: 0;
+            /*padding: 7px;*/
+            /*border: 1px solid #ccc;*/
+            border: none;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            background: #ccc;
+        }
+
+        .screen li {
+            width: 100vw;
+            height: 100%;
+            overflow: hidden;
+            float: left;
+            border: none !important;
+        }
+        .screen li img {
+            border: none !important;
+        }
+
+        .screen ul {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 500vw !important;
+            height: 100%;
+            overflow: hidden;
+            border: none !important;
+            margin-bottom: 0!important;
+        }
+
+        .all ol {
+            position: absolute;
+            right: 45%;
+            bottom: 0;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .all ol li {
+            float: left;
+            width: 10px;
+            height: 10px;
+            background: #c1c1c1;
+            /*border: 1px solid #ccc;*/
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none !important;
+        }
+
+        .all ol li.current {
+            background: #6e6e6e;
+        }
+
+        #arr {
+            display: none;
+        }
+
+        #arr span {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+        }
+
+        #arr #right {
+            right: 5px;
+            left: auto;
+        }
+
+        @media (max-width: 768px) and (min-width: 0px) {
+            .all ol {
+                right: 40%;
+            }
+        }
+
+        @media (min-width: 240px) and (max-width: 320px) {
+            .screen ul {
+                width: 477vw;
+            }
+        }
+
+        @media (min-width: 321px) and (max-width: 360px) {
+            .screen ul {
+                width: 480vw;
+            }
+        }
+
+        @media (min-width: 361px) and (max-width: 375px) {
+            .screen ul {
+                width: 481vw;
+            }
+        }
+
+        @media (min-width: 376px) and (max-width: 384px) {
+            .screen ul {
+                width: 482vw;
+            }
+        }
+
+        @media (min-width: 385px) and (max-width: 414px) {
+            .screen ul {
+                width: 483vw;
+            }
+        }
+
+        @media (min-width: 415px) and (max-width: 450px) {
+            .screen ul {
+                width: 483vw;
+            }
+        }
+
+        @media (min-width: 700px) and (max-width: 768px) {
+            .screen ul {
+                width: 480vw;
+            }
+
+            .all ol {
+                right: 44%;
+            }
+        }
+
+        @media (max-width: 1025px) and (min-width: 800px) {
+            .screen ul {
+                width: 468vw;
+            }
+        }
+
+        @media (max-width: 1366px) and (min-width: 1025px) {
+            .screen ul {
+                width: 431.4vw;
+            }
+
+            .all ol {
+                right: 46%;
+            }
+        }
+
+        @media (max-width: 1900px) and (min-width: 1366px) {
+            .screen ul {
+                width: 350.2vw;
+            }
+
+            .all ol {
+                right: 46%;
+            }
+        }
+
+        @media (max-width: 1920px) and (min-width: 1900px) {
+            .screen ul {
+                width: 302.5vw;
+            }
+
+            .all ol {
+                right: 46%;
+            }
+        }
+
+        .home-center {
+            margin: 0 !important;
+            width: unset !important;
+        }
+
+        .home-center-header {
+            width: 100%;
+            height: 47vh;
+            background: url(assets/images/bg-home.png) no-repeat center / 100% 100%;
+        }
+
+        .container.container1 {
+            margin-top: 5.2vh;
+        }
+
+        .card-container {
+            display: flex;
+            width: 100%;
+            margin-top: 0 !important;
+            background: #f9f9f9 !important;
+        }
+
+        .card-container-container {
+            margin: 5.2vh auto !important;
+            background: #fff;
+            width: 62.5vw;
+        }
+
+        .notice-panel, .game-panel {
+            margin-bottom: 0 !important;
+            border: none;
+            box-shadow: none !important;
+            /*padding: 2.4vh 1.2vw 2.4vh 0;*/
+            padding: 2.4vh 1.2vw;
+        }
+        .notice-panel {
+            padding: 2.4vh 1.2vw 2.4vh 0;
+        }
+        .panel-item {
+            border-top: 1px solid #d5d5d5 !important;
+            /*padding: 2.1vh;*/
+            padding: 2.18vh 0 0 0 !important;
+            border-bottom: none !important;
+        }
+        .game-panel .panel-item {
+            height: 19.4vh;
+        }
+        .notice-panel .panel-item {
+            padding: 1.85vh 0 !important;
+        }
+        .list-unstyled .panel-item:last-child {
+            border-bottom: 1px solid #d5d5d5 !important
+        }
+        .panel-default > .panel-heading {
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 1.25vh;
+        }
+        .panel-item div {
+            padding: 0!important;
+        }
+        .panel-item .img-responsive {
+            height: 14.8vh !important;
+        }
+        .panel-item .right-content {
+            padding-left: 1.2vw !important;
+            height: 14.8vh !important;
+        }
+        .panel-item .right-content h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .panel-body, .panel-heading {
+            padding: 0;
+        }
+        .btn-more {
+            color: #999999 !important;
+            border: 1px solid #dbdbdb;
+            border-radius: 13px;
+            padding: 2px 10px;
+            font-size: 14px;
+        }
+        .btn-more a {
+            color: #999999 !important;
+            font-weight: 400;
+        }
+        .btn-more span {
+            font-size: 12px;
+        }
+        .game-focus-container {
+            margin: 5.2vh auto !important;
+            background: #fff;
+            width: 62.5vw;
+        }
+        .game-focus-header {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: left;
+            color: #333333;
+            border-bottom: 1px solid #d5d5d5;
+            padding: 1.85vh 0;
+        }
+        .game-focus-main {
+            margin: 3.47vh 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        .game-focus-main header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .answer-question {
+            width: 50%;
+            padding-right: 3.64vw;
+        }
+        .splendid-moment {
+            width: 50%;
+        }
+        .answer-list {
+            margin: 2vh 0;
+        }
+        .answer-list li {
+            font-size: 12px;
+            font-weight: 400;
+            text-align: left;
+            color: #666666;
+            /*margin-bottom: 1vh;*/
+        }
+        .img-bg {
+            display: flex;
+            border: 1px solid #ebebeb;
+            border-radius: 4px;
+            padding: 3.6vh 1.3vw;
+            margin-top: 1.48vh;
+        }
+        .img-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 8.43vw;
+            height: 12.7vh;
+            margin: 0 auto;
+            /*margin: 1.56vh 0.6vw;*/
+            transition: all .3s;
+            box-shadow: 0 6px 20px 0 rgba(0,0,0,0.10);
+            border-radius: 10px;
+        }
+        .img-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .information-security {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            padding: 7.4vh 0;
+        }
+        .information-security aside {
+            /*height: 29.7vh;*/
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 6px 20px 0px rgba(0,0,0,0.10);
+            padding: 3vh 2vw;
+            text-align: center;
+        }
+        .award-query {
+            padding-bottom: 5.1vh !important;
+            width: 24.48vw;
+        }
+        .security-game {
+            width: 36.4vw;
+            margin-left: 1.56vw;
+        }
+        .information-security aside header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333333;
+        }
+        .award-query main {
+            padding-top: 3.3vh;
+        }
+        .award-query-label {
+            font-size: 14px;
+            font-weight: 400;
+            text-align: left;
+            color: #666666;
+        }
+        .award-query-input {
+            width: calc(100% - 90px);
+            /*width: 15.6vw;*/
+            height: 36px;
+            background: #ffffff;
+            border: 1px solid #d5d5d5;
+            border-radius: 2px;
+            text-indent: 10px;
+        }
+        .award-query-item {
+            margin-bottom: 2vh;
+        }
+        .award-query-item:last-child {
+            margin-bottom: 0;
+        }
+        .award-query main button, a.button button {
+            width: 90px;
+            height: 30px;
+            background: #1886d9;
+            border-radius: 15px;
+            border: none;
+            font-size: 12px;
+            font-weight: 400;
+            color: #ffffff;
+            margin-top: 4.9vh;
+        }
+        .security-game-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            /*height: 8.4vh;*/
+            background: #f2f9ff;
+            padding: 1.46vh 0;
+        }
+        .label-practice {
+            font-size: 12px;
+            font-weight: 400;
+            color: #666666;
+        }
+        .value-practice {
+            font-weight: 700;
+        }
+        .header-col .label-practice {
+            font-size: 14px;
+            font-weight: 700;
+            text-align: left;
+            color: #333333;
+        }
+        .row-practice {
+            margin-top: 27px;
+        }
+        .row-practice img {
+            width: 2.1vw;
+        }
+        .row-practice .value-practice {
+            color: #3697f1;
+        }
+        .row-works {
+            margin-top: 20px;
+        }
+        .row-works .value-practice {
+            color: #F17A36;
+        }
+        .leader-body {
+            border-top: 1px solid #d5d5d5;
+            padding-top: 2.6vh;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+        }
+        .leader-item {
+            width: 360px;
+            height: 4.6vh;
+            line-height: 4.6vh;
+            background: #ffffff;
+            border: 1px solid #d5d5d5;
+            border-radius: 26px;
+            margin: 1.94vh 3.1vw;
+        }
+        .leader-item a {
+            padding: 0 10px;
+            text-decoration: none;
+        }
+        button[disabled] {
+            cursor: not-allowed;
+        }
+        .flag {
+            position: absolute;
+            width: 50px;
+            height: 20px;
+            border-radius: 0 0 13px 0;
+            margin-top: 0;
+            font-size: 10px;
+            font-weight: 500;
+            text-align: center;
+            color: #ffffff;
+            line-height: 18px;
+        }
+        .flag.going {
+            background: linear-gradient(90deg,#f98856, #f1a431);
+        }
+        .flag.end {
+            background: linear-gradient(90deg,#788994, #afcbce);
+        }
+        .flag.early {
+            background: linear-gradient(90deg,#5697f9, #49cdef);
+        }
+        .comTitle {
+            width: 100%;  /*也可以是固定值、min-width这些*/
+            white-space: nowrap;  /*强制文本不能换行*/
+            overflow: hidden;  /*隐藏溢出内容*/
+            text-overflow: ellipsis;
+        }
+        .comDesc {
+            width: 100%;
+            overflow: hidden;
+            word-break: break-all;  /*允许在单词内换行，更美观*/
+            text-overflow: ellipsis;
+            display: -webkit-box;  /*元素作为box伸缩盒子*/
+            -webkit-line-clamp: 3;  /*设置文本行数限制*/
+            -webkit-box-orient: vertical;  /*设置文本排列方式*/
+        }
+    </style>
+    <div class="container-fluid container1">
+        <div class="container container1 home-center">
+            
+                        <div class="container container1 home-center">
+                <div class="panel panel-default" style="border:none; box-shadow: none;margin-bottom: 0;">
+                    <div class="panel-body panel-body1">
+                        <input type="hidden" id="delay" name="" value="5000">
+                    <!-- <ul class="list-unstyled">
+                                                    <li><a href="#" target="_blank"  onclick="add_banner_num('#');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=38" target="_blank"  onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=38');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=37" target="_blank"  onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=37');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="#" target="_blank"  onclick="add_banner_num('#');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="#" target="_blank"  onclick="add_banner_num('#');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=35" target="_blank"  onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=35');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                    <li><a href="https://ctf.ichunqiu.com/topic/2022dxs" target="_blank"  onclick="add_banner_num('https://ctf.ichunqiu.com/topic/2022dxs');" ><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" class="img-responsive" style="width:100%;height: 411px;"></a></li>
+                                <li><img src="http://www.ciscn.cn/uploads/avatar/default_avatar.png" style="width:100%;height: 411px;"/></li>
+                                                        </ul> -->
+                    </div>
+                    <div class="all" id='box'>
+                        <div class="screen">
+                            <ul>
+                                                                    <li><a href="#" target="_blank"
+                                           onclick="add_banner_num('#');"><img
+                                                    src="http://www.ciscn.cn/uploads/banner/2025-banner.jpg" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=38" target="_blank"
+                                           onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=38');"><img
+                                                    src="http://www.ciscn.cn/uploads/banner/2023_banner3.png" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=37" target="_blank"
+                                           onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=37');"><img
+                                                    src="http://www.ciscn.cn/uploads/banner/2023_banner_6.png" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="#" target="_blank"
+                                           onclick="add_banner_num('#');"><img
+                                                    src="/uploads/banner/2024_banner.png" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="#" target="_blank"
+                                           onclick="add_banner_num('#');"><img
+                                                    src="/uploads/banner/2024_banner2.png" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=35" target="_blank"
+                                           onclick="add_banner_num('http://www.ciscn.cn/competition/securityCompetition?compet_id=35');"><img
+                                                    src="http://www.ciscn.cn/uploads/banner/banner_2022z.jpg" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                                    <li><a href="https://ctf.ichunqiu.com/topic/2022dxs" target="_blank"
+                                           onclick="add_banner_num('https://ctf.ichunqiu.com/topic/2022dxs');"><img
+                                                    src="http://www.ciscn.cn/uploads/banner/banner_2022sj.jpg" class="img-responsive"
+                                                    style="width:100vw;height: 100%;"></a></li>
+                                                            </ul>
+                            <ol>
+                            </ol>
+                        </div>
+                        <div id="arr"><span id="left">&lt;</span><span id="right">&gt;</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="container container1 card-container">
+                <div class="container container1 card-container-container">
+                    <div class="col-md-7" style="padding-left:0;padding-right: 0;">
+                        <div class="panel panel-default game-panel">
+                            <div class="panel-heading panel-headingf">
+                                <h3 class="panel-title"><img src="http://www.ciscn.cn/assets/images/icon-game.png"/>赛事通道
+                                    <span class="btn-more" style="float:right;">
+                                        <a href="http://www.ciscn.cn/competition">更多</a>
+                                        <span class="glyphicon glyphicon-menu-right"></span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+                                                                    <div class="panel-item" style="position: relative">
+                                        <div class="col-md-4">
+                                                                                            <div class="flag end">已结束</div>
+                                                                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=44"><img
+                                                        class="img-responsive" src="http://www.ciscn.cn/uploads/compet/20241104kUSnH7it5x.png"></a>
+                                        </div>
+                                        <div class="col-md-8 right-content">
+                                            <h3 class="comTitle">第十九届全国大学生信息安全竞赛（创新实践能力赛）暨...</h3>
+                                            <span class="comDesc">
+                                                为深入践行总体国家安全观，积极落实国家网络空间安全人才战略，实现以赛促学、以赛促教、以赛促用，提质增效，推动网络空间安全人才培养和产学研用生态发展，中国信息安全测评中心和教育部高等学校网络空间安全专业教学指导委员会联合主办第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo;网数智安全大赛（防护赛）。
+                                            </span>
+                                            <div>
+                                                <a  class="button" href="http://www.ciscn.cn/competition/securityCompetition?compet_id=44">
+                                                    <button style="position: absolute;bottom: 0;margin-top: 5px">点击进入</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                <div class="panel-item" style="position: relative">
+                                        <div class="col-md-4">
+                                                                                            <div class="flag end">已结束</div>
+                                                                                        <a href="http://www.ciscn.cn/competition/securityCompetition?compet_id=43"><img
+                                                        class="img-responsive" src="http://www.ciscn.cn/uploads/compet/202504018w3ebb8RHe.png"></a>
+                                        </div>
+                                        <div class="col-md-8 right-content">
+                                            <h3 class="comTitle">第十八届全国大学生信息安全竞赛&mdash;作品赛</h3>
+                                            <span class="comDesc">
+                                                为选拔、推荐优秀网络空间安全专业人才，培养学生的创新意识与团队合作精神，提高学生的网络安全技术水平、创新实践与综合设计能力，推动我国高校网络空间安全专业建设与改革，由西安交通大学承办的&ldquo;第十八届全国大学生信息安全竞赛&mdash;作品赛&rdquo;（以下简称&ldquo;信息安全作品赛&rdquo;），将于2025年5月至2025年8月在西安交通大学兴庆校区举行。
+                                            </span>
+                                            <div>
+                                                <a  class="button" href="http://www.ciscn.cn/competition/securityCompetition?compet_id=43">
+                                                    <button style="position: absolute;bottom: 0;margin-top: 5px">点击进入</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                        <!--  <div class="col-md-12">
+                                <hr>
+                                <h4>第十届全国大学生信息安全竞赛决赛集锦</h4>
+                                <embed wmode="transparent" width="100%" height="500" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" src="http://player.youku.com/player.php/sid/XMzAzODU2OTQ4OA==/v.swf" allowfullscreen="true" quality="high" flashvars="isShowRelatedVideo=false&amp;showAd=0&amp;show_pre=1&amp;show_next=1&amp;isAutoPlay=false&amp;isDebug=false&amp;UserID=&amp;winType=interior&amp;playMovie=true&amp;MMControl=false&amp;MMout=false&amp;adss=0&amp;show_ce=0&amp;showsearch=0" play="true" loop="true" menu="true">
+                            </div> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 col-md-new" style="padding-right:0;border-left: 2px solid #f9f9f9;">
+                        <div class="panel panel-default notice-panel">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <img src="http://www.ciscn.cn/assets/images/icon-notice.png"/>最新公告
+                                    <span class="btn-more" style="float:right;">
+                                        <a href="http://www.ciscn.cn/announcement">更多</a>
+                                        <span class="glyphicon glyphicon-menu-right"></span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div class="panel-body panel-body1">
+                                <ul class="list-unstyled list-unstyled1" style="margin-bottom:0;">
+                                                                                                                        <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/406"
+                                                   title="关于晋级半决赛队伍尽快加入赛区QQ群的通知"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">关于晋级半决赛队伍尽快加入赛区QQ群的...</a></li>
+
+
+                                                                                                                                <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/405"
+                                                   title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）半决赛技术文件"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                                                                <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/404"
+                                                   title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）半决赛开赛通知"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                                                                <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/403"
+                                                   title="关于取消TSG等三支队伍半决赛晋级资格的公告"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">关于取消TSG等三支队伍半决赛晋级资格的...</a></li>
+
+
+                                                                                                                                <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/401"
+                                                   title="关于半决赛入围队伍名单的公示"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">关于半决赛入围队伍名单的公示</a></li>
+
+
+                                                                                                                                <li class="panel-item"><span>创新赛通知</span>
+                                                                                        <a href="http://www.ciscn.cn/announcement/view/402"
+                                                   title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo;网数智安全大赛（防护赛）初赛裁决公告"
+                                                   style="margin-left: 1.56vw;"
+                                                   target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                            </ul>
+                            </div>
+                        <!-- <div class="panel-heading">
+                            <h3 class="panel-title"><img src="http://www.ciscn.cn/assets/images/laba.jpg" />最新公告<small style="float:right;"><a href="http://www.ciscn.cn/announcement">更多</small></h3>
+                        </div>
+                        <div class="panel-body panel-body1">
+                            <ul class="list-unstyled list-unstyled1" style="margin-bottom:0;">
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/406" title="关于晋级半决赛队伍尽快加入赛区QQ群的通知" target="_blank">关于晋级半决赛队伍尽快加入赛区QQ群的...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/405" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）半决赛技术文件" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/404" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）半决赛开赛通知" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/403" title="关于取消TSG等三支队伍半决赛晋级资格的公告" target="_blank">关于取消TSG等三支队伍半决赛晋级资格的...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/401" title="关于半决赛入围队伍名单的公示" target="_blank">关于半决赛入围队伍名单的公示</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/402" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo;网数智安全大赛（防护赛）初赛裁决公告" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/399" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届 &ldquo;长城杯&rdquo;网数智安全大赛（防护赛）初赛成功举办" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/398" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo;网数智安全大赛（防护赛）即将开赛" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/397" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届&ldquo;长城杯&rdquo;网数智安全大赛（防护赛） 线上初赛参赛手册" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/396" title="第十九届全国大学生信息安全竞赛 （创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）参赛规程" target="_blank">第十九届全国大学生信息安全竞赛 （创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/395" title="第十九届全国大学生信息安全竞赛（创新实践能力赛）暨第三届 &ldquo;长城杯&rdquo;网数智安全大赛（防护赛） 报名进入最后倒计时" target="_blank">第十九届全国大学生信息安全竞赛（创新...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/394" title="第十九届全国大学生信息安全竞赛 （创新实践能力赛）暨第三届&ldquo;长城杯&rdquo; 网数智安全大赛（防护赛）初赛技术文件" target="_blank">第十九届全国大学生信息安全竞赛 （创新...</a></li>
+
+
+                                                                                            <li><span>[通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/393" title="第十八届中国网络空间安全学科专业建设与人才培养研讨会会议通知" target="_blank">第十八届中国网络空间安全学科专业建设...</a></li>
+
+
+                                                                                            <li><span>[作品赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/392" title="第十八届全国大学生信息安全竞赛&mdash;作品赛 决赛结果通知" target="_blank">第十八届全国大学生信息安全竞赛&mdash;作品赛...</a></li>
+
+
+                                                                                            <li><span>[作品赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/391" title="第十八届全国大学生信息安全竞赛-作品赛决赛入围通知" target="_blank">第十八届全国大学生信息安全竞赛-作品赛...</a></li>
+
+
+                                                                                            <li><span>[创新赛通知]</span>
+                                                                        <a href="http://www.ciscn.cn/announcement/view/390" title="第十八届全国大学生信息安全竞赛&mdash;&mdash;创新实践能力赛总决赛于郑州大学成功举办" target="_blank">第十八届全国大学生信息安全竞赛&mdash;&mdash;创新...</a></li>
+
+
+                                                                </ul>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container container1 game-focus-container">
+                <header class="game-focus-header">
+                    <img src="http://www.ciscn.cn/assets/images/icon-game-focus.png">
+                    赛场焦点
+                </header>
+                <main class="game-focus-main">
+                    <aside class="answer-question">
+                        <header>常见问题解答</header>
+                        <main>
+                            <ul class="answer-list">
+                                <li>1.高校主管在哪里进行审核
+                                    <p>高校主管审核位置：在学校参赛信息-参加创新实践能力赛队伍中进行操作，但要在学生邀请完指导老师后操作</p>
+                                </li>
+                                <li>2.访问赛题的WEB页面时显示“502”错误
+                                    <li>原因：</li>
+                                    <li>一般是因为赛题内部的WEB端口与提交赛题时录入的端口信息不一致。</li>
+                                    <li>解决：</li>
+                                    <li>请按赛题模板指定的端口在赛题内安装并设置WEB服务，并在提交赛题页面录入与其一致的端口信息。</li>
+                                </li>
+                            </ul>
+                            <span class="btn-more" style="float:left;">
+                                <a href="http://www.ciscn.cn/helper">查看全部</a>
+                                <span class="glyphicon glyphicon-menu-right"></span>
+                            </span>
+                        </main>
+                    </aside>
+                    <aside class="splendid-moment">
+                        <header>精彩瞬间
+                            <span class="btn-more" style="float:right;">
+                                <a href="http://www.ciscn.cn/marvellous">更多</a>
+                                <span class="glyphicon glyphicon-menu-right"></span>
+                            </span>
+                        </header>
+                        <main class="img-bg">
+                            <div class="img-container">
+                                <img src="http://www.ciscn.cn/uploads/moment/12473360.jpg">
+                            </div>
+                            <div class="img-container">
+                                <img src="http://www.ciscn.cn/uploads/moment/15562915.jpg">
+                            </div>
+                            <div class="img-container">
+                                <img src="http://www.ciscn.cn/uploads/moment/15645627.jpg">
+                            </div>
+                        </main>
+                    </aside>
+                </main>
+            </div>
+            <section class="information-security">
+                <aside class="award-query">
+                    <header>获奖查询</header>
+                    <main>
+                        <form id="form" onsubmit="return submitForm();">
+                            <div class="award-query-item">
+                                <span class="award-query-label">身份信息：</span>
+                                <input class="award-query-input" name="account" placeholder="请填写姓名或身份证号" required>
+                            </div>
+                            <div class="award-query-item">
+                                <span class="award-query-label">证书编号：</span>
+                                <input class="award-query-input" name="number" placeholder="请填写证书编号" required>
+                            </div>
+                            <button type="submit" >查询</button>
+                        </form>
+                    </main>
+                </aside>
+                <aside class="security-game">
+                    <header>第十四届大学生信息安全竞赛</header>
+                    <main>
+                        <div class="security-game-row row-practice" style="background: #f2f9ff;">
+                            <div class="security-game-col header-col">
+                                <img src="http://www.ciscn.cn/assets/images/icon-practice.png">
+                                <div class="label-practice">实践赛</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">489</div>
+                                <div class="label-practice">参赛高校</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">2160</div>
+                                <div class="label-practice">参赛队伍</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">7639</div>
+                                <div class="label-practice">参与人数</div>
+                            </div>
+                        </div>
+                        <div class="security-game-row row-works" style="background: #fffaf3;">
+                            <div class="security-game-col header-col">
+                                <img src="http://www.ciscn.cn/assets/images/icon-works.png">
+                                <div class="label-practice">作品赛</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">204</div>
+                                <div class="label-practice">参赛高校</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">839</div>
+                                <div class="label-practice">参赛队伍</div>
+                            </div>
+                            <div class="security-game-col">
+                                <div class="value-practice">2944</div>
+                                <div class="label-practice">参与人数</div>
+                            </div>
+                        </div>
+                    </main>
+                </aside>
+            </section>
+            <div class="container container1" style="width: 100% !important;">
+                <div class="panel panel-default" style="border: none;box-shadow: none; width: 62.5vw;margin: auto;">
+                    <div class="panel-heading panel-headingf">
+                        <h3 class="panel-title"><img src="http://www.ciscn.cn/assets/images/icon-school.png"/>参赛高校
+                            <span class="btn-more" style="float:right;">
+                            <a href="http://www.ciscn.cn/school">更多</a>
+                            <span class="glyphicon glyphicon-menu-right"></span>
+                        </span>
+                        </h3>
+                    </div>
+                    <div class="panel-body" style="border-top: 1px solid #d5d5d5; padding-top: 2.6vh;">
+                                                    <div class="col-sm-2 text-center">
+                                <a href="https://www.pku.edu.cn" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20220414NJth5xoR8e.png"></a>
+                                <p style="margin:10px 0 0 0;"><a href="https://www.pku.edu.cn"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 北京大学</a>
+                                </p>
+                            </div>
+                                                    <div class="col-sm-2 text-center">
+                                <a href="https://www.tsinghua.edu.cn" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20220414yOk4dpKdCC.png"></a>
+                                <p style="margin:10px 0 0 0;"><a href="https://www.tsinghua.edu.cn"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 清华大学</a>
+                                </p>
+                            </div>
+                                                    <div class="col-sm-2 text-center">
+                                <a href="http://www.besti.edu.cn" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20160314kfQ7jV7kNQ.png"></a>
+                                <p style="margin:10px 0 0 0;"><a href="http://www.besti.edu.cn"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 北京电子科技学院</a>
+                                </p>
+                            </div>
+                                                    <div class="col-sm-2 text-center">
+                                <a href="http://www.buaa.edu.cn" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20160319E1NMW382rg.jpg"></a>
+                                <p style="margin:10px 0 0 0;"><a href="http://www.buaa.edu.cn"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 北京航空航天大学</a>
+                                </p>
+                            </div>
+                                                    <div class="col-sm-2 text-center">
+                                <a href="http://www.ruc.edu.cn/" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20160311HIYFWy0Kpm.jpg"></a>
+                                <p style="margin:10px 0 0 0;"><a href="http://www.ruc.edu.cn/"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 中国人民大学</a>
+                                </p>
+                            </div>
+                                                    <div class="col-sm-2 text-center">
+                                <a href="http://www.fudan.edu.cn/index.html" target="_blank"><img
+                                            style="width: 120px;height:120px;"
+                                            src="http://www.ciscn.cn/uploads/school-logo/20160319NGH1u6E8Y3.jpg"></a>
+                                <p style="margin:10px 0 0 0;"><a href="http://www.fudan.edu.cn/index.html"
+                                                                 arget="_blank"
+                                                                 style="color:#333;"> 复旦大学</a>
+                                </p>
+                            </div>
+                                            </div>
+                </div>
+            </div>
+            <div class="container container1"  style="width: 100% !important;">
+                <div class="col-md-12" style="padding:0;">
+                    <div class="panel panel-default" style="border: none;box-shadow: none;width: 62.5vw;margin: auto;">
+                        <div class="panel-heading panel-headingf">
+                            <h3 class="panel-title"><img src="http://www.ciscn.cn/assets/images/icon-leader.png"/>领导机构</h3>
+                        </div>
+                        <div class="panel-body panel-body2 text-center leader-body">
+                            <div>
+                                <div class="leader-item"><a href="http://www.cac.gov.cn/"
+                                                            target="_blank">中共中央网络安全和信息化领导小组办公室</a>
+                                </div>
+                                <div class="leader-item"><a href="http://www.cidf.net/"
+                                                            target="_blank">中国互联网发展基金会</a>
+                                </div>
+                            </div>
+                            <div>
+                               
+                                <div class="leader-item"><a href="http://www.pki.org.cn/"
+                                                            target="_blank">国家信息安全工程技术研究中心</a></div>
+                                <div class="leader-item"><a href="http://www.isccc.gov.cn/"
+                                                            target="_blank">中国信息安全认证中心</a></div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    <script type="text/javascript"> 
+    //要做事先找人
+    var box = document.getElementById("box");
+    var screen = box.children[0];
+    var ul = screen.children[0];
+    var ol = screen.children[1];
+    var ulLis = ul.children;//所有的图片
+    var imgWidth = screen.offsetWidth;
+    var arr = document.getElementById("arr");
+    var arrRight = document.getElementById("right");
+    var arrLeft = document.getElementById("left");
+    var timer = null;
+    //alert(imgWidth);
+
+    //1.动态生成结构
+    //1.1根据图片的数量动态生成按钮
+    for (var i = 0; i < ulLis.length; i++) {
+        //动态生成按钮
+        var li = document.createElement("li");
+        //追加到ol下面
+        ol.appendChild(li);
+    }
+    var olLis = ol.children;//必须生成之后才能获取到
+    olLis[0].className = "current";
+
+    //1.2把第一张图片追加到最后
+    //复制第一张图片
+    var firstImg = ulLis[0].cloneNode(true);
+    //追加到ul后面
+    ul.appendChild(firstImg);
+
+    //2.鼠标经过按钮
+    //循环遍历 给每一个按钮绑定鼠标经过事件
+    for (var j = 0; j < olLis.length; j++) {
+        olLis[j].index = j;
+        olLis[j].onmouseover = function () {
+            //按钮排他
+            //干掉所有人
+            for (var k = 0; k < olLis.length; k++) {
+                olLis[k].className = "";
+            }
+            //留下我自己
+            this.className = "current";
+            //根据索引号 通过动画函数移动ul
+            //图片移动的位置 和 当前按钮索引号 和 图片宽度有关 而且是负数
+            var target = -this.index * imgWidth;
+            animate(ul, target);
+
+            //将应该显示的图片的索引号 和 鼠标经过的按钮的索引号 进行统一
+            pic = this.index;
+            //将应该亮起的按钮的索引号 和 鼠标经过的按钮的索引号 进行统一
+            square = this.index;
+        }
+    }
+
+    //3.鼠标点击箭头
+    //鼠标经过box显示arr 清理定时器停止自动播放
+    box.onmouseover = function () {
+        arr.style.display = "block";
+        clearInterval(timer);
+    }
+    //鼠标离开box隐藏arr 设置定时器继续自动播放
+    box.onmouseout = function () {
+        arr.style.display = "none";
+        clearInterval(timer);
+        timer = setInterval(playNext, 3000);
+    }
+
+    //点击 右箭头 显示下一张
+    var pic = 0;//pic表示当前图片的索引
+    var square = 0;//square表示当前按钮的索引
+    arrRight.onclick = function () {
+        playNext();
+    }
+    arrLeft.onclick = function () {
+        //判断当前图片的索引pic是否等于最后一张图片的索引ulLis.length-1
+        if (pic == 0) {
+            pic = ulLis.length - 1;
+            ul.style.left = -(ulLis.length - 1) * imgWidth + "px";
+        }
+        pic--;
+        //通过动画函数对ul进行移动
+        //target 和 图片索引 和 图片宽度 有关 而且是负数
+        var target = -pic * imgWidth;
+        animate(ul, target);
+        
+        //按钮也应该自动播放
+        //如果当前按钮的索引号square大于第一个按钮的索引号0 就--
+        if (square > 0) {
+            square--;
+        } else {
+            //如果square等于零 说明到第一个了 这时就应该把他变成最后一个
+            square = olLis.length - 1;
+        }
+        //干掉所有人
+        for (var i = 0; i < olLis.length; i++) {
+            olLis[i].className = "";
+        }
+        //留下我自己
+        olLis[square].className = "current";
+    }
+
+    //4.添加自动滚动
+    timer = setInterval(playNext, 3000)
+    //5.完善鼠标经过
+    function animate(obj, target) {
+        clearInterval(obj.timer);
+        obj.timer = setInterval(function () {
+            var step = 25;
+            //left值越小越靠左
+            //obj.offsetLeft小于target
+            //obj在target的左侧
+            //应该向右走
+            //向右走step是正
+            /*if (obj.offsetLeft < target) {
+             step = 9;
+             }
+             if (obj.offsetLeft > target) {
+             //向左走是负
+             step = -9;
+             }*/
+            var step = obj.offsetLeft < target ? step : -step;
+
+            //Math.abs(obj.offsetLeft - target) 这个表示对象到目标的距离
+            //如果对象到目标的距离比一步迈出的距离要大 我就要继续走
+
+            if (Math.abs(obj.offsetLeft - target) > Math.abs(step)) {
+                obj.style.left = obj.offsetLeft + step + "px";
+            } else {
+                //再迈一步就超过目标了
+                obj.style.left = target + "px";//手动把对象放置到目标上
+                clearInterval(obj.timer);//清理定时器
+            }
+        }, 15)
+    }
+
+    function playNext() {
+        //先判断当前图片的索引pic是否等于最后一张图片的索引ulLis.length-1
+        //如果相等马上跳过去然后在执行动画效果 从而实现无缝滚动
+        //并且把索引号也归零
+        if (pic == ulLis.length - 1) {
+            ul.style.left = 0;
+            pic = 0;
+        }
+        pic++;//pic++相当于 pic=pic+1;
+        //通过动画函数对ul进行移动
+        //target 和 图片索引 和 图片宽度 有关 而且是负数
+        var target = -pic * imgWidth;
+        animate(ul, target);
+        //按钮也应该自动播放
+        //如果当前按钮的索引号square小于最后一个按钮的索引号olLis.length - 1 就++
+        if (square < olLis.length - 1) {
+            square++;
+        } else {
+            square = 0;
+        }
+
+        //干掉所有人
+        for (var i = 0; i < olLis.length; i++) {
+            olLis[i].className = "";
+        }
+        //留下我自己
+        olLis[square].className = "current";
+    }
+
+window.onblur = function(e){
+    clearInterval(timer);
+}
+window.onfocus = function(e){
+    clearInterval(timer);
+    timer = setInterval(playNext, 3000)
+}
+</script>
+<script>
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+$(document).ready(function() {
+    var delay = $('#delay').val(); 
+    $('#top-slider').unslider({
+            dots: true,
+        autoplay: true,
+        arrows: false,
+        delay: delay,
+    });
+
+   
+    $.ajax({
+        url: "/schoolInfoCheck",
+        type: "get",
+        dataType: "JSON",
+        data: {},
+        timeout: 3000,
+        success:function(data){
+            if(data.status == 'false'){
+                if(data.role == 'teacherincharge'){
+                    layer.alert('您的学校信息有变化，请联系管理员或秘书处进行修改。', {icon: 2});
+                }else{
+                    layer.alert('您的学校信息有变化，请在个人中心确认自己的学校信息。', {icon: 2});
+                }
+                
+                return false;
+            }
+        }
+    });
+
+});
+function add_banner_num(link)
+{
+    //进行ajax调用增加num的数量
+    $.ajax({
+        url: "ajaxbanner",
+        type: "POST",
+        dataType: "JSON",
+        data: { 'link':link },
+        timeout: 3000,
+        success:function(data){
+            if(data.msg == 'success'){
+                console.log('add link click num success');
+            }else{
+                console.log('add link click fail' + data.msg);
+            }
+        }
+    });
+}
+function submitForm(){
+    var formData =  new FormData($("#form")[0]);
+    formData.append("token","8rBDij4VHJAKN7lldGjFIys9xKygQpe5feDwzBzn");
+    var indexLoad = layer.load();
+    $.ajax({
+        url: "/certificate",
+        type: 'POST',
+        dataType: 'json',
+        contentType: false,
+        data: formData,
+        processData: false,
+        success: function(result) {
+            layer.close(indexLoad)
+            if(result.code == 10001){
+                $('#raceResult').val('')
+                layer.msg( result.msg, {
+                    icon: 0,
+                    time: 3000 //不自动关闭
+                });
+            }else{
+                window.location.href = "/certificate?account=" + formData.get('account') + '&number=' + formData.get('number')
+            }
+        },
+        error:function(XMLHttpRequest, textStatus, errorThrown){
+            layer.close(indexLoad)
+            // 状态码
+            console.log(XMLHttpRequest.status);
+            // 状态
+            console.log(XMLHttpRequest.readyState);
+            // 错误信息
+            console.log(textStatus);
+            layer.msg( '发生异常请重试', {
+                icon: 0,
+                time: 2000 //不自动关闭
+                ,btn: ['关闭']
+            });
+        }
+    });
+    return false;
+}
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".menu-list > li").each(function(){
+            var aurl = $(this).children('a')[0];
+            if(aurl == undefined){
+                return false;
+            }
+            if(aurl.href == undefined){
+                return false;
+            }
+            url = new URL(aurl.href);
+            if(aurl.href === String(location.origin + location.pathname)
+                || (location.href.split(location.origin)[1] === "/" && aurl.href.endsWith('/home'))){
+                // 当访问地址不带/home的时候，也默认高亮首页菜单
+                $(this).addClass("menu-active");
+            }
+        });
+    })
+function AddFavorite(title, url) {
+  try {
+      window.external.addFavorite(url, title);
+  }
+catch (e) {
+     try {
+       window.sidebar.addPanel(title, url, "");
+    }
+     catch (e) {
+         alert("抱歉，您所使用的浏览器无法完成此操作。\n\n加入收藏失败，请使用Ctrl+D进行添加");
+     }
+  }
+}
+
+function showXSpaceAppQRCode(type) {
+    var qrcodeimg = type=='ios'?'xspaceappqrcode-ios.png':'xspaceappqrcode-android.png';
+
+    layer.open({
+        type: 1,
+        title: false,
+        closeBtn: 0,
+        area: ['312px', '312px'],
+        skin: 'layui-layer-rim', //加上边框
+        shadeClose: true,
+        content: '<img style="width:300px; height:300px;" src="/assets/images/' + qrcodeimg + '">'
+    });
+}
+
+function blinklink() {
+    if (!document.getElementById('ctf-live').style.color) {
+        document.getElementById('ctf-live').style.color = "red";
+    }
+
+    if (document.getElementById('ctf-live').style.color == "red") {
+        document.getElementById('ctf-live').style.color = "blue";
+    } else if (document.getElementById('ctf-live').style.color == "blue") {
+        document.getElementById('ctf-live').style.color = "green";
+    } else {
+        document.getElementById('ctf-live').style.color = "red";
+    }
+    timer = setTimeout("blinklink()", 200);
+}
+function stoptimer() {
+    clearTimeout(timer);
+}
+function pagesizeChange(pagesize){
+    if(window.location.href.indexOf('pagesize') != -1){
+        window.location.href =  window.location.href.replace(/pagesize=\d*/, 'pagesize=' + pagesize)
+    }else{
+        window.location.href = window.location.href + '&pagesize=' + pagesize
+    }
+}
+$(function(){
+    $("#showQuestions").mouseover(function(){
+        $(this).next().show();
+    });
+     $("#showQuestions").mouseout(function(){
+        $(this).next().hide();
+    });
+})
+//blinklink()
+</script>
+<div class="foot">
+    <div class="cont text-center">
+        <span><a href="http://www.ciscn.cn/helper">使用帮助</a></span>
+            <span>|</span>
+        <!-- <span><a href="http://www.ciscn.cn/sitemap">网站地图</a></span>
+            <span>|</span> -->
+        <span><a href="http://www.ciscn.cn/contact">联系我们</a></span>
+            <span>|</span>
+        <span style="margin-right:0;"><a href="javascript:void(0);" onclick="AddFavorite('common.SITE_TITLE','http://ciscn.com')">收藏本站</a></span>
+    
+    </div>
+    <p><span>技术支持与保障</span><a href="https://360.net" target="_blank" style="color:#FFF;">360数字安全集团</a>&nbsp;●&nbsp;
+    <a href="https://360.net" target="_blank" style="color:#FFF;">国卫信安</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    备案号：<a href="https://beian.miit.gov.cn/">京ICP备15033807号-5</a></p>
+    <div class="copyr">
+        <p>中国互联网发展基金会主办</p>
+    </div>
+</div>
+</div>
+</body>
+</html>

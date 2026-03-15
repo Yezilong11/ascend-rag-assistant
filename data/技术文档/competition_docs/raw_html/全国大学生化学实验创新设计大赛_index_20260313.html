@@ -1,0 +1,241 @@
+
+    
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+            <title>全国大学生化学实验创新设计竞赛网</title>
+            <link rel="icon" type="image/x-icon" href="../assets/images/gallery/favicon.ico" />
+            <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+            <link rel="stylesheet" href="../assets/css/ace.min.css" />
+            <link rel="stylesheet" href="../css/index.css" />
+            <link rel="stylesheet" href="../css/common.css" />
+            <link rel="stylesheet" href="../css/lunbotu.css" />
+            <link rel="stylesheet" href="../plugins/layui/css/layui.css" />
+        </head>
+
+        <body style="background:#efefef;">
+            <!--常见问题详情弹框-->
+            <div id="cjwtdetailmodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                    <div class="modal-content">
+                        <div class="modal-header no-padding" style="border:none;">
+                            <div class="table-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    <span class="white">&times;</span>
+                                </button>
+                                常见问题
+                            </div>
+                        </div>
+                        <div class="modal-body" style="padding:10px;">
+                            <!--<div class="tishikuang_commommodal"></div>-->
+                            <div><span class="questiontitle"></span>
+                                <h4 class="question"></h4>
+                            </div>
+                            <div><span class="Answertitle"></span><span class="Answer"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="hrefareaId" value="0" />
+            <input type="hidden" id="hrefareaName" value="总决赛" />
+            <div class="headerbg Layout">
+                <img class='herderbg-img' src="../assets/images/gallery/headerbg.png" alt="">
+                <img class="loginlogo" src="../assets/images/gallery/loginlogo.png" alt="">
+                <span class="fenareaName">总决赛</span>
+            </div>
+            <div class="indexnav Layout">
+                <div class="">
+                    <div class="indexyemian navone activenav"><a onclick="gotoindex()">网站首页</a><span class="shuxian"
+                            style="display:none;"></span></div>
+                    <div class="navone"><a onclick="goH('CompetitionProfile')">竞赛简介</a><span class="shuxian"></span>
+                    </div>
+                    <!--   onclick="goH('CompetitionArea')" 赛区选择点击事件-->
+                    <div class="navone" onmouseover="menuTwoshow(this)" onclick="goH('CompetitionArea')"
+                        onmouseout="menuTwohide(this)"><a>赛区选择</a><span class="shuxian"></span>
+                        <div class="menuTwo">
+
+                        </div>
+                    </div>
+
+                    <div class="navone"><a onclick="goH('NotificationNotice')">通知公告</a><span class="shuxian"></span>
+                    </div>
+                    <div class="navone"><a onclick="goH('NewCenter')">新闻中心</a><span class="shuxian"></span></div>
+                    <!--  <div class="navone"><a onclick="goH('LeavingMessage')">发表留言</a><span class="shuxian"></span></div> -->
+                    <div class="navone"><a onclick="goH('CommonProblem')">常见问题</a><span class="shuxian"></span></div>
+                    <div class="navone"><a onclick="goH('DownloadCenter')">下载中心</a></div>
+
+                </div>
+            </div>
+
+            <div class="indexyemian">
+                <div class="introAndnotice Layout row">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="padding:0px;">
+                        <div class="introduce bg_fff" style="height:210px;">
+                            <div class="introduceTitle">
+                                <div class="introduceTitletext">竞赛简介</div>
+                                <div style="text-align:center;margin-top: 10px;"><a
+                                        onclick="goH('CompetitionProfile')">More</a></div>
+                            </div>
+                            <div class="introduceDetail">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 loginmodel" style="padding:0px;">
+                        <div class="denglukou bg_fff" style="height:210px;padding-top: 20px;padding-left:  20px;">
+                            <div class="loginTitle">登录</div>
+                            <div class="zhanghaoAmima">
+                                <div class="zhanghao">账号：<input id="name" type="text" placeholder="请输入用户名..." /></div>
+                                <div class="mima">密码：<input id="password" type="password" onkeyup="keyLogin()"
+                                        placeholder="请输入密码..." /></div>
+                                <div id="qiehuanUser" style="display:none">
+                                    <div id="qiehuanname"></div>
+                                </div>
+                                <div class="">
+                                    <div style="font-size: 12px;margin:10px 0 0 0;float: right;"><span id="dengluinfo"
+                                            style="color:red;"></span></div>
+                                    <div class="rmemberpass"><input id="rmemberPass" type="checkbox" name="memberPass"
+                                            style="vertical-align:bottom;">记住密码</div>
+                                    <div id="qiehuanotherUser" onclick="qiehuan()">切换用户</div>
+                                </div>
+                                <div id="sub"><button class="login_btn btn-btnActive"
+                                        onclick="login()">登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</button></div>
+                                <!-- <div><button class="login_btn z-login"
+                                        onclick="">专家登录</button></div> -->
+                                <div id="loding"><button class="loding login_btn" onclick="login()">登录中...</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="padding:0px;">
+                        <div class="newscenter bg_fff" style="height:210px;">
+                            <div class="newscenterTitle">
+                                <div class="newscenterTitletext">最新新闻</div>
+                                <div style="text-align:center;margin-top: 10px;"><a onclick="goH('NewCenter')">More</a>
+                                </div>
+
+                            </div>
+                            <div class="newscenterdetail">
+                                <ul class="newscenterUl"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 addschoAduiwu bg_fff" style="height:210px;">
+                        <div class="schoolduibtn">
+                            <button class="certificate_btn cansaibtn" onclick="goH('Certificates')">证书查询</button>
+                            <button class="cansaischool_btn cansaibtn" onclick="goH('Schools')">参赛学校</button>
+                            <button class="cansaiduiwu_btn cansaibtn" onclick="goH('Ranks')">参赛队伍</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="zuixintongzhi Layout bg_fff">
+                    <div class="" style="height:210px;padding:0px;">
+                        <div class="introduceTitle">
+                            <div class="introduceTitletext">最新通知</div>
+                            <div style="text-align:center;margin-top: 10px;"><a
+                                    onclick="goH('NotificationNotice')">More</a></div>
+
+                        </div>
+                        <div class="introducedetail">
+                            <ul class="introduceUl"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="schoolAndFAQ Layout row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" style="padding:0px;">
+                        <div class="cansaischool bg_fff" style="height:225px;">
+                            <div class="loginTitle">参赛学校</div>
+                            <!-- banner end -->
+                            <!-- 新闻和通告 begin -->
+                            <div id="newslunbo" style="margin-bottom: 25px;">
+                                <div class="slider" style="float:left;">
+                                    <ul class="slider-main">
+
+                                    </ul>
+                                    <div class="slider-extra">
+                                        <ul class="slider-nav">
+
+                                        </ul>
+                                        <div class="slider-page">
+                                            <a class="slider-pre" href="javascript:;;">&lt;</a>
+                                            <a class="slider-next" href="javascript:;;">&gt;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ziyuanxiazai col-lg-8 col-md-8 col-sm-8 col-xs-12" style="padding:0px;">
+                        <div class="resourcesDown bg_fff" style="height:225px;">
+                            <div class="introduceTitle">
+                                <div class="introduceTitletext">资源下载</div>
+                                <div style="text-align:center;margin-top: 10px;"><a
+                                        onclick="goH('DownloadCenter')">More</a></div>
+                            </div>
+                            <div class="downloadDetail">
+                                <ul class="Resourcesdownload"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ziyuanxiazai Layout row">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="padding:0px;">
+                        <div class="friendsLink bg_fff" style="height:210px;">
+                            <div class="introduceTitle">
+                                <div class="introduceTitletext">友情链接</div>
+                                <div style="text-align:center;margin-top: 10px;"><a
+                                        onclick="goH('Friendslinks')">More</a></div>
+                            </div>
+                            <div style="margin-left: 80px;">
+                                <ul class="friendlinks" style="height:150px;overflow:hidden;padding-top:20px;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-lg-4 col-md-4 col-sm-4 col-xs-12" style="padding:0px;">
+                        <div class="FAQ bg_fff" style="height:210px">
+                            <div class="loginTitle">FAQ</div>
+                            <div class="cjwtMore"> <a onclick="goH('CommonProblem')">More</a></div>
+                            <div>
+                                <ul class="cjwtFAQ" style="height:150px;overflow:hidden;"></ul>
+                            </div>
+                            <div class="cjwtinput"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ziyuanxiazai Layout">
+                    <div class="pictureShow bg_fff" style="height:210px;">
+                        <div class="introduceTitle">
+                            <div class="introduceTitletext">图片展示</div>
+                            <div style="text-align:center;margin-top: 10px;">More</div>
+                        </div>
+                        <div class="screen" id="screen">
+                            <ul class="photoshow">
+
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="footer">
+                版权所有 © 化学实验创新设计竞赛 2019 <span class="xiaopingmu">保留所有版权 技术支持：<a href="http://www.dlvrtec.com"
+                        target="_blank">北京微瑞集智科技有限公司</a> </span>
+            </div>
+
+            <script src="../assets/js/jquery-2.0.3.min.js"></script>
+            <script type="text/javascript" src="../assets/js/jquery.cookie.js"></script>
+            <script src="../assets/js/bootstrap.min.js"></script>
+            <script src="../plugins/layui/layui.js"></script>
+            <script src="../js/index.js"></script>
+            <script src="../js/login.js"></script>
+            <script src="../js/lunbotu.js"></script>
+            <script src="../js/indexResources.js"></script>
+        </body>
+
+        </html>

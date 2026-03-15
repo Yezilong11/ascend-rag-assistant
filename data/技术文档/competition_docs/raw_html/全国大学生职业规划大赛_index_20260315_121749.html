@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>全国大学生职业规划大赛</title>
+    <meta
+      data-react-helmet="true"
+      name="keywords"
+      content="职规赛,职规赛官网,职业规划,职业生涯,生涯闯关,职业规划大赛,大学生职业规划大赛,全国大学生职业规划大赛"
+    />
+    <meta
+      name="description"
+      content="全国大学生职业规划大赛是由教育部举办的赛事，生涯教育与就业指导工作贯穿高校招生、培养、就业全过程，是就业指导服务的核心内容、强化价值观引导的重要载体、促进毕业生高质量充分就业的基础工作。以全国大学生职业规划大赛为契机，各地各高校充分发挥大赛的示范作用和育人价值，不断完善大学生生涯教育与就业指导课程体系建设，做实做细就业指导服务，增强大学生职业规划意识。"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      charset="utf-8"
+      href="../styles/global.css"
+    />
+    <link
+      href="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/icon/favicon.ico"
+      rel="shortcut icon"
+      type="image/vnd.microsoft.icon"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=0,user-scalable=no,maximum-scale=1"
+    />
+    <script src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/public/career/iconfont.js"></script>
+    <script src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/public/global/global-icons.js"></script>
+
+    <style type="text/css">
+      body {
+        -webkit-font-smoothing: antialiased; /*chrome、safari*/
+        -moz-osx-font-smoothing: grayscale; /*firefox*/
+        font-family: "PingFang SC", "思源黑体CN";
+      }
+
+      @font-face {
+        font-family: "YouSheBiaoTiHei";
+        src: url("https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/font/YouSheBiaoTiHei-2.ttf")
+          format("opentype");
+        font-display: swap;
+      }
+
+      .app_wrapper {
+        height: 100%;
+      }
+
+      /* TODO 此处修改了Antd全局样式会对 产生较大影响 */
+      div,
+      p,
+      span,
+      i,
+      label {
+        white-space: pre-line;
+        word-break: break-all;
+        overflow-wrap: break-word;
+      }
+      .ant-form-item-label > label {
+        /* font-size: 14px !important; */
+        font-family: PingFangSC-Regular, PingFang SC !important;
+        color: #333333 !important;
+        /*line-height: 20px !important;*/
+      }
+      /*.ant-btn, .ant-btn-primary{
+            width: 112px;
+            height: 42px !important;
+          }*/
+      .ant-input,
+      .ant-select-selector {
+        font-size: 16px !important;
+        font-family: PingFangSC-Regular, PingFang SC;
+        color: #333333 !important;
+        /*line-height: 22px !important;;*/
+
+        /*padding: 8px 6px !important;;*/
+        border: 1px solid rgba(64, 135, 247, 0.18) !important;
+        border-radius: 8px !important;
+      }
+
+      textarea.ant-input {
+        font-size: 16px !important;
+        font-family: PingFangSC-Regular, PingFang SC !important;
+        color: #333333 !important;
+        /*line-height: 22px !important;;*/
+        padding: 16px !important;
+        border: 1px solid rgba(64, 135, 247, 0.18) !important;
+        border-radius: 8px !important;
+        resize: none;
+      }
+      .ant-input::-webkit-input-placeholder,
+      textarea.ant-input::-webkit-input-placeholder {
+        color: #aaaaaa !important;
+      }
+      .ant-input:focus,
+      .ant-input-focused {
+        border: 1px solid rgba(64, 135, 247, 1) !important;
+      }
+
+      /* 自定义滚动条整体样式 */
+      ::-webkit-scrollbar {
+        width: 8px; /* 设置滚动条的宽度 */
+        height: 8px;
+      }
+
+      /* 自定义滚动条滑块样式 */
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15); /* 设置滑块的颜色 */
+        border-radius: 4px; /* 设置滑块的圆角 */
+      }
+
+      /* 自定义滚动条轨道样式 */
+      ::-webkit-scrollbar-track {
+        background-color: #f0f0f0; /* 设置轨道的颜色 */
+        border-radius: 4px;
+      }
+
+      @media screen and (max-width: 1380px) {
+        body {
+          white-space: nowrap; /* ul中的内容不换行 */
+          overflow-x: scroll; /* 横向滚动 */
+        }
+        .app_wrapper {
+          width: 1380px;
+        }
+      }
+    </style>
+    <script>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?35269319fecb54bb918e61dcf8bf67ef";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+    <script>
+      window.routerBase = "/";
+    </script>
+    <script>
+      window.publicPath =
+        window.resourceBaseUrl ||
+        "https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/web_static/zgs_resource_pc_2/000089/";
+    </script>
+    <script>
+      //! umi version: 3.5.20
+    </script>
+  </head>
+  <body>
+    <link rel="stylesheet/less" type="text/css" href="/color.less" />
+    <script>
+      window.less = {
+        async: false,
+        env: 'production'
+      };
+    </script>
+    <script type="text/javascript" src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/public/global/less.min.js"></script>
+        
+    <div id="root" class="app_wrapper"></div>
+
+    <script src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/public/global/react.production.min.js"></script>
+    <script src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/zgs_resource/public/global/react-dom.production.min.js"></script>
+    <script src="https://chsi-zyghds.oss-cn-beijing.aliyuncs.com/web_static/zgs_resource_pc_2/000089/umi.16a44e01.js"></script>
+  </body>
+</html>

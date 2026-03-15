@@ -1,0 +1,1174 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>首页-全国大学生统计建模大赛官网</title>
+    <link rel="stylesheet" href="/r/cms/tjjmds/default/css/jSlider.css">
+    <link rel="stylesheet" href="/r/cms/tjjmds/default/css/index.css?v=20250321">
+    <meta name="title" content="全国大学生统计建模大赛官网,统计建模大赛" />
+    <meta name="keywords" content="全国大学生统计建模大赛官网,统计建模大赛官网,统计建模大赛,大学生统计建模大赛" />
+    <meta name="description" content="全国大学生统计建模大赛官网,统计建模大赛官网" />
+</head>
+
+<body>
+    <!-- 顶部导航 -->
+<link rel="stylesheet" href="/r/cms/tjjmds/default/css/reset.css?v=20260211" />
+<link rel="stylesheet" href="/r/cms/tjjmds/default/css/header.css" />
+<link rel="stylesheet" href="/r/cms/tjjmds/default/icon/iconfont.css" />
+<link rel="stylesheet" href="/r/cms/tjjmds/default/fonts/iconfont.css">
+
+<link rel="stylesheet" href="/r/cms/tjjmds/default/css/password.css" />
+<link rel="stylesheet" href="/r/cms/tjjmds/default/css/jquery.my-message.1.1.css"/>
+
+<script>
+	localStorage.setItem('base', '');
+</script>
+
+<!-- IE兼容ES6基本语法 -->
+<!-- <script src="js/browser.min.js"></script> -->
+<!-- 转换 Iterator、Generator、Set、Maps、Proxy、Reflect、
+Symbol、Promise等语法 -->
+<!-- <script src="js/browser-polyfill.min.js"></script> -->
+<!-- ======== -->
+<script src="/r/cms/tjjmds/default/js/jquery-1.12.4.js"></script>
+<script src="/r/cms/tjjmds/default/js/sm.js"></script>
+<script src="/r/cms/tjjmds/default/js/crypto-js.js"></script>
+<script src="/r/cms/tjjmds/default/js/jquery.my-message.1.1.js"></script>
+<script src="/r/cms/tjjmds/default/js/jquery.validate.js"></script>
+<script src="/r/cms/tjjmds/default/js/jquery.page.js"></script>
+<script src="/r/cms/tjjmds/default/js/chinese.js"></script>
+<script src="/r/cms/tjjmds/default/js/public.js" type="text/javascript" charset="utf-8"></script>
+<script src="/r/cms/tjjmds/default/js/app.js"></script>
+<script src="/r/cms/tjjmds/default/js/permCheck.js" type="text/javascript" charset="utf-8"></script>
+<script src="/r/cms/tjjmds/default/js/siteSurver.js"></script>
+<script>
+	setTimeout(function() {
+					siteInitTime(getUrlArg('errorLink'));
+			}, 500);
+	$.extend($.validator.messages, {
+    required: "必选字段",
+    remote: "请修正该字段",
+    email: "请输入正确格式的电子邮件",
+    url: "请输入合法的网址",
+    date: "请输入合法的日期",
+    dateISO: "请输入合法的日期 (ISO).",
+    number: "请输入合法的数字",
+    digits: "只能输入整数",
+    creditcard: "请输入合法的信用卡号",
+    equalTo: "请再次输入相同的值",
+    accept: "请输入拥有合法后缀名的字符串",
+    maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符串"),
+    minlength: $.validator.format("请输入一个长度最少是 {0} 的字符串"),
+    rangelength: $.validator.format("请输入一个长度介于 {0} 和 {1} 之间的字符串"),
+    range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值"),
+    max: $.validator.format("请输入一个最大为 {0} 的值"),
+    min: $.validator.format("请输入一个最小为 {0} 的值")
+});
+</script>
+
+<!-- 顶1部 -->
+
+<script type="text/javascript">
+
+	$(function() {
+
+		// GOV.yuyinInit("","true");
+		// register-sso
+		function isSsoLogin (){
+			var openSso = 'false';
+			if(openSso == 'true'){
+				$('.register-sso').css('display','inline-block');
+				$('.header .typeArea .navbar ul li').css('margin-left','50px');
+			} else {
+				$('.register-sso').css('display','none');
+				$('.header .typeArea .navbar ul li').css('margin-left','40px');
+			}
+
+		}
+		isSsoLogin();
+	})
+</script>
+
+<div >
+	<div class="barrierBed none"></div>
+	<div class="header">
+		<!-- 搜索隐藏模块展开12 -->
+		<div class="search-show none">
+			<div class="search-top">
+				<div class="box">
+					<div class="title">
+						<input type="text" maxlength="150" id="headerKeyword" placeholder="请输入你要查找的内容"/>
+						<i onclick="upSearch()"  class="iconfont iconsousuo1"></i>
+					</div>
+					<i class="iconfont iconguanbi"></i>
+					<div class="hotBot">
+						<div class="text">热搜词</div>
+						<ul>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('重庆大学附属仁济医院++等保测评')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">重庆大学附属仁济医院++等保测评</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('滁州经济技术开发区管委会')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">滁州经济技术开发区管委会</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('ä¼˜ç§€è®ºæ–‡')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">ä¼˜ç§€è®ºæ–‡</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('即墨市马山下泊地块编码')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">即墨市马山下泊地块编码</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('2021年（第七届）全国大学生统计建模大赛获奖名单')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">2021年（第七届）全国大学生统计建模大赛获奖名单</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('Ã¥Å½â€ Ã¥Â±Å Ã¤Â¼ËœÃ§Â§â‚¬Ã¨Â®ÂºÃ¦â€“â€¡')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">Ã¥Å½â€ Ã¥Â±Å Ã¤Â¼ËœÃ§Â§â‚¬Ã¨Â®ÂºÃ¦â€“â€¡</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('湘潭大学2025初试成绩查询')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">湘潭大学2025初试成绩查询</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('赛程')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">赛程</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('获奖优秀文章')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">获奖优秀文章</a></li>
+							<li><a rel="noopener noreferrer" class="ooo" onclick="upSearch('新质生产力的指标构建及其时空演进分析')" rel="noopener noreferrer" target='_blank' rel="noopener noreferrer">新质生产力的指标构建及其时空演进分析</a></li>
+							<div class="clearfix"></div>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="typeArea">
+			
+			<div class="navbar Semilight">
+				<!--给0初始值是为了方便首页其他页面非栏目内容页面不报错-->
+				<!--这一段是为了获取当前内容栏目所在的顶层栏目所在顶层栏目的序号位置-->
+				<!--如果当前栏目位置原本是在第二行，则少取一个，将当前访问栏目放最后-->
+				<ul id="navList">
+					<!--如果当前栏目位置原本是在第二行，则少取一个，取第一行12-->
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="http://tjjmds.ai-learning.net/" rel="noopener noreferrer">首页</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/gyds/37115.jhtml" rel="noopener noreferrer">关于大赛</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/dstz.jhtml" rel="noopener noreferrer">大赛通知</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/dsdt.jhtml" rel="noopener noreferrer">大赛动态</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/pxzy.jhtml" rel="noopener noreferrer">培训资源</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/sshg.jhtml" rel="noopener noreferrer">赛事回顾</a>
+						</li>
+						<li  >
+						<a rel="noopener noreferrer"  class=" ddd" href="/lxwm/37118.jhtml" rel="noopener noreferrer">联系我们</a>
+						</li>
+					<!--如果当前栏目位置原本是在第二行，则少取一个，取第一行的最后一个-->
+					<!-- <li class="moreBox">
+						<div >
+							<span class=" pointer moreH">大赛资源</span>
+							<i class="iconfont  iconfanhui-copy-copy-copy-copy icoH"></i>
+							<i class="iconfont  iconfanhui-copy-copy-copy-copy1 none icoH"  ></i>
+						</div>
+					</li> -->
+				</ul>
+			</div>
+			<!-- 右边 -->
+			<div class="function">
+				<i class="search iconfont iconsousuo1 pointer"></i>
+			</div>
+		</div>
+		<div class="headerLine"></div>
+		<div class=" moreBox1" style="height: 50px;overflow: hidden;width: 100%;margin: 0 auto;">
+			<div class="font-show2">
+				<!--  -->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+				<!--第二行展示的后面的栏目 排除第一行展示的栏目且不是当前栏目-->
+			</div>
+		</div>
+	</div>
+
+
+	<div id="goTop" class="pointer">
+		<span>返回<br />顶部</span>
+		<i class="iconfont iconjiantousvg"></i>
+	</div>
+	<div class="mian-all">
+		<div class="all-dig"></div>
+		<div class="all-showHide">
+			<p>修改密码</p>
+			<div class="showHide-input">
+				<div >
+					<label>
+						<span>*</span>
+						旧密码：
+						<input id="oldPass" maxlength="50" type="password" placeholder="请输入旧密码">
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>*</span>
+						新密码：
+						<input id="newPass" maxlength="50" type="password" placeholder="请输入新密码">
+					</label>
+				</div>
+				<div>
+					<label>
+						<span>*</span> 确认新密码：
+						<input id="PlqStr" maxlength="50" type="password" placeholder="请再次输入新密码">
+					</label>
+				</div>
+			</div>
+			<div class="all-add">
+				<button id="addPassWord">完成</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// 设置cookie
+	function setTCookie(c_name, value, expiredays) {
+		var d = new Date();
+		d.setTime(d.getTime() + (expiredays*24*60*60*1000));
+		var expires = "expires="+d.toUTCString();
+		document.cookie = c_name + "=" + value + "; " + expires+"; path=/";//path=/是根路径
+	}
+	//获取cookie
+	function getTCookie(cname) {
+		var name = cname + "=";
+		var ca = document.cookie.split(';');
+		for(var i=0; i<ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0)==' ') c = c.substring(1);
+			if (c.indexOf(name) != -1) return c.substring(name.length, c.length);
+		}
+		return "";
+	}
+	// 清除cookie
+	function clearTCookie(name) {
+		setTCookie(name, "", -1);
+	}
+
+	// 加载地址图标
+	var linkTag = $('<link rel="icon" type="image/x-icon" href="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202602/260930324hgm.ico"/>');
+	$($('head')[0]).append(linkTag);
+
+	function getAuthToken() {
+        let cookies = document.cookie.split(";");
+        var str = "";
+        for(let i = 1;i<cookies.length;i++){
+					let cookie = cookies[i]
+            if (cookie.trim().startsWith("AUTHTOKEN")) {
+                console.log(cookie)
+                str = cookie.trim().replace("AUTHTOKEN=", "")
+                break
+            }
+        }
+        return str;
+    }
+
+	function quitLogin() {
+		var authToken = getAuthToken()
+		
+		console.log(document.cookie)
+		api.POST('/logout', {authToken:authToken}, function (result) {
+			if (result.code === 200) {
+				myMessage.add(result.message, 'success');
+				localStorage.setItem('JEECMS-Auth-Token', '');
+				window.localStorage.setItem('paidUser',false)
+				clearTCookie('rememberMe');
+				console.log(getTCookie('rememberMe'))
+				userLoad()
+				if(window.location.href.indexOf("member-vipcenter") != -1 ){
+					document.getElementById('loginUrl').click();
+				}
+			} else {
+				myMessage.add(result.message, 'error');
+			}
+		})
+	}
+
+	function userLoad() {
+		$(".stateUser").load("/csi-loginStatus.htm")
+	}
+	userLoad()
+
+	$('.stateUser').on('mouseenter', function () {
+		$('.stateUser ul').stop().slideDown(500);
+	});
+	if($('.font-show2 div').length===0){
+		$('.moreBox').addClass('none')
+		$('.icoH').addClass('none')
+		$('.lineH').eq(0).addClass('none')
+	}
+	$('.stateUser').on('mouseleave', function () {
+		$('.stateUser ul').stop().slideUp(500);
+	});
+	$('.moreBox').on("mouseover",function(){$('.moreBox1').stop().slideDown(500);$('.icoH').eq(0).addClass('none');$('.icoH').eq(1).removeClass('none')})
+	$('.moreBox').on("mouseout",function(){$('.moreBox1').stop().slideUp(500);$('.icoH').eq(1).addClass('none');$('.icoH').eq(0).removeClass('none')})
+	$('.moreBox1').on("mouseover",function(){$('.moreBox1').stop().slideDown(500);$('.icoH').eq(0).addClass('none');$('.icoH').eq(1).removeClass('none')})
+	$('.moreBox1').on("mouseout",function(){$('.moreBox1').stop().slideUp(500);$('.icoH').eq(1).addClass('none');$('.icoH').eq(0).removeClass('none')})
+	// var isTypeface = true
+	//更换简体繁体
+	// $('.typeface .background a').on('click',function(){
+	// 	if(isTypeface){
+	// 		$('.typeface>span').text('简体');
+	// 		$(this).css('color','#E30B20');
+	// 		$('.typeface .background1 a').css('color','#333');
+	// 		zh_tran('s')
+	// 		isTypeface = false
+	// 	}
+	// 	else{
+	// 		// $('.typeface>span').text('简体');
+	// 		// $(this).text('繁体');
+	// 		zh_tran('s')
+	// 		isTypeface = true
+	// 	}
+
+	// });
+	// $('.typeface .background1 a').on('click',function(){
+	// 	if(isTypeface){
+	// 		$('.typeface>span').text('繁体');
+	// 		$(this).css('color','#E30B20');
+	// 		$('.typeface .background a').css('color','#333');
+	// 		zh_tran('t')
+	// 		isTypeface = false
+	// 	}
+	// 	else{
+	// 		// $('.typeface>span').text('简体');
+	// 		// $(this).text('繁体');
+	// 		zh_tran('s')
+	// 		isTypeface = true
+	// 	}
+	// });
+
+	/**
+	 * 分级保护-修改密码start
+	 */
+	$('#addPassWord').click(function () {
+		var oldPStr = desEncrypt($('#oldPass').val());
+		var newPStr
+		var againPStr
+		if ($('#oldPass').val() == '') {
+			myMessage.add('旧密码不能为空', 'error');
+			return
+		}
+		if ($('#newPass').val() == '') {
+			myMessage.add('新密码不能为空', 'error');
+			return
+		}
+		if ($('#PlqStr').val() == '') {
+			myMessage.add('确认密码不能为空', 'error');
+			return
+		}
+		if ($('#PlqStr').val() === $('#newPass').val()) {
+			newPStr = desEncrypt($('#newPass').val());
+			againPStr = newPStr
+		} else {
+			myMessage.add('两次输入密码不一致!', 'error');
+			return
+		}
+
+		api.POST('/member/memberinfo/pstr', {
+			oldPStr: oldPStr,
+			newPStr: newPStr,
+			againPStr: againPStr
+		}, function (result) {
+			if (result.code === 200) {
+				$('.mian-all').css('display',"none")
+				myMessage.add(result.message, 'success');
+			} else {
+				myMessage.add(result.message, 'error');
+			}
+		})
+	})
+	// function getHeaders(){
+	//   var req = new XMLHttpRequest();
+	//   req.open('GET', document.location.href, false);
+	//   req.send(null);
+	//   var headerArr = req.getAllResponseHeaders().split('\n');
+	// 	var headers = {};
+	// 	for(var i = 0;i<headerArr.length;i++){
+	// 		if(headerArr[i]){
+	// 			var index = headerArr[i].indexOf(':');
+	// 			var key = headerArr[i].slice(0,index);
+	// 			var value = headerArr[i].slice(index+1).trim();
+	// 			headers[key] = value
+	// 		}
+	// 	}
+	// 	return headers
+	// }
+	// var headers = getHeaders()
+	/**
+	 * 分级保护-修改密码end
+	 */
+	$(function(){
+		if(localStorage.getItem('typeface') && localStorage.getItem('typeface')=='简体'){
+			$('.typeface>span').text('简体');
+			zh_tran('s')
+		}else if(localStorage.getItem('typeface') && localStorage.getItem('typeface')=='繁体'){
+			$('.typeface>span').text('繁体');
+			zh_tran('t')
+		}else{
+			$('.typeface>span').text('简体');
+			zh_tran('s')
+		}
+		/**
+		 * 分级保护之修改密码 判断开始是否第一次进入  是弹出修改密码弹窗 start
+		 */
+		var passType = window.localStorage.getItem('passType')
+		var token = localStorage.getItem('JEECMS-Auth-Token');
+		if (token)  {
+			if (passType === 'true') {
+				$('.mian-all').css('display',"block")
+			}
+		}
+		/**
+		 * 分级保护之修改密码 判断开始是否第一次进入  是弹出修改密码弹窗 end
+		 */
+	})
+	$('.typeface .background a').on('click', function () {
+		$('.typeface>span').text('简体');
+		$(this).css('color', '#E30B20');
+		$('.typeface .background1 a').css('color', '#333');
+		localStorage.setItem('typeface','简体');
+		zh_tran('s')
+	});
+	$('.typeface .background1 a').on('click', function () {
+		$('.typeface>span').text('繁体');
+		$(this).css('color', '#E30B20');
+		$('.typeface .background a').css('color', '#333');
+		localStorage.setItem('typeface','繁体');
+		zh_tran('t')
+	});
+
+
+	function upSearch(q) {
+		var keyWords = q?encodeURI(q):''
+		var inpVal = encodeURI($('#headerKeyword').val())
+		var headerKeyword = keyWords||inpVal
+		window.open('/search.htm?q=' + headerKeyword);
+	}
+
+	$("#headerKeyword").keypress(function (e) {
+		if (e.which == 13) {
+			var headerKeyword = encodeURI($('#headerKeyword').val())
+			window.open('/search.htm?q=' + headerKeyword);
+		}
+	});
+
+
+	//简体繁体切换
+	$('.typeface').on('mouseenter', function () {
+		$('.typeface .iconfanhui-copy-copy-copy-copy').addClass('none');
+		$('.typeface .iconfanhui-copy-copy-copy-copy1').removeClass('none');
+	});
+	$('.typeface').on('mouseleave', function () {
+		$('.typeface .iconfanhui-copy-copy-copy-copy1').addClass('none');
+		$('.typeface .iconfanhui-copy-copy-copy-copy').removeClass('none');
+	});
+	$(function () {
+		/*固定*/
+		var sTop = 0;
+		$(window).scroll(function () {
+			sTop = $(this).scrollTop();
+			if (sTop > 600) {
+				$('#goTop').show()
+			} else {
+				$('#goTop').hide()
+
+			}
+		});
+
+		$('#goTop').click(function () {
+			$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $(
+					'html,body');
+			$body.animate({
+				scrollTop: 0
+			}, 1000);
+		});
+
+	})
+</script>
+<a id="loginUrl" href="/login" style="display: none" target="_self"></a>
+    <!--顶部导航 over-->
+    <!-- 大中部整体模块 -->
+    <div class="section">
+        <div class="typeArea" style="margin-bottom: 0px;">
+            <div class="title">
+                <div class="headline">
+                    <div class="logo Regular">
+                        <span>头条</span>
+                    </div>
+                    <div class="title-top Bold">
+                        <a rel="noopener noreferrer"  href="/dstz/37119.jhtml" target="_blank">
+关于举办2026年(第十二届)全国大学生统计建模大赛的通知                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="title-bottom Regular">
+<ul>
+                    
+                         <li>
+                            <a rel="noopener noreferrer" href="/dsdt/37042.jhtml" target="_blank">全国大学生统计建模大赛优秀论文集入选中国知网2024年度高影响力学术会议论文集</a>
+                        </li>
+
+                         <span style="color:#999;padding:0 6px 0 13px">|</span>
+                   
+                         <li>
+                            <a rel="noopener noreferrer" href="/dsdt/36904.jhtml" target="_blank">“全国大学生统计建模大赛”进入全国大学生竞赛排行榜</a>
+                        </li>
+ </ul>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 轮播图模块 -->
+        <div class="lunbo">
+            <div class="banner" id="b04">
+                <ul>
+                    <li
+                        style=" height: 600px; margin: 0 auto; background: url('http://cmswebsite.ai-learning.net/u/cms/tjjmds/202502/13182442qtg7.png') no-repeat;background-size: cover;">
+                        <a rel="noopener noreferrer" href="http://tjjmds.ai-learning.net/dstz/37119.jhtml" 
+                            rel="noopener noreferrer">
+                            <img style="width: 1200px;" src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202602/06142803g19l.png" alt="" />
+                            <!-- <div class="text Regular hover">2026第十二届大赛图片</div> -->
+                        </a>
+                    </li>
+                </ul>
+                <a rel="noopener noreferrer" href="javascript:void(0);" class="unslider-arrow04 prev hover">
+                    <i class="iconfont iconjiaodiantujiantouzuo arrow" id="al"></i>
+                </a>
+                <a rel="noopener noreferrer" href="javascript:void(0);" class="unslider-arrow04 next hover">
+                    <i class="iconfont iconjiaodiantujiantou arrow" id="ar"></i>
+                </a>
+            </div>
+        </div>
+        <div class="typeArea">
+            <!-- 按钮 -->
+            <div id="loginColumn" class="loginActionBtn fixedWidth fontDisableSelection" style="margin: 30px auto;">
+
+                <!-- <a href="http://tjjmds.jingsai.ai-learning.net?uType=3" target="_black"> -->
+                <a href="#" target="_black">
+                    <div class="loginItem btn1">
+                        <div class="text">注册登录</div>
+                    </div>
+                </a>
+                <!-- <a href="http://tjjmds.jingsai.ai-learning.net?uType=4" target="_black"> -->
+                <a href="#" target="_black">
+                    <div class="loginItem btn4 ">
+                        <div class="text">院校管理员登录</div>
+                    </div>
+                </a>
+              
+                <!-- <a href="http://tjjmds.jingsai.ai-learning.net?uType=2" target="_black"> -->
+                <a href="#" target="_black">
+                    <div class="loginItem btn3 ">
+                        <div class="text">评审专家登录</div>
+                    </div>
+                </a>
+                <!-- <a href="http://tjjmds.jingsai.ai-learning.net?uType=1" target="_black"> -->
+                <a href="#" target="_black">
+                    <div class="loginItem btn2 ">
+                        <div class="text">管理员登录</div>
+                    </div>
+                </a>
+            </div>
+            <!-- 热点要闻模块 -->
+            <div class="hot">
+                <div class="nav">
+                    <div class="title Regular">
+                        <a rel="noopener noreferrer" href="/dsdt.jhtml">大赛动态</a>
+                    </div>
+                    <div class="more Light">
+                        <a rel="noopener noreferrer" href="/dsdt.jhtml" target="_blank">更多</a>
+                        <a rel="noopener noreferrer" href="/dsdt.jhtml" target="_blank"
+                            class="search iconfont icongengduo"></a>
+                    </div>
+                </div>
+                <!-- 左侧要闻列表 -->
+                <div class="new-list">
+                    <div class="new-left Semilight">
+                        <dl>
+                            <dd>
+                                <div class="newsImages">
+                                    <a rel="noopener noreferrer" class="rank-img fl" href="/dsdt/37092.jhtml" style="height: 100%;">
+                                        <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21123746goz9.jpg" alt="" style="height: 100%;">
+                                    </a>
+                                </div>
+                                <div class="newsData">
+                                    <a rel="noopener noreferrer" href="/dsdt/37092.jhtml" class="text Semilight fl">
+关于公布2025年（第十一届）全国大学生统计建模大赛国赛获奖名单的通知                                    </a>
+                                    <div class="viewsData">
+                                        <div class="source">
+                                            大赛组委会
+                                        </div>
+                                        <div class="date">2025-10-29 21:45</div>
+                                        <div class="viewsDetails">
+                                            <a rel="noopener noreferrer" class="uicon fr " href="/dsdt/37092.jhtml">
+                                                <i class="iconfont iconliulang"></i>
+                                                <span>39279</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover ups" href="/dsdt/37092.jhtml"
+                                                style="display: none;">
+                                                <i class="iconfont iconthumb-up-line"></i>
+                                                <span>0</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover comments"
+                                                href="/dsdt/37092.jhtml?comments=1" target="_blank">
+                                                <i class="iconfont iconmessage--line1"></i>
+                                                <span>0</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </dd>
+                            <dd>
+                                <div class="newsImages">
+                                    <a rel="noopener noreferrer" class="rank-img fl" href="/dsdt/37082.jhtml" style="height: 100%;">
+                                        <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21123746goz9.jpg" alt="" style="height: 100%;">
+                                    </a>
+                                </div>
+                                <div class="newsData">
+                                    <a rel="noopener noreferrer" href="/dsdt/37082.jhtml" class="text Semilight fl">
+中国统计教育学会关于举办2025年（第十一届）全国大学生统计建模大赛现场答辩赛的通知                                    </a>
+                                    <div class="viewsData">
+                                        <div class="source">
+                                            大赛组委会
+                                        </div>
+                                        <div class="date">2025-10-14 00:30</div>
+                                        <div class="viewsDetails">
+                                            <a rel="noopener noreferrer" class="uicon fr " href="/dsdt/37082.jhtml">
+                                                <i class="iconfont iconliulang"></i>
+                                                <span>17629</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover ups" href="/dsdt/37082.jhtml"
+                                                style="display: none;">
+                                                <i class="iconfont iconthumb-up-line"></i>
+                                                <span>0</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover comments"
+                                                href="/dsdt/37082.jhtml?comments=1" target="_blank">
+                                                <i class="iconfont iconmessage--line1"></i>
+                                                <span>0</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </dd>
+                            <dd>
+                                <div class="newsImages">
+                                    <a rel="noopener noreferrer" class="rank-img fl" href="/dsdt/37072.jhtml" style="height: 100%;">
+                                        <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21123746goz9.jpg" alt="" style="height: 100%;">
+                                    </a>
+                                </div>
+                                <div class="newsData">
+                                    <a rel="noopener noreferrer" href="/dsdt/37072.jhtml" class="text Semilight fl">
+关于公布2025年（第十一届）全国大学生统计建模大赛入围国赛名单的通知                                    </a>
+                                    <div class="viewsData">
+                                        <div class="source">
+                                            大赛组委会
+                                        </div>
+                                        <div class="date">2025-09-30 23:07</div>
+                                        <div class="viewsDetails">
+                                            <a rel="noopener noreferrer" class="uicon fr " href="/dsdt/37072.jhtml">
+                                                <i class="iconfont iconliulang"></i>
+                                                <span>23033</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover ups" href="/dsdt/37072.jhtml"
+                                                style="display: none;">
+                                                <i class="iconfont iconthumb-up-line"></i>
+                                                <span>0</span>
+                                            </a>
+                                            <a rel="noopener noreferrer" class="uicon fr hover comments"
+                                                href="/dsdt/37072.jhtml?comments=1" target="_blank">
+                                                <i class="iconfont iconmessage--line1"></i>
+                                                <span>0</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                <!-- 右侧热点排行 -->
+                <div class="ranking">
+                    <div class="box">
+                        <div class="logo Regular">
+                            <span>大赛通知</span>
+                            <i class="iconfont iconpaihang"></i>
+                        </div>
+                    </div>
+                    <ul id="hotList">
+                        <li>
+                            <span class="num Bold fl">1</span>
+                            <a rel="noopener noreferrer" class="rank-img fl" href="/dstz/37119.jhtml">
+                                <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21142443gdy5.jpg" alt="">
+                            </a>
+                            <a rel="noopener noreferrer" href="/dstz/37119.jhtml" class="text Semilight fl">
+关于举办2026年(第十二届)全国...                            </a>
+                            <span class="read Semilight">30130人阅读</span>
+                        </li>
+                        <li>
+                            <span class="num Bold fl">2</span>
+                            <a rel="noopener noreferrer" class="rank-img fl" href="/dstz/37047.jhtml">
+                                <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21142443gdy5.jpg" alt="">
+                            </a>
+                            <a rel="noopener noreferrer" href="/dstz/37047.jhtml" class="text Semilight fl">
+关于举办2025年(第十一届)全国...                            </a>
+                            <span class="read Semilight">506335人阅读</span>
+                        </li>
+                        <li>
+                            <span class="num Bold fl">3</span>
+                            <a rel="noopener noreferrer" class="rank-img fl" href="/dstz/36972.jhtml">
+                                <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21153020zlqf.jpg" alt="">
+                            </a>
+                            <a rel="noopener noreferrer" href="/dstz/36972.jhtml" class="text Semilight fl">
+关于举办2024年(第十届)全国大...                            </a>
+                            <span class="read Semilight">3216602人阅读</span>
+                        </li>
+                    </ul>
+                    <div class="slide">
+                        <a rel="noopener noreferrer" href="/dstz.jhtml">
+                            查看更多 <span class="search iconfont icongengduo" style="margin-left: 5px;"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 培训资源 -->
+        <div class="trainResourcesBox">
+            <div class="columnTitleBox">
+                <div class="columnTitleZHWhite">培训资源</div>
+                <div class="columnTitleEN columnTitleColor1">TRAINING RESOURCES</div>
+                <div class="columnUnderline columnUnderlineBorder1"></div>
+            </div>
+
+            <!-- 栏目内容 -->
+            <div class="trainResourcesContent fixedWidth">
+                <ul>
+                    <li>
+                        <div class="dateBox">
+                            <div class="day">08 </div>
+                            <div class="date">2025/03</div>
+                        </div>
+                        <div class="contentData">
+                            <div class="title">
+                                <a href="/pxzy/37050.jhtml">
+                                    关于发布2025年（第十一届）全国大学生统计建模大赛培训课程的通知
+                                </a>
+                            </div>
+                            <div class="otherdata">
+                                <div class="authorBox">
+                                    <div class="icon"></div>
+                                    <div class="author">来源: 大赛组委会</div>
+                                </div>
+                                <div class="reviewBox">
+                                    <div class="icon"></div>
+                                    <div class="review">
+                                        <a href="/pxzy/37050.jhtml">
+                                            127588
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dateBox">
+                            <div class="day">19 </div>
+                            <div class="date">2024/03</div>
+                        </div>
+                        <div class="contentData">
+                            <div class="title">
+                                <a href="/dsdt/36982.jhtml">
+                                    关于发布2024年（第十届）全国大学生统计建模大赛主题解读培训课程的通知
+                                </a>
+                            </div>
+                            <div class="otherdata">
+                                <div class="authorBox">
+                                    <div class="icon"></div>
+                                    <div class="author">来源: 大赛组委会</div>
+                                </div>
+                                <div class="reviewBox">
+                                    <div class="icon"></div>
+                                    <div class="review">
+                                        <a href="/dsdt/36982.jhtml">
+                                            2564570
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dateBox">
+                            <div class="day">06 </div>
+                            <div class="date">2023/04</div>
+                        </div>
+                        <div class="contentData">
+                            <div class="title">
+                                <a href="/dsdt/36912.jhtml">
+                                    《2023年（第九届）全国大学生统计建模大赛主题解读》（视频）
+                                </a>
+                            </div>
+                            <div class="otherdata">
+                                <div class="authorBox">
+                                    <div class="icon"></div>
+                                    <div class="author">来源: 大赛组委会</div>
+                                </div>
+                                <div class="reviewBox">
+                                    <div class="icon"></div>
+                                    <div class="review">
+                                        <a href="/dsdt/36912.jhtml">
+                                            3386783
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dateBox">
+                            <div class="day">04 </div>
+                            <div class="date">2022/04</div>
+                        </div>
+                        <div class="contentData">
+                            <div class="title">
+                                <a href="/dsdt/36782.jhtml">
+                                    《2022年（第八届）全国大学生统计建模大赛主题解读》（视频版+文字版）
+                                </a>
+                            </div>
+                            <div class="otherdata">
+                                <div class="authorBox">
+                                    <div class="icon"></div>
+                                    <div class="author">来源: 大赛组委会</div>
+                                </div>
+                                <div class="reviewBox">
+                                    <div class="icon"></div>
+                                    <div class="review">
+                                        <a href="/dsdt/36782.jhtml">
+                                            8328017
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="reviewMore">
+                <a href="/pxzy.jhtml">查看更多</a>
+            </div>
+        </div>
+
+        <!-- 赛事回顾 -->
+        <div class="eventReviewBox fixedWidth">
+            <div class="columnTitleBox">
+                <div class="columnTitleZHBlack">赛事回顾</div>
+                <div class="columnTitleEN columnTitleColor2">EVENT REVIEW</div>
+                <div class="columnUnderline columnUnderlineBorder2"></div>
+            </div>
+
+            <!-- 栏目内容 -->
+            <div class="eventReviewContent">
+                <ul>
+                    <li>
+                        <div class="imgBox">
+                            <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202503/21123746goz9.jpg" alt="">
+                        </div>
+                        <div class="content">
+                            <div class="title">
+                                <a href="/sshg/37055.jhtml">
+                                    关于公布2024年（第十届）全国大学生统计建模大赛国赛获奖名单的通知
+                                </a>
+                            </div>
+
+                            <div class="sourceData">
+                                <div class="source">
+                                    大赛组委会
+                                </div>
+                                <div class="date">2024-08-27</div>
+                                <div class="views">
+                                    <a rel="noopener noreferrer" class="uicon fr " href="/sshg/37055.jhtml">
+                                        <i class="iconfont iconliulang"></i>
+                                        <span>26</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="imgBox">
+                            <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202308/301609192s68.jpg" alt="">
+                        </div>
+                        <div class="content">
+                            <div class="title">
+                                <a href="/sshg/36966.jhtml">
+                                    关于公布2023年（第九届）全国大学生统计建模大赛全国赛获奖名单的通知
+                                </a>
+                            </div>
+
+                            <div class="sourceData">
+                                <div class="source">
+                                    大赛组委会
+                                </div>
+                                <div class="date">2023-08-31</div>
+                                <div class="views">
+                                    <a rel="noopener noreferrer" class="uicon fr " href="/sshg/36966.jhtml">
+                                        <i class="iconfont iconliulang"></i>
+                                        <span>7202</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="imgBox">
+                            <img src="http://cmswebsite.ai-learning.net/u/cms/tjjmds/202209/06143912w04q.jpg" alt="">
+                        </div>
+                        <div class="content">
+                            <div class="title">
+                                <a href="/sshg/36964.jhtml">
+                                    关于公布2022年（第八届）全国大学生统计建模大赛全国赛获奖名单的通告
+                                </a>
+                            </div>
+
+                            <div class="sourceData">
+                                <div class="source">
+                                    大赛组委会
+                                </div>
+                                <div class="date">2022-09-06</div>
+                                <div class="views">
+                                    <a rel="noopener noreferrer" class="uicon fr " href="/sshg/36964.jhtml">
+                                        <i class="iconfont iconliulang"></i>
+                                        <span>2033</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="reviewMore">
+                <a href="/sshg.jhtml">查看更多</a>
+            </div>
+        </div>
+
+        <!-- 相关链接 -->
+        <div class="cooperativePartner">
+            <div class="columnTitleBox">
+                <div class="columnTitleZHWhite">相关链接</div>
+                <div class="columnTitleEN columnTitleColor1">RELATED LINKS</div>
+                <div class="columnUnderline columnUnderlineBorder1"></div>
+            </div>
+            <div class="myPartnerBox">
+                <ul>
+                    <li>
+                        <a 
+                        href="http://www.stats.gov.cn/"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/111734562gqd.jpg" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                        href="http://www.moe.gov.cn"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/11174152ifb3.jpg" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                        href="https://www.zgtjcbs.com/bianweihui"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/11174152a668.jpg" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                        href="http://mas.ruc.edu.cn/"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/11183954x5pa.png" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                        href="http://stat.bnu.edu.cn/zgtjjyxkjcjyfk/index.htm"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/11174152ge9c.jpg" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                        href="http://www.camir.org"
+                        target="_black">
+                            <img src="/u/cms/tjjmds/202203/11174152nbvy.jpg" alt="">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="clearfix"></div>
+
+
+
+    <!-- 顶部导航 -->
+<link rel="stylesheet" type="text/css" href="/r/cms/tjjmds/default/css/footer.css?v=20260211" />
+<div class="footer">
+	<div class="typeArea">
+		<!-- <div class="body-top">
+			<div class="body-top-logo">
+				<a href="/"><img src="/r/cms/tjjmds/default/images/AISai.png" alt=""></a>
+			</div>
+			<div class="dody-top-line"></div>
+			<div class="body-top-nav">
+				<ul>
+				</ul>
+			</div>
+		</div> -->
+		<div class="body-bottom">
+			<div class="body-bottom-function">
+				<div class="phone">
+					<a rel="noopener noreferrer" href="javascript:;" class="iconfont iconshoujiduan">
+					</a>
+				</div>
+				<div class="weixin">
+					<a rel="noopener noreferrer" href="javascript:;" class="iconfont iconweixin">
+					</a>
+				</div>
+				<div class="applet">
+					<a rel="noopener noreferrer" href="javascript:;" class="iconfont iconxiaochengxu">
+					</a>
+				</div>
+				<div class="weibo">
+					<a rel="noopener noreferrer" href="javascript:;" class="iconfont iconweibo1">
+					</a>
+				</div>
+			</div>
+			<div class="shu"> </div>
+			<div class="statistics">
+				<ul class="clicks">
+					<li><a rel="noopener noreferrer" href="javascript:;" class="reds">今日</a></li>
+					<li><a rel="noopener noreferrer" href="javascript:;">昨日</a></li>
+					<li><a rel="noopener noreferrer" href="javascript:;">历史峰值</a></li>
+					<li><a rel="noopener noreferrer" href="javascript:;">累计</a></li>
+				</ul>
+				<div class="click-content">
+					<ul class="quantity">
+						<li class="left">浏览量(PV):<span id="todayPv"></span></li>
+						<li class="middle">访客数(UV):<span id="todayUv"></span></li>
+						<li class="right">IP数:<span id="todayIp"></span></li>
+					</ul>
+					<ul class="quantity none">
+						<li class="left">浏览量(PV):<span id="yesterdayPv"></span></li>
+						<li class="middle">访客数(UV):<span id="yesterdayUv"></span></li>
+						<li class="right">IP数:<span id="yesterdayIp"></span></li>
+					</ul>
+					<ul class="quantity none">
+						<li class="left">浏览量(PV):<span id="peakPv"></span></li>
+						<li class="middle">访客数(UV):<span id="peakUv"></span></li>
+						<li class="right">IP数:<span id="peakIp"></span></li>
+					</ul>
+					<ul class="quantity none">
+						<li class="left">浏览量(PV):<span id="pvTotal"></span></li>
+						<li class="middle">访客数(UV):<span id="uvTotal"></span></li>
+						<li class="right">IP数:<span id="ipTotal"></span></li>
+					</ul>
+				</div>
+			</div>
+			<div class="shu"> </div>
+			<div class="putonrecords">
+				<!-- <p>
+					ICP备案号：京ICP备19053717号-1 <a href="http://tjjmds.ai-learning.net">技术支持: 北京东方艾学信息技术有限责任公司</a>
+					<br />
+					&copy; 2009-<span class="new-date"></span> <a href="http://tjjmds.ai-learning.net">全国大学生统计建模大赛官网</a>
+				</p> -->
+				<p>
+					技术支持: 北京东方艾学信息技术有限责任公司
+					<!--<br />
+					咨询电话: 18910657979 -->
+				</p>
+			</div>
+		</div>
+	</div>
+	<div style="height: 40px;">
+		<div class="putonrecordsBottom">
+			<p>
+				ICP备案号：京ICP备20017485号-1
+				<span style="margin-left: 30px;">©2009-2026全国大学生统计建模大赛官网</span>
+				<!--<span style="margin-left: 30px;">技术支持: 东方艾学信息技术有限责任公司</span>-->
+				<span style="margin-left: 30px;">技术支持: 东方艾学</span>
+				<!--<span style="margin-left: 30px;">咨询电话: 18910657979</span>-->
+			</p>
+		</div>
+	</div>
+</div>
+<script src="/r/cms/tjjmds/default/js/front.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	$(function () {
+		console.log(new Date())
+		var date = new Date()
+		$(".new-date").html(date.getFullYear());
+		$(".blogroll").css("right", (405 - (($(".blogroll").width()) / 2)));
+		$('.body-top-nav .link').on('mouseenter', function () {
+			$('.blogroll').show()
+		})
+		$('.body-top-nav .link').on('mouseleave', function () {
+			$('.blogroll').hide()
+		})
+		$('.blogroll').on('mouseleave', function () {
+			$('.blogroll').hide()
+		});
+		$('.statistics .clicks li').click(function () {
+			var index = $(this).index();
+			$('.statistics .clicks li a').removeClass('reds');
+			$(this).find('a').addClass('reds');
+			$(".statistics .click-content .quantity").eq(index).removeClass("none").siblings().addClass("none");
+		});
+	});
+	$(function () {
+		Cms.siteFlow("");
+	});
+</script>    <!--顶部导航 over-->
+    <!-- 底部模块 -->
+    <script src="/r/cms/tjjmds/default/js/jquery.jSlider.js"></script>
+    <script src="/r/cms/tjjmds/default/js/unslider.min.js"></script>
+    <script src="/r/cms/tjjmds/default/js/index.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+            var unslider04 = $('#b04').unslider({
+                    dots: true
+                }),
+                data04 = unslider04.data('unslider');
+
+            $('.unslider-arrow04').click(function () {
+                var fn = this.className.split(' ')[1];
+                data04[fn]();
+            });
+            var unslider05 = $('#b05').unslider({
+                    dots: true
+                }),
+                data05 = unslider05.data('unslider');
+        });
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取 #loginColumn 下的所有 a 标签
+    const links = document.querySelectorAll('#loginColumn a');
+    
+    // 为每个链接添加点击事件
+    links.forEach(function(link, index) {
+        link.addEventListener('click', function(event) {
+            // 阻止默认跳转行为
+            event.preventDefault();
+            
+            // 根据链接位置显示不同提示
+            if (index === 0) {
+                alert('注册登录时间暂未开放，正式开放时间为：2026年5月18日9:00');
+            } else {
+                alert('暂未开放');
+            }
+        });
+    });
+});
+    </script>
+</body>
+
+</html>

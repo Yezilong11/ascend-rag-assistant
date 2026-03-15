@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: \u8fd0\u884c\u722c\u866b",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/architecture_competition_crawler.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}

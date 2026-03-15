@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="Cache-Control" content="no-transform"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="applicable-device" content="mobile"/>
+    <meta name="renderer" content="webkit"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta content="email=no" name="format-detection"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <title>规则委员会 - 大学生方程式系列赛事（FSC）</title>
+    <meta name="keywords"
+          content="FSC,formulastudent,方程式,大学生方程式,大学生方程式汽车,大学生方程式汽车大赛,大学生方程式汽车大赛,大学生方程式官网,大学生方程式官网_大学生方程式汽车大赛官网"/>
+    <meta name="description"
+          content="大学生方程式汽车大赛官网为您提供最新的赛事动态,赛事图片,赛事公告,赛事资讯,车队动态,以及历届车队成绩,是提供信息最快最全的官方网站。"/>
+    <link rel="stylesheet" type="text/css" href="/css/base.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="/css/css_whir.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css" media="screen"/>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/js/html5shiv.v3.72.min.js"></script>
+
+    <link rel="icon" href="favicon.ico">
+    <![endif]-->
+    <script>
+        var navID = '0';
+    </script>
+</head>
+<body>
+<header id="header">
+    <div class="inner">
+        <nav id="quick">
+            <ul>
+                <li>
+                    <a class="icon-search" href="javascript:void(0);" title="搜索"></a>
+                    <div id="search">
+                        <div class="form">
+                            <form action="/search.html" method="get">
+                                <input type="text" name="query" class="text" value="" placeholder="输入关键词搜索"/>
+                                <input type="submit" class="submit" value="搜索"/>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+				
+                <!--<li>
+                    <a class="icon-lang" href="javascript:void(0);" title="语言"></a>
+                    <ul>
+                        <li>
+                            <a href="javascript:alert('开发中');" title="英文站">英文</a>
+                        </li>
+                    </ul>
+                </li>-->
+                <li>
+                    <a class="icon-ucenter" href="http://ims.formulastudent.com.cn/" title="个人中心"></a>
+                </li>
+                <!--<li>
+                    <a class="icon-car" href="javascript:alert('开发中');" title=""></a>
+                </li>-->
+				<li>
+                    <a class="icon-lang" href="https://formulastudent.sae-china.org/" title="EN"></a>
+                    <ul>
+                        <li>
+                            <a href="https://formulastudent.sae-china.org/" title="English">EN</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div id="top">
+            <div id="logo">
+                <h1>
+                    <a href="/" title="中国汽车工程学会-方程式官网">中国汽车工程学会-方程式官网</a>
+                </h1>
+            </div>
+            <nav id="menu">
+                <ul>
+                    <li id="menu0">
+                        <a href="/" title="首页">首页</a>
+                    </li>
+                    <li id="menu1">
+                        <a href="javascript:;" title="大赛简介">大赛简介</a>
+                        <ul>
+                            <li>
+                                <a href="/introduction.html" title="赛事介绍">赛事介绍</a>
+                            </li>
+                            <li>
+                                <a href="/secretariat.html" title="组委会秘书处">组委会秘书处</a>
+                            </li>
+                            <li>
+                                <a href="/rule.html" title="规则委员会">规则委员会</a>
+                            </li>
+                            <li>
+                                <a href="/referee.html" title="裁判委员会">裁判委员会</a>
+                            </li>
+                            <li>
+                                <a href="/consult.html" title="咨询委员会">咨询委员会</a>
+                            </li>
+                            <li>
+                                <a href="/graduate.html" title="毕业生委员会">毕业生委员会</a>
+                            </li>
+                            <li>
+                                <a href="/hall_fame.html" title="名人堂">名人堂</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu2">
+                        <a href="javasecipt:;" title="赛事动态">赛事动态</a>
+                        <ul>
+                            <li>
+                                <a href="/announcement.html" title="赛事公告">赛事公告</a>
+                            </li>
+                            <li>
+                                <a href="/information.html" title="赛事资讯">赛事资讯</a>
+                            </li>
+                            <li>
+                                <a href="/fleet.html" title="车队资讯">车队资讯</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu3">
+                        <a href="javascript:;" title="车队简介">车队简介</a>
+                        <ul>
+                            <li>
+                                <a href="/oil_truck.html" title="油车">油车</a>
+                                <!--                                <a href="javascript:alert('建设中，敬请期待！');" title="油车">油车</a>-->
+                            </li>
+                            <li>
+                                <a href="/tram.html" title="电车">电车</a>
+                                <!--                                <a href="javascript:alert('建设中，敬请期待！');" title="电车">电车</a>-->
+                            </li>
+                            <li>
+                                <a href="/unmanned_vehicle.html" title="无人车">无人车</a>
+                                <!--                                <a href="javascript:alert('建设中，敬请期待！');" title="无人车">无人车</a>-->
+                            </li>
+                            <li>
+                                <a href="/baja.html" title="巴哈">巴哈</a>
+                                <!--                                <a href="javascript:alert('建设中，敬请期待！');" title="巴哈">巴哈</a>-->
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="menu4">
+                        <a href="javascript:;" title="资料查询">资料查询</a>
+                        <ul>
+                            <li>
+                                <a href="/documentation.html" title="通用文档">通用文档</a>
+                            </li>
+                            <li>
+                                <a href="/documentation.html?doc=2" title="油车">油车</a>
+                            </li>
+                            <li>
+                                <a href="/documentation.html?doc=3" title="电车">电车</a>
+                            </li>
+                            <li>
+                                <a href="/documentation.html?doc=4" title="无人车">无人车</a>
+                            </li>
+                            <li>
+                                <a href="/documentation.html?doc=5" title="巴哈">巴哈</a>
+                            </li>
+                            <!--                            <li>-->
+                            <!--                                <a href="javascript:alert('建设中，敬请期待！');" title="证书查询">证书查询</a>-->
+                            <!--                                								<a href="/certificate.html" title="证书查询">证书查询</a>-->
+                            <!--                            </li>-->
+                        </ul>
+                    </li>
+                    <li id="menu5">
+                        <a href="http://old.formulastudent.com.cn/" title="往届回顾">往届回顾</a>
+                        <!--						<a href="/review.html" title="往届回顾">往届回顾</a>-->
+                    </li>
+                    <li id="menu6">
+                        <a href="/job.html" title="人才招聘">人才招聘</a>
+                    </li>
+                    <li id="menu7">
+                        <a href="/display.html" title="赛品展示">赛品展示</a>
+                    </li>
+                    <li id="menu8">
+                        <a href="/partner.html" title="合作伙伴">合作伙伴</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="navbtn">
+                <i></i>导航栏
+            </div>
+        </div>
+    </div>
+</header><main>
+    <div id="banner" style="background-image:url(../uploadfiles/banner/about.jpg);"></div>
+    <div id="bar">
+        <div class="inner">
+            <div class="box">
+                <div id="breadcrumb">
+                    <a href="/" title="首页">首页</a><i>&gt;</i><a href="/introduction.html"
+                                                               title="大赛简介">大赛简介</a><i>&gt;</i><span>规则委员会</span>
+                </div>
+                <nav id="submenu">
+	<div class="parent">
+		<div class="column">
+			<div class="name">
+				<h2>大赛简介</h2>
+				<h3>Introduction</h3>
+			</div>
+		</div>
+	</div>
+	<ul>
+		<li id="sub1">
+			<a href="/introduction.html" title="赛事介绍">赛事介绍</a>
+		</li>
+		<li id="sub2">
+			<a href="/secretariat.html" title="组委会秘书处">组委会秘书处</a>
+		</li>
+		<li id="sub3">
+			<a href="/rule.html" title="规则委员会">规则委员会</a>
+		</li>
+		<li id="sub4">
+			<a href="/referee.html" title="裁判委员会">裁判委员会</a>
+		</li>
+		<li id="sub5">
+			<a href="/consult.html" title="咨询委员会">咨询委员会</a>
+		</li>
+		<li id="sub6">
+			<a href="/graduate.html" title="毕业生委员会">毕业生委员会</a>
+		</li>
+		<li id="sub7">
+			<a href="/hall_fame.html" title="名人堂">名人堂</a>
+		</li>
+	</ul>
+</nav>                <script>
+                    var subID = '3';
+                </script>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div id="committee">
+       
+        <section id="secretary">
+            <div class="inner">
+                <div class="hgroup">
+                    <h2 class="title">中国大学生方程式系列赛事规则委员会</h2>
+                </div>
+                <div class="list">
+                    <ul>
+                                            </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+<footer id="footer">
+    <div class="inner">
+        <div id="bottom">
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="大赛简介">大赛简介</a></h2>
+                <ul>
+                    <li>
+                        <a href="/introduction.html" title="赛事介绍">赛事介绍</a>
+                    </li>
+                    <li>
+                        <a href="/secretariat.html" title="组委会秘书处">组委会秘书处</a>
+                    </li>
+                    <li>
+                        <a href="/rule.html" title="规则委员会">规则委员会</a>
+                    </li>
+                    <li>
+                        <a href="/referee.html" title="裁判委员会">裁判委员会</a>
+                    </li>
+                    <li>
+                        <a href="/consult.html" title="咨询委员会">咨询委员会</a>
+                    </li>
+                    <li>
+                        <a href="/graduate.html" title="毕业生委员会">毕业生委员会</a>
+                    </li>
+                    <li>
+                        <a href="/hall_fame.html" title="名人堂">名人堂</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="#" title="赛事动态">赛事动态</a></h2>
+                <ul>
+                    <li>
+                        <a href="/announcement.html" title="赛事公告">赛事公告</a>
+                    </li>
+                    <li>
+                        <a href="/information.html" title="赛事资讯">赛事资讯</a>
+                    </li>
+                    <li>
+                        <a href="/fleet.html" title="车队资讯">车队资讯</a>
+                    </li>
+                </ul>
+            </section>
+            <!--            <section class="item btmMenu">-->
+            <!--                <h2><a href="javascript:;" title="车队简介">车队简介</a></h2>-->
+            <!--                <ul>-->
+            <!--                    <li>-->
+            <!--                        <a href="/oil_truck.html" title="油车">油车</a>-->
+            <!--                    </li>-->
+            <!--                    <li>-->
+            <!--                        <a href="/tram.html" title="电车">电车</a>-->
+            <!--                    </li>-->
+            <!--                    <li>-->
+            <!--                        <a href="/unmanned_vehicle.html" title="无人车">无人车</a>-->
+            <!--                    </li>-->
+            <!--                    <li>-->
+            <!--                        <a href="/baja.html" title="巴哈">巴哈</a>-->
+            <!--                    </li>-->
+            <!--                </ul>-->
+            <!--            </section>-->
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="车队简介">车队简介</a></h2>
+                <ul>
+                    <li>
+                        <a href="javascript:alert('建设中，敬请期待！');" title="油车">油车</a>
+                    </li>
+                    <li>
+                        <a href="javascript:alert('建设中，敬请期待！');" title="电车">电车</a>
+                    </li>
+                    <li>
+                        <a href="javascript:alert('建设中，敬请期待！');" title="无人车">无人车</a>
+                    </li>
+                    <li>
+                        <a href="javascript:alert('建设中，敬请期待！');" title="巴哈">巴哈</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="资料查询">资料查询</a></h2>
+                <ul>
+                    <li>
+                        <a href="/documentation.html" title="通用文档">通用文档</a>
+                    </li>
+                    <li>
+                        <a href="/documentation.html?doc=2" title="油车">油车</a>
+                    </li>
+                    <li>
+                        <a href="/documentation.html?doc=3" title="电车">电车</a>
+                    </li>
+                    <li>
+                        <a href="/documentation.html?doc=4" title="无人车">无人车</a>
+                    </li>
+                    <li>
+                        <a href="/documentation.html?doc=5" title="巴哈">巴哈</a>
+                    </li>
+<!--                    <li>-->
+<!--                        <a href="javascript:alert('建设中，敬请期待！');" title="资料查询">资料查询</a>-->
+<!--                                                <a href="/documentation.html" title="资料查询">资料查询</a>-->
+<!--                    </li>-->
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="往届回顾">往届回顾</a></h2>
+                <ul>
+                    <li>
+                        <a href="javascript:alert('建设中，敬请期待！');" title="往届回顾">往届回顾</a>
+                    </li>
+<!--                    <li>-->
+<!--                        <a href="javascript:alert('建设中，敬请期待！');" title="2021年">2021年</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="javascript:alert('建设中，敬请期待！');" title="2020年">2020年</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="javascript:alert('建设中，敬请期待！');" title="2019年">2019年</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        ……-->
+<!--                    </li>-->
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="#" title="人才招聘">人才招聘</a></h2>
+                <ul>
+                    <li>
+                        <a href="/job.html" title="人才招聘">人才招聘</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="赛品展示">赛品展示</a></h2>
+                <ul>
+                    <li>
+                        <a href="/display.html" title="赛品展示">赛品展示</a>
+                    </li>
+                </ul>
+            </section>
+            <section class="item btmMenu">
+                <h2><a href="javascript:;" title="合作伙伴">合作伙伴</a></h2>
+                <ul>
+                    <li>
+                        <a href="/partner.html" title="合作伙伴">合作伙伴</a>
+                    </li>
+                </ul>
+            </section>
+            <div class="item" id="contact">
+                <dl>
+                    <dt>电话</dt>
+                    <dd class="tel">
+                        <a href="tel:010-50911000">010-50911000</a>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>地址</dt>
+                    <dd>北京市大兴区亦庄经济开发区融兴北三街39号行知楼</dd>
+                </dl>
+                <dl>
+                    <dt>服务邮箱</dt>
+                    <dd>
+                        <a href="mailto:zhenghao@sae-china.org">zhenghao@sae-china.org</a>
+                    </dd>
+                </dl>
+                <div class="ourMore">
+                    <a href="javascript:alert('建设中，敬请期待！');" title="常见问题QA">常见问题QA</a>
+                </div>
+            </div>
+            <div class="item" id="qrcode">
+                <div class="qr">
+                    <p>
+                        <img src="../uploadfiles/qrcode_wechat.jpg" alt="官方微信"/>
+                    </p>
+                    <p>官方微信</p>
+                </div>
+                <div class="qr">
+                    <p>
+                        <img src="../uploadfiles/qrcode_weibo.jpg" alt="官方微博"/>
+                    </p>
+                    <p>官方微博</p>
+                </div>
+            </div>
+        </div>
+        <section id="links">
+            <h2>友情链接：</h2>
+            <ul>
+                                    <li>
+                        <a href="http://www.sae-china.org/"
+                           title="中国汽车工程学会">中国汽车工程学会</a>
+                    </li>
+                                        <li>
+                        <a href="http://www.ncbdc.top/"
+                           title="数字汽车大赛">数字汽车大赛</a>
+                    </li>
+                                        <li>
+                        <a href="http://students.sae.org/cds/formulaseries/"
+                           title="Formula SAE (USA)">Formula SAE (USA)</a>
+                    </li>
+                                        <li>
+                        <a href="http://www.jsae.or.jp/formula/en/"
+                           title="Formula SAE Japan">Formula SAE Japan</a>
+                    </li>
+                                        <li>
+                        <a href="http://www.formulastudent.de/"
+                           title="Formula Student Germany">Formula Student Germany</a>
+                    </li>
+                                        <li>
+                        <a href="http://www.formulastudent.com/"
+                           title="Formula Student UK">Formula Student UK</a>
+                    </li>
+                                </ul>
+        </section>
+        <div class="clear"></div>
+        <nav id="pages">
+            <ul>
+                <li>
+                    <a href="/c/586.html" title="关于我们">关于我们</a>
+                </li>
+                <li>
+                    <a href="/c/572.html" title="联系我们">联系我们</a>
+                </li>
+                <li>
+                    <a href="/c/587.html" title="寻求报道">寻求报道</a>
+                </li>
+                <li>
+                    <a href="/c/588.html" title="广告与合作">广告与合作</a>
+                </li>
+                <li>
+                    <a href="/c/589.html" title="赛事说明">赛事说明</a>
+                </li>
+            </ul>
+        </nav>
+        <div id="copyright">
+            Copyright &copy; 2026 www.formulastudent.com.cn, All Rights Reserved 版权所有 大学生方程式系列赛事
+            <a href="https://beian.miit.gov.cn/" title="京ICP证040935号-4" target="_blank">京ICP证040935号-4</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+</footer>
+<script src="/js/global.js"></script>
+<script src="/js/slick.js"></script>
+<script src="/js/index.js"></script>
+<script src="/js/jquery.mousewheel.min.js"></script>
+<script src="/js/jquery.mCustomScrollbar.js"></script>
+<script src="/js/vue.min.js"></script>
+</body>
+</html>

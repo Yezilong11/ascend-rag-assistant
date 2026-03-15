@@ -1,0 +1,6 @@
+2026-03-14 23:32:19,025 - INFO - 开始爬取全国海洋航行器设计与制作大赛竞赛规则...
+2026-03-14 23:32:19,025 - INFO - 正在访问: https://cmvc.moocollege.com/home/homepage
+2026-03-14 23:32:19,318 - INFO - 爬取完成，耗时: 0.29秒
+2026-03-14 23:32:19,318 - INFO - 正在保存Markdown文件: cmvc_competition_rules.md
+2026-03-14 23:32:19,319 - INFO - Markdown文件已保存: cmvc_competition_rules.md
+2026-03-14 23:32:19,320 - INFO - JSON数据已保存: cmvc_competition_rules.json
