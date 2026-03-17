@@ -1,0 +1,12 @@
+_value INTEGER
+12a570f7121b3a8ce750a2a7c36da20f…(	S‰=Mmetadb00001-embedding-metadata.sqlite.sqlCREATE TABLE embeddings (
+    id INTEGER PRIMARY KEY,
+    segment_id TEXT NOT NULL,
+    embedding_id TEXT NOT NULL,
+    seq_id BLOB NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (segment_id, embedding_id)
+);
+
+CREATE TABLE embedding_metadata (
+    id INTEGER REFERENC
