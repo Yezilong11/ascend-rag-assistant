@@ -1,5 +1,4 @@
 import os
-
 import streamlit as st
 
 from src.knowledge_base import KnowledgeBase
@@ -9,27 +8,213 @@ from src.rag_engine import RAGAssistant
 st.set_page_config(
     page_title="昇腾AI竞赛智能助教",
     page_icon="🤖",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # 自定义CSS样式
 st.markdown("""
 <style>
+    /* 全局样式 */
+    .main {
+        background-color: #f8fafc;
+    }
+
+    /* 主标题 */
     .main-title {
         font-size: 2.5rem;
         font-weight: bold;
-        color: #1f77b4;
+        background: linear-gradient(135deg, #1f77b4 0%, #6a5acd 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
     }
+
+    .subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* 聊天消息样式 */
+    .chat-container {
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 1rem 0;
+    }
+
     .chat-message {
-        padding: 1rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        max-width: 85%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+        background: linear-gradient(135deg, #1f77b4 0%, #4a90d9 100%);
+        color: white;
+        margin-left: auto;
+    }
+
+    .assistant-message {
+        background-color: white;
+        color: #1e293b;
+        margin-right: auto;
+        border: 1px solid #e2e8f0;
+    }
+
+    .message-avatar {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* 来源框 */
+    .source-box {
+        background-color: #f1f5f9;
+        padding: 0.75rem;
         border-radius: 0.5rem;
+        font-size: 0.85rem;
+        color: #475569;
+        margin-top: 0.5rem;
+        border-left: 3px solid #1f77b4;
+    }
+
+    /* 侧边栏 */
+    .sidebar-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* 状态指示器 */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-ready {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-not-ready {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    /* 输入框 */
+    .chat-input-container {
+        position: sticky;
+        bottom: 0;
+        background-color: transparent;
+        padding-top: 1rem;
+    }
+
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+    }
+
+    /* 欢迎卡片 */
+    .welcome-card {
+        background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
         margin-bottom: 1rem;
     }
-    .source-box {
-        background-color: #f0f2f6;
-        padding: 0.5rem;
-        border-radius: 0.3rem;
-        font-size: 0.9rem;
+
+    .welcome-card h3 {
+        color: #075985;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-card p {
+        color: #0369a1;
+        line-height: 1.6;
+    }
+
+    /* 示例问题标签 */
+    .example-question {
+        display: inline-block;
+        background-color: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 9999px;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        font-size: 0.875rem;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .example-question:hover {
+        border-color: #1f77b4;
+        color: #1f77b4;
+        transform: scale(1.05);
+    }
+
+    /* 按钮样式优化 */
+    .stButton > button {
+        width: 100%;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.35);
+    }
+
+    /* 清空按钮 */
+    .clear-btn > button {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .clear-btn > button:hover {
+        background-color: #dc2626;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -39,99 +224,203 @@ if 'assistant' not in st.session_state:
     st.session_state.assistant = None
 if 'kb' not in st.session_state:
     st.session_state.kb = None
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
 
 # 页面标题
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
-st.markdown("基于RAG技术的全天候竞赛知识助手")
+st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手，为你解答竞赛报名、规则、评分等各类问题</p>', unsafe_allow_html=True)
 
 # 侧边栏 - 知识库管理
 with st.sidebar:
-    st.header("📚 知识库管理")
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">📚 知识库管理</div>', unsafe_allow_html=True)
 
     # 初始化知识库
     if st.session_state.kb is None:
-        st.session_state.kb = KnowledgeBase()
-        st.success("知识库已初始化")
+        with st.spinner("初始化知识库..."):
+            st.session_state.kb = KnowledgeBase()
+        st.success("✅ 知识库初始化完成")
+
+    # 显示知识库状态
+    if st.session_state.kb is not None:
+        st.markdown('<span class="status-badge status-ready">✅ 知识库已就绪</span>', unsafe_allow_html=True)
+    else:
+        st.markdown('<span class="status-badge status-not-ready">❌ 知识库未就绪</span>', unsafe_allow_html=True)
+
+    st.divider()
 
     # 文件上传
     uploaded_file = st.file_uploader(
         "上传竞赛资料",
         type=["pdf", "txt", "md"],
-        accept_multiple_files=True
+        accept_multiple_files=True,
+        help="支持PDF、TXT、Markdown格式"
     )
 
-    if uploaded_file and st.button("📥 添加到知识库"):
-        with st.spinner("处理文档中..."):
+    if uploaded_file:
+        if st.button("📥 添加到知识库", use_container_width=True):
             for file in uploaded_file:
-                # 保存临时文件
-                temp_path = f"temp_{file.name}"
-                with open(temp_path, "wb") as f:
-                    f.write(file.getvalue())
+                with st.spinner(f"处理 {file.name}..."):
+                    # 保存临时文件
+                    temp_path = f"temp_{file.name}"
+                    with open(temp_path, "wb") as f:
+                        f.write(file.getvalue())
 
-                # 导入知识库
-                try:
-                    st.session_state.kb.ingest(temp_path)
-                    st.success(f"✅ {file.name} 导入成功")
-                except Exception as e:
-                    st.error(f"❌ {file.name} 导入失败: {str(e)}")
-                finally:
-                    # 清理临时文件
-                    if os.path.exists(temp_path):
-                        os.remove(temp_path)
+                    # 导入知识库
+                    try:
+                        st.session_state.kb.ingest(temp_path)
+                        st.success(f"✅ {file.name} 导入成功")
+                    except Exception as e:
+                        st.error(f"❌ {file.name} 导入失败: {str(e)}")
+                    finally:
+                        # 清理临时文件
+                        if os.path.exists(temp_path):
+                            os.remove(temp_path)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">🚀 AI引擎控制</div>', unsafe_allow_html=True)
+
+    # 显示AI引擎状态
+    if st.session_state.assistant is not None:
+        st.markdown('<span class="status-badge status-ready">✅ AI引擎运行中</span>', unsafe_allow_html=True)
+    else:
+        st.markdown('<span class="status-badge status-not-ready">❌ AI引擎未启动</span>', unsafe_allow_html=True)
 
     st.divider()
 
     # 模型初始化
-    if st.button("🚀 启动AI引擎"):
+    if st.button("启动AI引擎", type="primary", use_container_width=True):
         with st.spinner("加载大模型中，请稍候..."):
             st.session_state.assistant = RAGAssistant(st.session_state.kb)
-        st.success("AI引擎已就绪！")
+        st.success("✅ AI引擎已就绪！")
 
-# 主界面 - 问答区域
-col1, col2 = st.columns([2, 1])
+    # 清空对话按钮
+    if st.session_state.chat_history:
+        st.markdown('<div class="clear-btn">', unsafe_allow_html=True)
+        if st.button("🗑️ 清空对话历史", use_container_width=True):
+            st.session_state.chat_history = []
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
-with col1:
-    st.subheader("💬 智能问答")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    if st.session_state.assistant is None:
-        st.info("👈 请先点击侧边栏的「启动AI引擎」按钮")
-    else:
-        # 用户输入
-        question = st.text_input(
-            "请输入您的问题：",
-            placeholder="例如：如何报名昇腾AI竞赛？"
-        )
+    # 系统信息
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">ℹ️ 系统信息</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="font-size: 0.85rem; color: #64748b;">
+        <b>技术栈:</b><br>
+        • RAG + 大语言模型<br>
+        • Chroma 向量数据库<br>
+        • BGE-Large-ZH 嵌入<br>
+        • 昇腾NPU优化支持
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        if question:
-            with st.spinner("思考中..."):
-                result = st.session_state.assistant.query(question)
+# 主界面 - 聊天区域
+# 显示欢迎卡片
+if not st.session_state.chat_history:
+    st.markdown("""
+    <div class="welcome-card">
+        <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
+        <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-            # 显示答案
-            st.markdown("### 📝 回答")
-            st.markdown(result["answer"])
+    # 示例问题
+    example_questions = [
+        "如何报名西门子杯？",
+        "挑战杯的参赛流程是什么？",
+        "大唐杯比赛内容是什么？",
+        "RoboMaster机甲大师赛参赛条件？",
+        "中国国际大学生创新大赛评分标准？"
+    ]
 
-            # 显示来源
-            if result["sources"]:
-                with st.expander("📖 参考来源"):
-                    for i, source in enumerate(result["sources"], 1):
-                        st.markdown(f"**来源 {i}**: {source['source']}")
-                        st.markdown(
-                            f"<div class='source-box'>{source['content']}...</div>",
-                            unsafe_allow_html=True
-                        )
+    st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
+    cols = st.columns(3)
+    for i, q in enumerate(example_questions):
+        with cols[i % 3]:
+            if st.button(q, key=f"example_{i}", use_container_width=True):
+                if st.session_state.assistant is not None:
+                    st.session_state.chat_history.append({
+                        "role": "user",
+                        "content": q
+                    })
+                    with st.spinner("🤔 思考中..."):
+                        result = st.session_state.assistant.query(q)
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": result["answer"],
+                        "sources": result["sources"]
+                    })
+                    st.rerun()
+                else:
+                    st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
 
-with col2:
-    st.subheader("📊 系统状态")
+# 显示聊天历史
+chat_container = st.container()
+with chat_container:
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    for msg in st.session_state.chat_history:
+        if msg["role"] == "user":
+            st.markdown(f"""
+            <div class="chat-message user-message">
+                <div class="message-avatar">👤 你</div>
+                <div>{msg["content"]}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="chat-message assistant-message">
+                <div class="message-avatar">🤖 助教</div>
+                <div>{msg["content"]}</div>
+            """, unsafe_allow_html=True)
+            if "sources" in msg and msg["sources"]:
+                with st.expander("📖 查看参考来源"):
+                    for i, source in enumerate(msg["sources"], 1):
+                        st.markdown(f"**来源 {i}**: `{source['source']}`")
+                        st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # 显示当前状态
-    status = {
-        "知识库": "✅ 已连接" if st.session_state.kb else "❌ 未初始化",
-        "AI引擎": "✅ 运行中" if st.session_state.assistant else "❌ 未启动",
-    }
+# 输入框
+st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
 
-    for key, value in status.items():
-        st.metric(key, value)
+if st.session_state.assistant is None:
+    st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
+else:
+    question = st.chat_input("请输入您的问题，按回车发送...")
+
+    if question:
+        # 添加用户消息
+        st.session_state.chat_history.append({
+            "role": "user",
+            "content": question
+        })
+
+        # AI思考
+        with st.spinner("🤔 思考中..."):
+            result = st.session_state.assistant.query(question)
+
+        # 添加AI回答
+        st.session_state.chat_history.append({
+            "role": "assistant",
+            "content": result["answer"],
+            "sources": result["sources"]
+        })
+
+        # 滚动到底部
+        st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 页脚
 st.divider()
-st.markdown("<center>🚀 昇腾AI竞赛伴随式助教系统 | Powered by RAG + LLM</center>", unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align: center; color: #64748b; font-size: 0.9rem;">
+    🚀 昇腾AI竞赛伴随式助教系统 | Powered by RAG + LLM | 专为昇腾AI生态打造
+</div>
+""", unsafe_allow_html=True)
