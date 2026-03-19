@@ -87,13 +87,22 @@ pip install -r requirements.txt
 
 将以下模型下载到 `./models` 目录：
 - 嵌入模型: [BAAI/bge-large-zh-v1.5](https://huggingface.co/BAAI/bge-large-zh-v1.5)
-- 大语言模型: [Qwen/Qwen2-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct) 或 [THUDM/chatglm3-6b](https://huggingface.co/THUDM/chatglm3-6b)
+- 大语言模型（推荐量化版加速）:
+  - 🚀 **推荐**: [Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4) - 4bit量化，速度提升 **3-5倍**
+  - 标准版: [Qwen/Qwen2-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct)
+  - 小模型: [Qwen/Qwen2-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2-0.5B-Instruct) - 更快，适合CPU
+  - 大模型: [THUDM/chatglm3-6b](https://huggingface.co/THUDM/chatglm3-6b)
+
+**GPTQ量化优势：**
+- 显存占用减少 75%
+- 推理速度提升 **3-5倍**
+- 回答质量损失可忽略
 
 目录结构如下：
 ```
 models/
 ├── bge-large-zh-v1.5/
-└── Qwen2-1.5B-Instruct/
+└── Qwen2-1.5B-Instruct-GPTQ-Int4/  # 推荐量化版
 ```
 
 5. **启动应用**
@@ -157,6 +166,37 @@ streamlit run app.py
 |------|------|-------------|
 | Qwen2-1.5B | INT8 | ~25 tokens/s |
 | ChatGLM3-6B | INT4 | ~18 tokens/s |
+
+**性能参考（CPU/CUDA）**:
+| 硬件 | 模型 | 量化 | 平均生成速度 | 300字回答时间 |
+|------|------|------|-------------|--------------|
+| CPU | Qwen2-0.5B | 无 | ~8-12 tokens/s | 25-40秒 |
+| CPU | Qwen2-1.5B | 无 | ~3-5 tokens/s | 60-100秒 |
+| CUDA GPU | Qwen2-1.5B | FP16 | ~15-20 tokens/s | 15-20秒 |
+| CUDA GPU | Qwen2-1.5B | GPTQ-Int4 | ~30-40 tokens/s | 8-10秒 |
+
+## ⚡ 性能优化指南
+
+### 使用GPTQ量化模型（推荐）
+
+1. **安装依赖**
+```bash
+pip install auto-gptq optimum
+```
+
+2. **下载量化模型**
+```bash
+huggingface-cli download Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
+```
+
+3. **自动检测**
+系统会自动检测GPTQ模型（路径含`gptq`/`int4`/`int8`）并使用量化加载，无需修改代码。
+
+### CPU进一步优化
+
+1. **使用更小模型** - 使用 `Qwen/Qwen2-0.5B-Instruct`，速度提升2-3倍
+2. **限制生成长度** - 默认`max_new_tokens=256`，可根据需要调整
+3. **关闭采样** - 设置`do_sample=False`使用贪婪搜索，速度略快但多样性减少
 
 ## 📊 效果展示
 

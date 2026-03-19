@@ -290,10 +290,29 @@ with st.sidebar:
 
     st.divider()
 
+    # 模型选择
+    available_models = RAGAssistant.get_available_models()
+    model_options = [f"{k}: {v['name']}" for k, v in available_models.items()]
+    selected_model = st.selectbox(
+        "选择模型",
+        options=model_options,
+        format_func=lambda x: x.split(": ")[1] if ": " in x else x,
+        index=0,
+        help="选择要使用的大语言模型"
+    )
+
+    # 提取model_key
+    if ": " in selected_model:
+        model_key = selected_model.split(": ")[0]
+    else:
+        model_key = list(available_models.keys())[0]
+
+    st.divider()
+
     # 模型初始化
     if st.button("启动AI引擎", type="primary", use_container_width=True):
         with st.spinner("加载大模型中，请稍候..."):
-            st.session_state.assistant = RAGAssistant(st.session_state.kb)
+            st.session_state.assistant = RAGAssistant(st.session_state.kb, model_key=model_key)
         st.success("✅ AI引擎已就绪！")
 
     # 清空对话按钮
