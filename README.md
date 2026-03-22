@@ -18,7 +18,7 @@
 ### ✨ 核心特性
 
 - 🧠 **基于RAG的知识问答** - 结合私域知识库与大语言模型，提供准确可靠的回答
-- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU，支持INT8/INT4量化加速
+- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU
 - 🎯 **可切换模型** - 侧边栏自由切换不同大小、不同量化级别的模型
 - 🚀 **ModelScope一键下载** - 自动从魔搭下载模型到项目文件夹，国内访问更快
 - 🖥️ **精致对话界面** - 基于Streamlit构建的现代化聊天界面
@@ -104,8 +104,8 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local_dir ./mod
 
 | 模型 | 推荐 | 说明 |
 |------|------|------|
-| Qwen2-1.5B-Instruct-GPTQ-Int4 | 🚀 **推荐** | 4bit量化，速度提升3-5倍 |
-| Qwen2-1.5B-Instruct |  | 标准版，质量最好 |
+| Qwen2-1.5B-Instruct | 🚀 **推荐** | 标准版，质量最好 |
+| Qwen2-1.5B-Instruct-GPTQ-Int4 |  | 4bit量化，速度提升3-5倍 |
 | Qwen2-0.5B-Instruct | ⚡ CPU推荐 | 更快，适合CPU环境 |
 | chatglm3-6b |  | 大模型，质量更好 |
 
@@ -116,11 +116,7 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local_dir ./mod
 - 推理速度提升 **3-5倍**
 - 回答质量损失可忽略
 
-目录结构：
-```
-models/
-├── bge-large-zh-v1.5/
-└── Qwen2-1.5B-Instruct-GPTQ-Int4/  # 推荐量化版
+ 目录结构：
 ```
 models/
 ├── bge-large-zh-v1.5/
@@ -170,7 +166,9 @@ streamlit run app.py
 ### `src/rag_engine.py` - RAG引擎核心
 
 结合检索到的知识和大模型生成能力：
-- 支持本地/HuggingFace在线加载模型
+- 支持预定义多模型切换，默认优先加载量化版
+- 自动从ModelScope下载模型到`./models/`文件夹
+- 支持GPTQ量化模型自动检测和加载
 - 自定义Prompt模板
 - 返回回答及参考来源
 - 异常处理机制
@@ -257,6 +255,7 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./mod
 - [ChromaDB](https://trychroma.com/) - 开源向量数据库
 - [BGE](https://github.com/FlagOpen/FlagEmbedding) - 优秀的中文嵌入模型
 - [Qwen](https://github.com/QwenLM/Qwen2) - 通义千问大模型
+- [ModelScope](https://modelscope.cn/) - 魔搭社区，方便的模型下载服务
 - [昇腾AI](https://www.hiascend.com/) - 华为昇腾AI计算平台
 
 ---
