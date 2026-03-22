@@ -309,10 +309,19 @@ with st.sidebar:
 
     st.divider()
 
+    # 模型下载路径设置
+    model_dir = st.text_input(
+        "模型下载路径",
+        value="./models",
+        help="指定模型下载保存的目录路径"
+    )
+
+    st.divider()
+
     # 模型初始化
     if st.button("启动AI引擎", type="primary", use_container_width=True):
         with st.spinner("加载大模型中，请稍候..."):
-            st.session_state.assistant = RAGAssistant(st.session_state.kb, model_key=model_key)
+            st.session_state.assistant = RAGAssistant(st.session_state.kb, model_key=model_key, model_dir=model_dir)
         st.success("✅ AI引擎已就绪！")
 
     # 清空对话按钮

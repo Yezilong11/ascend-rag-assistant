@@ -35,5 +35,6 @@ scipy>=1.10.0
 pyyaml>=6.0
 pydantic>=2.7.0
 
-# 量化加速
-optimum>=1.20.0
+
+# ModelScope模型下载
+modelscope>=1.9.0

@@ -7,41 +7,32 @@ from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
 
-# GPTQ量化支持
+# ModelScope支持
 try:
-    from auto_gptq import AutoGPTQForCausalLM
-    GPTQ_AVAILABLE = True
+    from modelscope import snapshot_download
+    MODELSCOPE_AVAILABLE = True
 except ImportError:
-    GPTQ_AVAILABLE = False
+    MODELSCOPE_AVAILABLE = False
 
 warnings.filterwarnings("ignore")
 
 
 # 预定义模型配置
 PREDEFINED_MODELS = {
-    "qwen2-1.5b-gptq-int4": {
-        "repo_id": "Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4",
-        "name": "Qwen2-1.5B (GPTQ-Int4 量化)",
-        "description": "推荐，速度快，质量损失小",
-        "is_quantized": True
-    },
     "qwen2-1.5b": {
         "repo_id": "Qwen/Qwen2-1.5B-Instruct",
         "name": "Qwen2-1.5B (FP16)",
         "description": "标准版，质量最好",
-        "is_quantized": False
     },
     "qwen2-0.5b": {
         "repo_id": "Qwen/Qwen2-0.5B-Instruct",
         "name": "Qwen2-0.5B (FP16)",
         "description": "最快，适合CPU",
-        "is_quantized": False
     },
     "chatglm3-6b": {
         "repo_id": "THUDM/chatglm3-6b",
         "name": "ChatGLM3-6B (FP16)",
         "description": "大模型，质量更好",
-        "is_quantized": False
     }
 }
 
@@ -50,7 +41,6 @@ class RAGAssistant:
     """
     RAG智能助教核心引擎
     结合知识检索与大模型生成能力
-    支持GPTQ量化模型加速推理
     支持多模型切换
     """
 
@@ -59,7 +49,7 @@ class RAGAssistant:
         """获取所有预定义模型列表"""
         return PREDEFINED_MODELS
 
-    def __init__(self, knowledge_base, model_key="qwen2-1.5b-gptq-int4", model_dir="./models"):
+    def __init__(self, knowledge_base, model_key="qwen2-1.5b", model_dir="./models"):
         """
         初始化RAG助手
         Args:
@@ -74,100 +64,57 @@ class RAGAssistant:
         model_config = PREDEFINED_MODELS[model_key]
         model_id = model_config["repo_id"]
 
-        # 优先使用本地模型，自动优先检测量化版
+        # 优先使用本地模型
         local_model_name = model_id.split("/")[-1]
         local_model_path = os.path.join(model_dir, local_model_name)
-
-        # 检查本地是否存在，如果不存在并且优先有量化版，尝试检测量化版
-        if not os.path.exists(local_model_path) and not model_config["is_quantized"]:
-            # 尝试查找是否有同名量化版
-            quantized_candidates = [
-                f"{local_model_name}-GPTQ-Int4",
-                f"{local_model_name}-int4",
-                f"{local_model_name}-gptq"
-            ]
-            for candidate in quantized_candidates:
-                candidate_path = os.path.join(model_dir, candidate)
-                if os.path.exists(candidate_path):
-                    local_model_path = candidate_path
-                    print(f"🔍 未找到原版模型，自动使用本地量化版: {candidate}")
-                    break
 
         if os.path.exists(local_model_path):
             model_path = local_model_path
             print(f"正在加载本地模型: {model_path}...")
         else:
-            model_path = model_id
-            print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
+            # 本地不存在，尝试从ModelScope下载
+            if MODELSCOPE_AVAILABLE:
+                print(f"🔍 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
+                try:
+                    # ModelScope的Qwen命名格式
+                    if model_id.startswith("Qwen/"):
+                        modelscope_repo_id = model_id.replace("Qwen/", "qwen/")
+                    else:
+                        modelscope_repo_id = model_id
+                    # 确保下载到项目的models文件夹
+                    target_dir = os.path.join(model_dir, local_model_name)
+                    local_model_path = snapshot_download(
+                        modelscope_repo_id,
+                        local_dir=target_dir
+                    )
+                    model_path = local_model_path
+                    print(f"✅ ModelScope下载完成，保存到: {model_path}")
+                except Exception as e:
+                    print(f"⚠️ ModelScope下载失败: {str(e)}，回退到HuggingFace")
+                    model_path = model_id
+            else:
+                model_path = model_id
+                print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
 
         tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True
         )
 
-        # 修复ChatGLM3与新版本transformers兼容性问题
-        config = AutoConfig.from_pretrained(
+        print("🔍 加载模型...")
+        model = AutoModelForCausalLM.from_pretrained(
             model_path,
-            trust_remote_code=True
+            trust_remote_code=True,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         )
 
-        # 添加缺失的属性
-        if not hasattr(config, 'max_length'):
-            config.max_length = 2048
-        if not hasattr(config, 'max_seq_length'):
-            config.max_seq_length = 2048
-        if not hasattr(config, 'tie_word_embeddings'):
-            config.tie_word_embeddings = False
+        # 修复模型缺少的属性
+        if not hasattr(model, 'all_tied_weights_keys'):
+            model.all_tied_weights_keys = set()
 
-        # 判断是否使用GPTQ
-        is_gptq_model = model_config.get("is_quantized", None)
-        if is_gptq_model is None:
-            # 自动检测: 模型路径中包含GPTQ或int4/int8字样
-            is_gptq_model = any(keyword in model_path.lower() for keyword in ['gptq', 'int4', 'int8'])
-
-        # 当GPTQ不可用时，强制禁用量化检测
-        if not GPTQ_AVAILABLE and is_gptq_model:
-            print("⚠️ GPTQ不可用，禁用量化配置以普通模式加载")
-            if hasattr(config, 'quantization_config'):
-                delattr(config, 'quantization_config')
-            is_gptq_model = False
-
-        # 加载模型 - GPTQ量化分支
-        if GPTQ_AVAILABLE and is_gptq_model:
-            try:
-                print("⚡ 使用GPTQ量化模型加速推理")
-                model = AutoGPTQForCausalLM.from_quantized(
-                    model_path,
-                    device_map="auto",
-                    trust_remote_code=True,
-                    use_safetensors=True,
-                    inject_fused_attention=False
-                )
-            except Exception as e:
-                print(f"⚠️ GPTQ加载失败，降级到普通模型: {str(e)}")
-                model = AutoModelForCausalLM.from_pretrained(
-                    model_path,
-                    config=config,
-                    trust_remote_code=True,
-                    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                )
-        else:
-            # 普通加载
-            print("🔍 使用原始模型加载")
-            # 不传递config来避免自动量化检测
-            model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                trust_remote_code=True,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            )
-
-            # 修复模型缺少的属性
-            if not hasattr(model, 'all_tied_weights_keys'):
-                model.all_tied_weights_keys = set()
-
-            # 移动到设备
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            model = model.to(device)
+        # 移动到设备
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.to(device)
 
         # 修复pipeline的device参数
         if torch.cuda.is_available():

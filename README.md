@@ -19,7 +19,9 @@
 
 - 🧠 **基于RAG的知识问答** - 结合私域知识库与大语言模型，提供准确可靠的回答
 - ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU，支持INT8/INT4量化加速
-- 🖥️ **友好的Web界面** - 基于Streamlit构建的直观用户界面，支持文档上传与在线问答
+- 🎯 **可切换模型** - 侧边栏自由切换不同大小、不同量化级别的模型
+- 🚀 **ModelScope一键下载** - 自动从魔搭下载模型到项目文件夹，国内访问更快
+- 🖥️ **精致对话界面** - 基于Streamlit构建的现代化聊天界面
 - 📚 **多格式文档支持** - 支持PDF、TXT、Markdown等多种文档格式的导入
 - 🏠 **完全本地部署** - 支持全流程本地运行，保护数据隐私
 - 🔄 **易于扩展** - 模块化设计，方便添加新的数据源和模型
@@ -83,22 +85,42 @@ conda activate ascend-rag
 pip install -r requirements.txt
 ```
 
-4. **下载模型（可选）**
+ 4. **下载模型**
 
-将以下模型下载到 `./models` 目录：
-- 嵌入模型: [BAAI/bge-large-zh-v1.5](https://huggingface.co/BAAI/bge-large-zh-v1.5)
-- 大语言模型（推荐量化版加速）:
-  - 🚀 **推荐**: [Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4) - 4bit量化，速度提升 **3-5倍**
-  - 标准版: [Qwen/Qwen2-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct)
-  - 小模型: [Qwen/Qwen2-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2-0.5B-Instruct) - 更快，适合CPU
-  - 大模型: [THUDM/chatglm3-6b](https://huggingface.co/THUDM/chatglm3-6b)
+推荐使用 **ModelScope（魔搭社区）** 下载，国内访问更快：
+
+```bash
+# 安装modelscope
+pip install modelscope
+
+# 下载 BGE 嵌入模型
+modelscope download --model BAAI/bge-large-zh-v1.5 --local_dir ./models/bge-large-zh-v1.5
+
+# 下载 Qwen2 大语言模型（推荐）
+modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local_dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
+```
+
+**支持的模型列表：**
+
+| 模型 | 推荐 | 说明 |
+|------|------|------|
+| Qwen2-1.5B-Instruct-GPTQ-Int4 | 🚀 **推荐** | 4bit量化，速度提升3-5倍 |
+| Qwen2-1.5B-Instruct |  | 标准版，质量最好 |
+| Qwen2-0.5B-Instruct | ⚡ CPU推荐 | 更快，适合CPU环境 |
+| chatglm3-6b |  | 大模型，质量更好 |
+
+**自动下载：** 如果本地模型不存在，系统会**自动从ModelScope下载到 `./models/` 文件夹**，无需手动操作。
 
 **GPTQ量化优势：**
 - 显存占用减少 75%
 - 推理速度提升 **3-5倍**
 - 回答质量损失可忽略
 
-目录结构如下：
+目录结构：
+```
+models/
+├── bge-large-zh-v1.5/
+└── Qwen2-1.5B-Instruct-GPTQ-Int4/  # 推荐量化版
 ```
 models/
 ├── bge-large-zh-v1.5/
@@ -181,12 +203,12 @@ streamlit run app.py
 
 1. **安装依赖**
 ```bash
-pip install auto-gptq optimum
+pip install auto-gptq optimum modelscope
 ```
 
-2. **下载量化模型**
+2. **下载量化模型（推荐使用ModelScope）**
 ```bash
-huggingface-cli download Qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
+modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
 ```
 
 3. **自动检测**
