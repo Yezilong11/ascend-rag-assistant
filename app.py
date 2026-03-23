@@ -343,6 +343,8 @@ with st.sidebar:
         • RAG + 大语言模型<br>
         • Chroma 向量数据库<br>
         • BGE-Large-ZH 嵌入<br>
+        • 流式输出打字机效果<br>
+        • ModelScope模型下载<br>
         • 昇腾NPU优化支持
     </div>
     """, unsafe_allow_html=True)
@@ -429,18 +431,34 @@ else:
             "content": question
         })
 
-        # AI思考
-        with st.spinner("🤔 思考中..."):
-            result = st.session_state.assistant.query(question)
-
-        # 添加AI回答
+        # 流式生成AI回答
+        placeholder = st.empty()
+        full_response = ""
+        
+        # 逐步输出
+        for token in st.session_state.assistant.query_stream(question):
+            full_response += token
+            placeholder.markdown(f"""
+            <div class="chat-message assistant-message">
+                <div class="message-avatar">🤖 助教</div>
+                <div>{full_response}▌</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # 获取来源信息
+        sources = st.session_state.assistant._last_sources
+        
+        # 保存到聊天历史
         st.session_state.chat_history.append({
             "role": "assistant",
-            "content": result["answer"],
-            "sources": result["sources"]
+            "content": full_response,
+            "sources": sources
         })
 
-        # 滚动到底部
+        # 清空占位符
+        placeholder.empty()
+        
+        # 重新渲染显示完整对话
         st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)

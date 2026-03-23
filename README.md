@@ -19,8 +19,9 @@
 
 - 🧠 **基于RAG的知识问答** - 结合私域知识库与大语言模型，提供准确可靠的回答
 - ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU
-- 🎯 **可切换模型** - 侧边栏自由切换不同大小、不同量化级别的模型
+- 🎯 **可切换模型** - 侧边栏自由切换不同大小的模型
 - 🚀 **ModelScope一键下载** - 自动从魔搭下载模型到项目文件夹，国内访问更快
+- ✨ **流式输出** - 打字机逐字显示效果，大幅改善等待体验
 - 🖥️ **精致对话界面** - 基于Streamlit构建的现代化聊天界面
 - 📚 **多格式文档支持** - 支持PDF、TXT、Markdown等多种文档格式的导入
 - 🏠 **完全本地部署** - 支持全流程本地运行，保护数据隐私
@@ -53,7 +54,7 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                     昇腾NPU 适配层                            │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌────────────┐  │
-│  │  设备自动检测    │  │   量化优化       │  │ 性能测试   │  │
+│  │  设备自动检测    │  │   基础优化       │  │ 性能测试   │  │
 │  └──────────────────┘  └──────────────────┘  └────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -97,7 +98,7 @@ pip install modelscope
 modelscope download --model BAAI/bge-large-zh-v1.5 --local_dir ./models/bge-large-zh-v1.5
 
 # 下载 Qwen2 大语言模型（推荐）
-modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local_dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
+modelscope download --model qwen/Qwen2-1.5B-Instruct --local_dir ./models/Qwen2-1.5B-Instruct
 ```
 
 **支持的模型列表：**
@@ -105,22 +106,16 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local_dir ./mod
 | 模型 | 推荐 | 说明 |
 |------|------|------|
 | Qwen2-1.5B-Instruct | 🚀 **推荐** | 标准版，质量最好 |
-| Qwen2-1.5B-Instruct-GPTQ-Int4 |  | 4bit量化，速度提升3-5倍 |
 | Qwen2-0.5B-Instruct | ⚡ CPU推荐 | 更快，适合CPU环境 |
-| chatglm3-6b |  | 大模型，质量更好 |
+| ChatGLM3-6b |  | 大模型，质量更好 |
 
 **自动下载：** 如果本地模型不存在，系统会**自动从ModelScope下载到 `./models/` 文件夹**，无需手动操作。
-
-**GPTQ量化优势：**
-- 显存占用减少 75%
-- 推理速度提升 **3-5倍**
-- 回答质量损失可忽略
 
  目录结构：
 ```
 models/
 ├── bge-large-zh-v1.5/
-└── Qwen2-1.5B-Instruct-GPTQ-Int4/  # 推荐量化版
+└── Qwen2-1.5B-Instruct/  # 推荐
 ```
 
 5. **启动应用**
@@ -166,9 +161,9 @@ streamlit run app.py
 ### `src/rag_engine.py` - RAG引擎核心
 
 结合检索到的知识和大模型生成能力：
-- 支持预定义多模型切换，默认优先加载量化版
+- 支持预定义多模型切换，默认加载 Qwen2-1.5B
 - 自动从ModelScope下载模型到`./models/`文件夹
-- 支持GPTQ量化模型自动检测和加载
+- 支持流式输出（打字机效果
 - 自定义Prompt模板
 - 返回回答及参考来源
 - 异常处理机制
@@ -177,40 +172,16 @@ streamlit run app.py
 
 提供昇腾NPU设备管理和性能优化：
 - 自动检测NPU可用性
-- 支持INT8/INT4量化
-- KV Cache加速
 - 性能基准测试工具
 
-**性能参考（昇腾910B）**:
-| 模型 | 量化 | 平均生成速度 |
-|------|------|-------------|
-| Qwen2-1.5B | INT8 | ~25 tokens/s |
-| ChatGLM3-6B | INT4 | ~18 tokens/s |
-
 **性能参考（CPU/CUDA）**:
-| 硬件 | 模型 | 量化 | 平均生成速度 | 300字回答时间 |
-|------|------|------|-------------|--------------|
-| CPU | Qwen2-0.5B | 无 | ~8-12 tokens/s | 25-40秒 |
-| CPU | Qwen2-1.5B | 无 | ~3-5 tokens/s | 60-100秒 |
-| CUDA GPU | Qwen2-1.5B | FP16 | ~15-20 tokens/s | 15-20秒 |
-| CUDA GPU | Qwen2-1.5B | GPTQ-Int4 | ~30-40 tokens/s | 8-10秒 |
+| 硬件 | 模型 | 平均生成速度 | 300字回答时间 |
+|------|------|-------------|--------------|
+| CPU | Qwen2-0.5B | ~8-12 tokens/s | 25-40秒 |
+| CPU | Qwen2-1.5B | ~3-5 tokens/s | 60-100秒 |
+| CUDA GPU | Qwen2-1.5B | ~15-20 tokens/s | 15-20秒 |
 
 ## ⚡ 性能优化指南
-
-### 使用GPTQ量化模型（推荐）
-
-1. **安装依赖**
-```bash
-pip install auto-gptq optimum modelscope
-```
-
-2. **下载量化模型（推荐使用ModelScope）**
-```bash
-modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./models/Qwen2-1.5B-Instruct-GPTQ-Int4
-```
-
-3. **自动检测**
-系统会自动检测GPTQ模型（路径含`gptq`/`int4`/`int8`）并使用量化加载，无需修改代码。
 
 ### CPU进一步优化
 
@@ -233,7 +204,6 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct-GPTQ-Int4 --local-dir ./mod
 - [ ] 支持多模态文档（图片中的文字提取）
 - [ ] API服务化部署
 - [ ] Docker容器化支持
-- [ ] 优化昇腾NPU上的量化推理性能
 
 ## 🤝 贡献指南
 

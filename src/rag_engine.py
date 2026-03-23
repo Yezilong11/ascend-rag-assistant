@@ -1,11 +1,12 @@
 import os
 import warnings
+import threading
 
 import torch
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline, TextIteratorStreamer
 
 # ModelScope支持
 try:
@@ -21,17 +22,17 @@ warnings.filterwarnings("ignore")
 PREDEFINED_MODELS = {
     "qwen2-1.5b": {
         "repo_id": "Qwen/Qwen2-1.5B-Instruct",
-        "name": "Qwen2-1.5B (FP16)",
+        "name": "Qwen2-1.5B",
         "description": "标准版，质量最好",
     },
     "qwen2-0.5b": {
         "repo_id": "Qwen/Qwen2-0.5B-Instruct",
-        "name": "Qwen2-0.5B (FP16)",
+        "name": "Qwen2-0.5B",
         "description": "最快，适合CPU",
     },
     "chatglm3-6b": {
         "repo_id": "THUDM/chatglm3-6b",
-        "name": "ChatGLM3-6B (FP16)",
+        "name": "ChatGLM3-6B",
         "description": "大模型，质量更好",
     }
 }
@@ -41,7 +42,7 @@ class RAGAssistant:
     """
     RAG智能助教核心引擎
     结合知识检索与大模型生成能力
-    支持多模型切换
+    支持多模型切换、流式输出
     """
 
     @classmethod
@@ -59,6 +60,9 @@ class RAGAssistant:
         """
         self.kb = knowledge_base
         self.model_key = model_key
+        self.model = None
+        self.tokenizer = None
+        self._last_sources = None
 
         # 获取模型配置
         model_config = PREDEFINED_MODELS[model_key]
@@ -76,7 +80,7 @@ class RAGAssistant:
             if MODELSCOPE_AVAILABLE:
                 print(f"🔍 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
                 try:
-                    # ModelScope的Qwen命名格式
+                    # ModelScope的Qwen命名格式修正
                     if model_id.startswith("Qwen/"):
                         modelscope_repo_id = model_id.replace("Qwen/", "qwen/")
                     else:
@@ -96,25 +100,33 @@ class RAGAssistant:
                 model_path = model_id
                 print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
 
-        tokenizer = AutoTokenizer.from_pretrained(
+        self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True
         )
 
-        print("🔍 加载模型...")
-        model = AutoModelForCausalLM.from_pretrained(
+        # 加载配置
+        config = AutoConfig.from_pretrained(
             model_path,
+            trust_remote_code=True
+        )
+
+        # 普通加载
+        print("🔍 使用原始模型加载")
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            config=config,
             trust_remote_code=True,
             torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         )
 
         # 修复模型缺少的属性
-        if not hasattr(model, 'all_tied_weights_keys'):
-            model.all_tied_weights_keys = set()
+        if not hasattr(self.model, 'all_tied_weights_keys'):
+            self.model.all_tied_weights_keys = set()
 
         # 移动到设备
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model = model.to(device)
+        self.model = self.model.to(device)
 
         # 修复pipeline的device参数
         if torch.cuda.is_available():
@@ -123,10 +135,10 @@ class RAGAssistant:
             device_id = -1
 
         # 创建生成pipeline
-        pipe = pipeline(
+        pipeline_obj = pipeline(
             "text-generation",
-            model=model,
-            tokenizer=tokenizer,
+            model=self.model,
+            tokenizer=self.tokenizer,
             max_new_tokens=256,  # 限制生成长度，提升速度
             temperature=0.7,
             top_p=0.9,
@@ -135,7 +147,7 @@ class RAGAssistant:
             do_sample=True
         )
 
-        self.llm = HuggingFacePipeline(pipeline=pipe)
+        llm = HuggingFacePipeline(pipeline=pipeline_obj)
 
         # 自定义Prompt模板
         template = """基于以下检索到的相关信息，回答用户的问题。
@@ -155,7 +167,7 @@ class RAGAssistant:
 
         # 创建RAG链
         self.qa_chain = RetrievalQA.from_chain_type(
-            llm=self.llm,
+            llm=llm,
             chain_type="stuff",
             retriever=self.kb.db.as_retriever(search_kwargs={"k": 3}),
             chain_type_kwargs={"prompt": prompt},
@@ -166,7 +178,7 @@ class RAGAssistant:
 
     def query(self, question: str) -> dict:
         """
-        处理用户查询
+        完整问答，返回完整结果
         Args:
             question: 用户问题
         Returns:
@@ -189,3 +201,66 @@ class RAGAssistant:
                 "answer": f"处理问题时出错: {str(e)}",
                 "sources": []
             }
+
+    def query_stream(self, question: str):
+        """
+        流式问答，逐token返回生成结果
+        Args:
+            question: 用户问题
+        Yields:
+            逐字生成回答片段
+        """
+        # 先检索知识库
+        docs = self.kb.similarity_search(question, k=3)
+        context = "\n\n".join([doc.page_content for doc in docs])
+
+        # 构建Prompt
+        template = """基于以下检索到的相关信息，回答用户的问题。
+如果无法从信息中找到答案，请明确告知。
+
+相关信息：
+{context}
+
+用户问题：{question}
+
+请提供专业、准确的回答："""
+
+        prompt_text = template.format(context=context, question=question)
+
+        # Tokenize
+        inputs = self.tokenizer([prompt_text], return_tensors="pt")
+        if torch.cuda.is_available():
+            inputs = inputs.to("cuda")
+
+        # 创建streamer
+        streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, skip_special_tokens=True)
+
+        # Generation kwargs
+        generation_kwargs = dict(
+            inputs,
+            streamer=streamer,
+            max_new_tokens=256,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.1,
+            do_sample=True
+        )
+
+        # 在后台线程生成
+        thread = threading.Thread(target=self.model.generate, kwargs=generation_kwargs)
+        thread.start()
+
+        # 逐步返回
+        for new_text in streamer:
+            yield new_text
+
+        thread.join()
+
+        # 保存来源信息
+        self._last_sources = [
+            {
+                "content": doc.page_content[:200],
+                "source": doc.metadata.get("source", "未知")
+            }
+            for doc in docs
+        ]
