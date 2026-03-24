@@ -240,7 +240,42 @@ with st.sidebar:
     if st.session_state.kb is None:
         with st.spinner("初始化知识库..."):
             st.session_state.kb = KnowledgeBase()
-        st.success("✅ 知识库初始化完成")
+            
+            # 自动导入所有竞赛资料
+            def auto_ingest_all_data():
+                """自动导入所有竞赛资料"""
+                data_dirs = [
+                    "data/常见问题FAQ",
+                    "data/报名须知",
+                    "data/技术文档",
+                    "data/竞赛规则",
+                    "data/评分标准"
+                ]
+                supported_extensions = ['.md', '.txt', '.pdf']
+                total_files = 0
+                success_count = 0
+                
+                for data_dir in data_dirs:
+                    full_path = os.path.join(os.path.dirname(__file__), data_dir)
+                    if not os.path.exists(full_path):
+                        continue
+                    
+                    for root, dirs, files in os.walk(full_path):
+                        for file in files:
+                            if any(file.endswith(ext) for ext in supported_extensions):
+                                file_path = os.path.join(root, file)
+                                total_files += 1
+                                try:
+                                    st.session_state.kb.ingest(file_path)
+                                    success_count += 1
+                                except Exception:
+                                    pass
+                
+                return total_files, success_count
+            
+            # 执行自动导入
+            total, success = auto_ingest_all_data()
+        st.success(f"✅ 知识库初始化完成，自动导入了 {success}/{total} 个文件")
 
     # 显示知识库状态
     if st.session_state.kb is not None:
