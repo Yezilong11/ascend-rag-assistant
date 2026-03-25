@@ -239,11 +239,18 @@ with st.sidebar:
     # 初始化知识库
     if st.session_state.kb is None:
         with st.spinner("初始化知识库..."):
-            st.session_state.kb = KnowledgeBase()
+            kb = KnowledgeBase()
             
-            # 自动导入所有竞赛资料
-            def auto_ingest_all_data():
-                """自动导入所有竞赛资料"""
+            # 检查是否已有数据，如果没有才自动导入所有竞赛资料
+            def auto_ingest_all_data(kb):
+                """自动导入所有竞赛资料，只在数据库为空时执行"""
+                # 检查集合是否已有数据
+                collection = kb.db._collection
+                count = collection.count()
+                if count > 0:
+                    print(f"知识库已有 {count} 个片段，跳过自动导入")
+                    return 0, 0
+
                 data_dirs = [
                     "data/常见问题FAQ",
                     "data/报名须知",
@@ -266,7 +273,7 @@ with st.sidebar:
                                 file_path = os.path.join(root, file)
                                 total_files += 1
                                 try:
-                                    st.session_state.kb.ingest(file_path)
+                                    kb.ingest(file_path)
                                     success_count += 1
                                 except Exception:
                                     pass
@@ -274,8 +281,13 @@ with st.sidebar:
                 return total_files, success_count
             
             # 执行自动导入
-            total, success = auto_ingest_all_data()
-        st.success(f"✅ 知识库初始化完成，自动导入了 {success}/{total} 个文件")
+            total, success = auto_ingest_all_data(kb)
+            st.session_state.kb = kb
+            
+            if total > 0:
+                st.success(f"✅ 知识库初始化完成，自动导入了 {success}/{total} 个文件")
+            else:
+                st.success("✅ 知识库初始化完成，已加载已有数据")
 
     # 显示知识库状态
     if st.session_state.kb is not None:
