@@ -216,6 +216,14 @@ st.markdown("""
         background-color: #dc2626;
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
     }
+
+    /* 重排序配置折叠面板 */
+    .reranker-config {
+        background-color: #f8fafc;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -356,6 +364,60 @@ with st.sidebar:
 
     st.divider()
 
+    # ========== 重排序配置区域 ==========
+    st.markdown('<div class="sidebar-title">🎯 重排序配置</div>', unsafe_allow_html=True)
+    
+    # 是否启用重排序
+    use_reranker = st.toggle(
+        "启用重排序功能",
+        value=True,
+        help="启用后，系统会先检索更多候选文档，再用重排序模型精排，提升答案质量"
+    )
+    
+    # 重排序模型选择
+    available_rerankers = RAGAssistant.get_available_rerankers()
+    reranker_options = [f"{k}: {v['name']} ({v['size']})" for k, v in available_rerankers.items()]
+    selected_reranker = st.selectbox(
+        "重排序模型",
+        options=reranker_options,
+        format_func=lambda x: x.split(": ")[1] if ": " in x else x,
+        index=0,
+        disabled=not use_reranker,
+        help="选择用于精排的Cross-Encoder模型，bge-reranker-v2-m3效果最佳"
+    )
+    
+    # 提取reranker_key
+    if ": " in selected_reranker:
+        reranker_key = selected_reranker.split(": ")[0]
+    else:
+        reranker_key = list(available_rerankers.keys())[0]
+    
+    # 高级配置（折叠）
+    with st.expander("⚙️ 高级配置", expanded=False):
+        initial_retrieval_k = st.slider(
+            "初始检索数量",
+            min_value=3,
+            max_value=20,
+            value=10,
+            step=1,
+            disabled=not use_reranker,
+            help="先检索这么多候选文档，再让重排序模型精排"
+        )
+        
+        reranker_top_k = st.slider(
+            "精排后保留数量",
+            min_value=1,
+            max_value=5,
+            value=3,
+            step=1,
+            disabled=not use_reranker,
+            help="重排序后保留最相关的几个文档喂给大模型"
+        )
+        
+        st.caption(f"💡 流程：检索 {initial_retrieval_k} 个 → 重排序 → 取前 {reranker_top_k} 个 → 生成答案")
+
+    st.divider()
+
     # 模型下载路径设置
     model_dir = st.text_input(
         "模型下载路径",
@@ -368,7 +430,15 @@ with st.sidebar:
     # 模型初始化
     if st.button("启动AI引擎", type="primary", use_container_width=True):
         with st.spinner("加载大模型中，请稍候..."):
-            st.session_state.assistant = RAGAssistant(st.session_state.kb, model_key=model_key, model_dir=model_dir)
+            st.session_state.assistant = RAGAssistant(
+                knowledge_base=st.session_state.kb,
+                model_key=model_key,
+                model_dir=model_dir,
+                use_reranker=use_reranker,
+                reranker_model=reranker_key,
+                reranker_top_k=reranker_top_k,
+                initial_retrieval_k=initial_retrieval_k
+            )
         st.success("✅ AI引擎已就绪！")
 
     # 清空对话按钮
@@ -390,11 +460,27 @@ with st.sidebar:
         • RAG + 大语言模型<br>
         • Chroma 向量数据库<br>
         • BGE-Large-ZH 嵌入<br>
+        • BGE-Reranker-v2-m3 重排序<br>
         • 流式输出打字机效果<br>
         • ModelScope模型下载<br>
         • 昇腾NPU优化支持
     </div>
     """, unsafe_allow_html=True)
+    
+    # 显示重排序状态
+    if use_reranker:
+        st.markdown("""
+        <div style="font-size: 0.85rem; color: #1f77b4; margin-top: 0.5rem;">
+            ✅ 重排序功能已启用
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+            ⚪ 重排序功能未启用
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 主界面 - 聊天区域
@@ -514,6 +600,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.divider()
 st.markdown("""
 <div style="text-align: center; color: #64748b; font-size: 0.9rem;">
-    🚀 昇腾AI竞赛伴随式助教系统 | Powered by RAG + LLM | 专为昇腾AI生态打造
+    🚀 昇腾AI竞赛伴随式助教系统 | Powered by RAG + LLM + Reranker | 专为昇腾AI生态打造
 </div>
 """, unsafe_allow_html=True)

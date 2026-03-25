@@ -8,20 +8,20 @@ from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline, TextIteratorStreamer
 
-# 导入重排序模型
-try:
-    from sentence_transformers import CrossEncoder
-    RERANKER_AVAILABLE = True
-except ImportError:
-    RERANKER_AVAILABLE = False
-    print("⚠️ 未安装sentence-transformers，重排序功能不可用")
-
 # ModelScope支持
 try:
     from modelscope import snapshot_download
     MODELSCOPE_AVAILABLE = True
 except ImportError:
     MODELSCOPE_AVAILABLE = False
+
+# 重排序依赖
+try:
+    from sentence_transformers import CrossEncoder
+    RERANKER_AVAILABLE = True
+except ImportError:
+    RERANKER_AVAILABLE = False
+    print("⚠️ 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
 
 warnings.filterwarnings("ignore")
 
@@ -46,96 +46,138 @@ PREDEFINED_MODELS = {
 }
 
 
+# 预定义重排序模型配置
+PREDEFINED_RERANKERS = {
+    "bge-reranker-v2-m3": {
+        "repo_id": "BAAI/bge-reranker-v2-m3",
+        "name": "BGE-Reranker-v2-m3",
+        "description": "推荐，多语言支持，效果最佳",
+        "size": "~1.2GB"
+    },
+    "bge-reranker-large": {
+        "repo_id": "BAAI/bge-reranker-large",
+        "name": "BGE-Reranker-Large",
+        "description": "效果好，速度较快",
+        "size": "~1.3GB"
+    },
+    "bge-reranker-base": {
+        "repo_id": "BAAI/bge-reranker-base",
+        "name": "BGE-Reranker-Base",
+        "description": "速度快，效果良好",
+        "size": "~0.6GB"
+    }
+}
+
+
 class Reranker:
     """
-    重排序器：对检索到的文档片段进行重新排序
-    使用交叉编码器（Cross-Encoder）计算查询与文档的相关性分数
+    重排序器
+    使用 Cross-Encoder 模型对检索结果进行精排
     """
     
-    def __init__(self, model_name="BAAI/bge-reranker-base"):
+    @classmethod
+    def get_available_models(cls):
+        """获取所有预定义重排序模型列表"""
+        return PREDEFINED_RERANKERS
+    
+    def __init__(self, model_name: str = "bge-reranker-v2-m3", model_dir: str = "./models", device: str = None):
         """
         初始化重排序器
-        
         Args:
-            model_name: 重排序模型名称
-                       可选: "BAAI/bge-reranker-base" (中文优化)
-                            "cross-encoder/ms-marco-MiniLM-L-6-v2" (英文)
+            model_name: 模型名称，可选 bge-reranker-v2-m3 / bge-reranker-large / bge-reranker-base
+            model_dir: 本地模型存放目录
+            device: 设备，None则自动检测
         """
         if not RERANKER_AVAILABLE:
-            raise ImportError("请先安装sentence-transformers: pip install sentence-transformers")
+            raise ImportError("sentence-transformers未安装，无法使用重排序功能")
         
-        print(f"🚀 加载重排序模型: {model_name}")
-        self.model = CrossEncoder(model_name, max_length=512)
-        print("✅ 重排序模型加载完成")
+        self.model_name = model_name
+        
+        if device is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self.device = device
+        
+        # 获取模型配置
+        if model_name not in PREDEFINED_RERANKERS:
+            print(f"⚠️ 未知的重排序模型: {model_name}，使用默认 bge-reranker-v2-m3")
+            model_name = "bge-reranker-v2-m3"
+        
+        model_config = PREDEFINED_RERANKERS[model_name]
+        model_id = model_config["repo_id"]
+        local_model_name = model_id.split("/")[-1]
+        local_model_path = os.path.join(model_dir, local_model_name)
+        
+        # 检查本地是否存在
+        if os.path.exists(local_model_path):
+            model_path = local_model_path
+            print(f"正在加载重排序模型: {model_path}...")
+        else:
+            # 本地不存在，尝试从ModelScope下载
+            if MODELSCOPE_AVAILABLE:
+                print(f"🔍 本地重排序模型 {local_model_name} 未找到，正在从ModelScope下载...")
+                try:
+                    # ModelScope的BAAI命名格式
+                    modelscope_repo_id = model_id  # BAAI/bge-reranker-v2-m3
+                    target_dir = os.path.join(model_dir, local_model_name)
+                    snapshot_download(
+                        modelscope_repo_id,
+                        local_dir=target_dir
+                    )
+                    model_path = target_dir
+                    print(f"✅ ModelScope下载完成，保存到: {model_path}")
+                except Exception as e:
+                    print(f"⚠️ ModelScope下载失败: {str(e)}，尝试从HuggingFace加载")
+                    model_path = model_id
+            else:
+                model_path = model_id
+                print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
+        
+        # 加载 Cross-Encoder
+        print(f"正在加载重排序模型到设备: {self.device}")
+        self.cross_encoder = CrossEncoder(
+            model_path,
+            device=self.device,
+            trust_remote_code=True
+        )
+        print(f"✅ 重排序器初始化完成 [{model_config['description']}]")
     
     def rerank(self, query: str, documents: list, top_k: int = 3) -> list:
         """
         对检索结果进行重排序
-        
         Args:
-            query: 用户查询
-            documents: 检索到的文档列表，每个元素是文档内容字符串
-            top_k: 返回前k个最相关的文档
-            
+            query: 用户问题
+            documents: 原始文档块列表，每个元素是包含 page_content 和 metadata 的对象
+            top_k: 返回的最相关文档数量
         Returns:
-            重排序后的文档列表（按相关性从高到低）
+            重排序后的文档块列表（按相关度降序）
         """
         if not documents:
             return []
         
-        # 准备查询-文档对
-        pairs = [(query, doc) for doc in documents]
+        # 准备 query-document 对
+        pairs = [(query, doc.page_content) for doc in documents]
         
         # 计算相关性分数
-        scores = self.model.predict(pairs)
+        scores = self.cross_encoder.predict(pairs)
         
-        # 将分数与文档配对并排序
-        scored_docs = list(zip(documents, scores))
-        scored_docs.sort(key=lambda x: x[1], reverse=True)
+        # 组合文档和分数
+        doc_with_scores = list(zip(documents, scores))
         
-        # 返回前top_k个文档
-        return [doc for doc, score in scored_docs[:top_k]]
-    
-    def rerank_with_metadata(self, query: str, documents_with_meta: list, top_k: int = 3) -> list:
-        """
-        重排序并保留元数据
+        # 按分数降序排序
+        doc_with_scores.sort(key=lambda x: x[1], reverse=True)
         
-        Args:
-            query: 用户查询
-            documents_with_meta: 包含元数据的文档列表
-                                [{"content": "...", "metadata": {...}}, ...]
-            top_k: 返回前k个最相关的文档
-            
-        Returns:
-            重排序后的文档列表（包含元数据和分数）
-        """
-        if not documents_with_meta:
-            return []
+        # 返回 top_k 个文档（仅文档对象）
+        reranked_docs = [doc for doc, _ in doc_with_scores[:top_k]]
         
-        # 提取文档内容
-        contents = [doc["content"] for doc in documents_with_meta]
-        
-        # 计算相关性分数
-        pairs = [(query, content) for content in contents]
-        scores = self.model.predict(pairs)
-        
-        # 添加分数到元数据
-        for doc, score in zip(documents_with_meta, scores):
-            doc["relevance_score"] = float(score)
-        
-        # 按分数排序
-        sorted_docs = sorted(documents_with_meta, 
-                           key=lambda x: x["relevance_score"], 
-                           reverse=True)
-        
-        return sorted_docs[:top_k]
+        return reranked_docs
 
 
 class RAGAssistant:
     """
     RAG智能助教核心引擎
     结合知识检索与大模型生成能力
-    支持多模型切换、流式输出
+    支持多模型切换、流式输出、重排序
     """
 
     @classmethod
@@ -143,23 +185,37 @@ class RAGAssistant:
         """获取所有预定义模型列表"""
         return PREDEFINED_MODELS
 
-    def __init__(self, knowledge_base, model_key="qwen2-1.5b", model_dir="./models", use_reranker=True):
+    @classmethod
+    def get_available_rerankers(cls):
+        """获取所有预定义重排序模型列表"""
+        return PREDEFINED_RERANKERS
+
+    def __init__(self, knowledge_base, model_key="qwen2-1.5b", model_dir="./models", 
+                 use_reranker: bool = True, reranker_model: str = "bge-reranker-v2-m3",
+                 reranker_top_k: int = 3, initial_retrieval_k: int = 10):
         """
         初始化RAG助手
-        
         Args:
             knowledge_base: KnowledgeBase实例
             model_key: 预定义模型key
             model_dir: 本地模型目录
-            use_reranker: 是否启用重排序功能
+            use_reranker: 是否启用重排序
+            reranker_model: 重排序模型名称
+            reranker_top_k: 重排序后返回的文档数量
+            initial_retrieval_k: 初始检索的文档数量
         """
         self.kb = knowledge_base
         self.model_key = model_key
-        self.use_reranker = use_reranker
         self.model = None
         self.tokenizer = None
         self._last_sources = None
-
+        
+        # 重排序配置
+        self.use_reranker = use_reranker
+        self.reranker_top_k = reranker_top_k
+        self.initial_retrieval_k = initial_retrieval_k
+        self.reranker = None
+        
         # 获取模型配置
         model_config = PREDEFINED_MODELS[model_key]
         model_id = model_config["repo_id"]
@@ -183,11 +239,11 @@ class RAGAssistant:
                         modelscope_repo_id = model_id
                     # 确保下载到项目的models文件夹
                     target_dir = os.path.join(model_dir, local_model_name)
-                    local_model_path = snapshot_download(
+                    snapshot_download(
                         modelscope_repo_id,
                         local_dir=target_dir
                     )
-                    model_path = local_model_path
+                    model_path = target_dir
                     print(f"✅ ModelScope下载完成，保存到: {model_path}")
                 except Exception as e:
                     print(f"⚠️ ModelScope下载失败: {str(e)}，回退到HuggingFace")
@@ -231,7 +287,7 @@ class RAGAssistant:
             device_id = -1
 
         # 创建生成pipeline
-        pipeline_obj = pipeline(
+        self.pipeline_obj = pipeline(
             "text-generation",
             model=self.model,
             tokenizer=self.tokenizer,
@@ -243,7 +299,24 @@ class RAGAssistant:
             do_sample=True
         )
 
-        llm = HuggingFacePipeline(pipeline=pipeline_obj)
+        llm = HuggingFacePipeline(pipeline=self.pipeline_obj)
+
+        # 初始化重排序器（如果启用）
+        if self.use_reranker and RERANKER_AVAILABLE:
+            try:
+                self.reranker = Reranker(
+                    model_name=reranker_model,
+                    model_dir=model_dir,
+                    device=device
+                )
+                print(f"✅ 已启用重排序功能，模型: {reranker_model}，精排后保留 {reranker_top_k} 个文档")
+            except Exception as e:
+                print(f"⚠️ 重排序器加载失败: {str(e)}，将不使用重排序")
+                self.use_reranker = False
+                self.reranker = None
+        else:
+            self.use_reranker = False
+            self.reranker = None
 
         # 自定义Prompt模板
         template = """基于以下检索到的相关信息，回答用户的问题。
@@ -261,85 +334,66 @@ class RAGAssistant:
             input_variables=["context", "question"]
         )
 
-        # ========== 重排序功能初始化 ==========
-        if use_reranker and RERANKER_AVAILABLE:
-            print("\n🔍 初始化重排序器...")
-            try:
-                self.reranker = Reranker()
-                print("✅ 重排序器初始化完成")
-                
-                # 创建支持重排序的自定义检索器
-                from langchain.schema import BaseRetriever, Document
-                
-                class RerankingRetriever(BaseRetriever):
-                    """自定义检索器，支持重排序"""
-                    
-                    def __init__(self, base_retriever, reranker):
-                        self.base_retriever = base_retriever
-                        self.reranker = reranker
-                    
-                    def get_relevant_documents(self, query: str):
-                        # 1. 基础检索（检索更多文档）
-                        docs = self.base_retriever.get_relevant_documents(query)
-                        
-                        # 2. 准备重排序数据
-                        documents_with_meta = []
-                        for doc in docs:
-                            documents_with_meta.append({
-                                "content": doc.page_content,
-                                "metadata": doc.metadata
-                            })
-                        
-                        # 3. 重排序
-                        reranked = self.reranker.rerank_with_metadata(
-                            query=query,
-                            documents_with_meta=documents_with_meta,
-                            top_k=3  # 最终返回3个
-                        )
-                        
-                        # 4. 转换回Document格式
-                        result_docs = []
-                        for item in reranked:
-                            doc = Document(
-                                page_content=item["content"],
-                                metadata={
-                                    **item["metadata"],
-                                    "relevance_score": item["relevance_score"]
-                                }
-                            )
-                            result_docs.append(doc)
-                        
-                        return result_docs
-                
-                # 创建基础检索器（检索更多文档）
-                base_retriever = self.kb.db.as_retriever(search_kwargs={"k": 10})
-                
-                # 创建自定义检索器
-                custom_retriever = RerankingRetriever(base_retriever, self.reranker)
-                
-                # 使用自定义检索器
-                retriever_to_use = custom_retriever
-                print("✅ 已启用重排序功能（检索10个 → 重排序 → 选3个）")
-                
-            except Exception as e:
-                print(f"⚠️ 重排序器初始化失败: {str(e)}，使用普通检索器")
-                retriever_to_use = self.kb.db.as_retriever(search_kwargs={"k": 3})
-        else:
-            # 不使用重排序，直接检索3个文档
-            if use_reranker and not RERANKER_AVAILABLE:
-                print("⚠️ 重排序功能不可用（未安装sentence-transformers），使用普通检索器")
-            retriever_to_use = self.kb.db.as_retriever(search_kwargs={"k": 3})
+        # 创建RAG链（使用自定义检索器，支持重排序）
+        self._init_qa_chain(llm, prompt)
+        
+        print(f"✅ RAG引擎初始化完成 [{model_config['name']}]")
 
-        # 创建RAG链
+    def _init_qa_chain(self, llm, prompt):
+        """
+        初始化 QA 链，支持重排序
+        """
+        from langchain_core.retrievers import BaseRetriever
+        from langchain_core.callbacks import CallbackManagerForRetrieverRun
+        from typing import List
+        from langchain_core.documents import Document
+
+        # 定义一个符合 LangChain 标准的检索器
+        class RerankCompatibleRetriever(BaseRetriever):
+            """自定义检索器，兼容 LangChain BaseRetriever，支持重排序"""
+            rag_assistant: 'RAGAssistant'
+            
+            class Config:
+                arbitrary_types_allowed = True
+
+            def _get_relevant_documents(
+                self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+            ) -> List[Document]:
+                # 1. 初步检索（获取更多候选）
+                docs = self.rag_assistant.kb.similarity_search(
+                    query, 
+                    k=self.rag_assistant.initial_retrieval_k
+                )
+                
+                # 2. 重排序（如果启用）
+                if self.rag_assistant.use_reranker and self.rag_assistant.reranker:
+                    docs = self.rag_assistant.reranker.rerank(
+                        query, 
+                        docs, 
+                        top_k=self.rag_assistant.reranker_top_k
+                    )
+                else:
+                    # 没有重排序，直接取前 top_k
+                    docs = docs[:self.rag_assistant.reranker_top_k]
+                
+                # 保存检索结果，供后续使用
+                self.rag_assistant._last_reranked_docs = docs
+                return docs
+        
+        # 创建自定义检索器实例
+        custom_retriever = RerankCompatibleRetriever(rag_assistant=self)
+        
+        # 创建 QA 链
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
-            retriever=retriever_to_use,
+            retriever=custom_retriever,
             chain_type_kwargs={"prompt": prompt},
             return_source_documents=True
         )
-
-        print(f"✅ RAG引擎初始化完成 [{model_config['name']}]")
+        
+        # 初始化存储最后检索文档的变量
+        self._last_reranked_docs = []
 
     def query(self, question: str) -> dict:
         """
@@ -350,25 +404,23 @@ class RAGAssistant:
             包含答案和来源的字典
         """
         try:
+            # 清空上次的检索结果
+            self._last_reranked_docs = []
+            
             result = self.qa_chain({"query": question})
             
-            # 格式化输出，包含重排序分数
-            sources = []
-            for doc in result["source_documents"]:
-                source_info = {
-                    "content": doc.page_content[:200],
-                    "source": doc.metadata.get("source", "未知")
-                }
-                
-                # 如果有重排序分数，添加到输出
-                if "relevance_score" in doc.metadata:
-                    source_info["relevance_score"] = doc.metadata["relevance_score"]
-                
-                sources.append(source_info)
+            # 获取来源（使用重排序后的文档）
+            source_docs = self._last_reranked_docs if self._last_reranked_docs else result["source_documents"]
             
             return {
                 "answer": result["result"],
-                "sources": sources
+                "sources": [
+                    {
+                        "content": doc.page_content[:200],
+                        "source": doc.metadata.get("source", "未知")
+                    }
+                    for doc in source_docs
+                ]
             }
         except Exception as e:
             return {
@@ -384,44 +436,29 @@ class RAGAssistant:
         Yields:
             逐字生成回答片段
         """
-        # 先检索知识库（支持重排序）
-        if hasattr(self, 'reranker') and self.use_reranker:
-            # 使用重排序检索
-            from langchain.schema import Document
-            
-            # 检索更多文档
-            docs = self.kb.similarity_search(question, k=10)
-            
-            # 准备重排序数据
-            documents_with_meta = []
-            for doc in docs:
-                documents_with_meta.append({
-                    "content": doc.page_content,
-                    "metadata": doc.metadata
-                })
-            
-            # 重排序
-            reranked = self.reranker.rerank_with_metadata(
-                query=question,
-                documents_with_meta=documents_with_meta,
-                top_k=3
-            )
-            
-            # 转换回Document格式
-            docs = []
-            for item in reranked:
-                doc = Document(
-                    page_content=item["content"],
-                    metadata={
-                        **item["metadata"],
-                        "relevance_score": item["relevance_score"]
-                    }
-                )
-                docs.append(doc)
-        else:
-            # 普通检索
-            docs = self.kb.similarity_search(question, k=3)
+        # 清空上次的检索结果
+        self._last_reranked_docs = []
         
+        # 1. 初步检索（获取更多候选）
+        docs = self.kb.similarity_search(question, k=self.initial_retrieval_k)
+        
+        # 2. 重排序（如果启用）
+        if self.use_reranker and self.reranker:
+            docs = self.reranker.rerank(question, docs, top_k=self.reranker_top_k)
+        else:
+            docs = docs[:self.reranker_top_k]
+        
+        # 保存来源信息
+        self._last_reranked_docs = docs
+        self._last_sources = [
+            {
+                "content": doc.page_content[:200],
+                "source": doc.metadata.get("source", "未知")
+            }
+            for doc in docs
+        ]
+        
+        # 构建上下文
         context = "\n\n".join([doc.page_content for doc in docs])
 
         # 构建Prompt
@@ -465,35 +502,3 @@ class RAGAssistant:
             yield new_text
 
         thread.join()
-
-        # 保存来源信息
-        self._last_sources = []
-        for doc in docs:
-            source_info = {
-                "content": doc.page_content[:200],
-                "source": doc.metadata.get("source", "未知")
-            }
-            if "relevance_score" in doc.metadata:
-                source_info["relevance_score"] = doc.metadata["relevance_score"]
-            self._last_sources.append(source_info)
-
-
-# 测试代码
-if __name__ == "__main__":
-    print("🧪 测试重排序功能")
-    
-    # 模拟测试
-    from unittest.mock import Mock
-    
-    # 创建模拟知识库
-    mock_kb = Mock()
-    mock_kb.db = Mock()
-    mock_kb.db.as_retriever = Mock(return_value=Mock())
-    
-    # 测试初始化
-    try:
-        assistant = RAGAssistant(mock_kb, use_reranker=True)
-        print("✅ RAG助手初始化成功（带重排序）")
-    except Exception as e:
-        print(f"⚠️ 初始化失败: {e}")
-        print("请安装依赖: pip install sentence-transformers")
