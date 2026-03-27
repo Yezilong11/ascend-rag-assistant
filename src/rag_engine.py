@@ -63,6 +63,10 @@ class RAGAssistant:
         self.model = None
         self.tokenizer = None
         self._last_sources = None
+        
+        # 添加简单缓存
+        self._cache = {}  # 问题缓存
+        self._cache_max_size = 100  # 最大缓存数量
 
         # 获取模型配置
         model_config = PREDEFINED_MODELS[model_key]
@@ -139,7 +143,7 @@ class RAGAssistant:
             "text-generation",
             model=self.model,
             tokenizer=self.tokenizer,
-            max_new_tokens=256,  # 限制生成长度，提升速度
+            max_new_tokens=512,  # 增加生成长度，避免回答被截断
             temperature=0.7,
             top_p=0.9,
             repetition_penalty=1.1,
@@ -169,7 +173,7 @@ class RAGAssistant:
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
-            retriever=self.kb.db.as_retriever(search_kwargs={"k": 3}),
+            retriever=self.kb.db.as_retriever(search_kwargs={"k": 2}),  # 减少检索文档数量，提升速度
             chain_type_kwargs={"prompt": prompt},
             return_source_documents=True
         )
@@ -184,9 +188,15 @@ class RAGAssistant:
         Returns:
             包含答案和来源的字典
         """
+        # 检查缓存
+        cache_key = question.strip().lower()
+        if cache_key in self._cache:
+            print(f"📦 从缓存返回结果")
+            return self._cache[cache_key]
+        
         try:
             result = self.qa_chain({"query": question})
-            return {
+            response = {
                 "answer": result["result"],
                 "sources": [
                     {
@@ -196,6 +206,13 @@ class RAGAssistant:
                     for doc in result["source_documents"]
                 ]
             }
+            
+            # 缓存结果
+            if len(self._cache) >= self._cache_max_size:
+                self._cache.clear()
+            self._cache[cache_key] = response
+            
+            return response
         except Exception as e:
             return {
                 "answer": f"处理问题时出错: {str(e)}",
@@ -211,7 +228,7 @@ class RAGAssistant:
             逐字生成回答片段
         """
         # 先检索知识库
-        docs = self.kb.similarity_search(question, k=3)
+        docs = self.kb.similarity_search(question, k=2)  # 减少检索文档数量，提升速度
         context = "\n\n".join([doc.page_content for doc in docs])
 
         # 构建Prompt
