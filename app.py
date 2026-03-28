@@ -544,7 +544,14 @@ with chat_container:
             if "sources" in msg and msg["sources"]:
                 with st.expander("📖 查看参考来源"):
                     for i, source in enumerate(msg["sources"], 1):
-                        st.markdown(f"**来源 {i}**: `{source['source']}`")
+                        # 转换为项目根目录的相对路径
+                        abs_path = source["source"]
+                        try:
+                            rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
+                        except ValueError:
+                            # 如果跨盘，只保留文件名
+                            rel_path = os.path.basename(abs_path)
+                        st.markdown(f"**来源 {i}**: `{rel_path}`")
                         st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
