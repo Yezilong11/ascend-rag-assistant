@@ -1,0 +1,46 @@
+{
+  "competition_skill_mapping": {
+    "competition1": {
+      "name": "中国国际大学生创新大赛",
+      "required_skills": [
+        "tech.programming.python.python_basic",
+        "tech.algorithm.data_structure.basic_data_structure",
+        "comprehensive.teamwork.team_communication.effective_communication",
+        "comprehensive.presentation.public_speaking.speech_preparation",
+        "comprehensive.project_management.basic_project_management.project_planning"
+      ]
+    },
+    "competition2": {
+      "name": "挑战杯全国大学生课外学术科技作品竞赛",
+      "required_skills": [
+        "academic.paper_writing.academic_paper.paper_structure",
+        "academic.data_analysis.statistical_analysis.basic_statistics",
+        "comprehensive.teamwork.team_communication.effective_communication",
+        "comprehensive.presentation.public_speaking.speech_preparation"
+      ]
+    },
+    "competition3": {
+      "name": "全国大学生数学建模竞赛",
+      "required_skills": [
+        "tech.programming.python.python_basic",
+        "academic.data_analysis.statistical_analysis.basic_statistics",
+        "comprehensive.teamwork.team_communication.effective_communication"
+      ]
+    },
+    "competition4": {
+      "name": "国际大学生程序设计竞赛（ICPC）",
+      "required_skills": [
+        "tech.programming.c_cpp.c_basic",
+        "tech.algorithm.data_structure.basic_data_structure"
+      ]
+    },
+    "competition5": {
+      "name": "全国大学生电子设计竞赛",
+      "required_skills": [
+        "tech.programming.c_cpp.c_basic",
+        "tech.algorithm.data_structure.basic_data_structure",
+        "comprehensive.teamwork.team_communication.effective_communication"
+      ]
+    }
+  }
+}

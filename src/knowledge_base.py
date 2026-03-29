@@ -126,10 +126,35 @@ class KnowledgeBase:
                 model_kwargs={'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
             )
 
-        self.db = Chroma(
-            persist_directory=persist_dir,
-            embedding_function=self.embeddings
-        )
+        try:
+            self.db = Chroma(
+                persist_directory=persist_dir,
+                collection_name="knowledge_base",
+                embedding_function=self.embeddings
+            )
+        except Exception as e:
+            print(f"Chroma初始化失败，尝试使用客户端模式: {e}")
+            try:
+                import chromadb
+                # 尝试使用不同的方式初始化
+                settings = chromadb.config.Settings(
+                    persist_directory=persist_dir,
+                    is_persistent=True
+                )
+                client = chromadb.Client(settings=settings)
+                self.db = Chroma(
+                    client=client,
+                    collection_name="knowledge_base",
+                    embedding_function=self.embeddings
+                )
+            except Exception as e2:
+                print(f"客户端模式也失败: {e2}")
+                # 降级方案：使用内存模式
+                print("使用内存模式初始化Chroma")
+                self.db = Chroma(
+                    collection_name="knowledge_base",
+                    embedding_function=self.embeddings
+                )
 
     def detect_doc_type(self, file_path: str) -> str:
         """

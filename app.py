@@ -3,6 +3,7 @@ import streamlit as st
 
 from src.knowledge_base import KnowledgeBase
 from src.rag_engine import RAGAssistant
+from src.skill_tree import SkillTreeManager, ProgressTrackingService, CompetitionAssociationService, render_skill_tree, render_progress_tracking, render_competition_association
 
 # 页面配置
 st.set_page_config(
@@ -234,10 +235,34 @@ if 'kb' not in st.session_state:
     st.session_state.kb = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'skill_tree_manager' not in st.session_state:
+    st.session_state.skill_tree_manager = None
+if 'progress_service' not in st.session_state:
+    st.session_state.progress_service = None
+if 'competition_service' not in st.session_state:
+    st.session_state.competition_service = None
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = "default_user"
+if 'page' not in st.session_state:
+    st.session_state.page = "chat"
 
 # 页面标题
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手，为你解答竞赛报名、规则、评分等各类问题</p>', unsafe_allow_html=True)
+
+# 导航选项
+page_options = ["智能问答", "技能树", "学习进度", "竞赛技能推荐"]
+selected_page = st.selectbox("选择功能模块", page_options, index=page_options.index("智能问答"))
+
+# 更新页面状态
+if selected_page == "智能问答":
+    st.session_state.page = "chat"
+elif selected_page == "技能树":
+    st.session_state.page = "skill_tree"
+elif selected_page == "学习进度":
+    st.session_state.page = "progress"
+elif selected_page == "竞赛技能推荐":
+    st.session_state.page = "competition"
 
 # 侧边栏 - 知识库管理
 with st.sidebar:
@@ -483,125 +508,173 @@ with st.sidebar:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 主界面 - 聊天区域
-# 显示欢迎卡片
-if not st.session_state.chat_history:
-    st.markdown("""
-    <div class="welcome-card">
-        <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
-        <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 示例问题
-    example_questions = [
-        "如何报名西门子杯？",
-        "挑战杯的参赛流程是什么？",
-        "大唐杯比赛内容是什么？",
-        "RoboMaster机甲大师赛参赛条件？",
-        "中国国际大学生创新大赛评分标准？"
-    ]
-
-    st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
-    cols = st.columns(3)
-    for i, q in enumerate(example_questions):
-        with cols[i % 3]:
-            if st.button(q, key=f"example_{i}", use_container_width=True):
-                if st.session_state.assistant is not None:
-                    st.session_state.chat_history.append({
-                        "role": "user",
-                        "content": q
-                    })
-                    with st.spinner("🤔 思考中..."):
-                        result = st.session_state.assistant.query(q)
-                    st.session_state.chat_history.append({
-                        "role": "assistant",
-                        "content": result["answer"],
-                        "sources": result["sources"]
-                    })
-                    st.rerun()
-                else:
-                    st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
-
-# 显示聊天历史
-chat_container = st.container()
-with chat_container:
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    for msg in st.session_state.chat_history:
-        if msg["role"] == "user":
-            st.markdown(f"""
-            <div class="chat-message user-message">
-                <div class="message-avatar">👤 你</div>
-                <div>{msg["content"]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class="chat-message assistant-message">
-                <div class="message-avatar">🤖 助教</div>
-                <div>{msg["content"]}</div>
-            """, unsafe_allow_html=True)
-            if "sources" in msg and msg["sources"]:
-                with st.expander("📖 查看参考来源"):
-                    for i, source in enumerate(msg["sources"], 1):
-                        # 转换为项目根目录的相对路径
-                        abs_path = source["source"]
-                        try:
-                            rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
-                        except ValueError:
-                            # 如果跨盘，只保留文件名
-                            rel_path = os.path.basename(abs_path)
-                        st.markdown(f"**来源 {i}**: `{rel_path}`")
-                        st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+    # 技能树模块
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">🌳 技能树模块</div>', unsafe_allow_html=True)
+    
+    # 初始化技能树
+    if st.session_state.skill_tree_manager is None:
+        try:
+            with st.spinner("初始化技能树..."):
+                st.session_state.skill_tree_manager = SkillTreeManager()
+                st.session_state.progress_service = ProgressTrackingService()
+                st.session_state.competition_service = CompetitionAssociationService()
+                st.success("✅ 技能树初始化完成")
+        except Exception as e:
+            st.error(f"❌ 技能树初始化失败：{str(e)}")
+            st.session_state.skill_tree_manager = None
+            st.session_state.progress_service = None
+            st.session_state.competition_service = None
+    
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 输入框
-st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
+# 主界面内容
+if st.session_state.page == "chat":
+    # 显示欢迎卡片
+    if not st.session_state.chat_history:
+        st.markdown("""
+        <div class="welcome-card">
+            <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
+            <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-if st.session_state.assistant is None:
-    st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
-else:
-    question = st.chat_input("请输入您的问题，按回车发送...")
+        # 示例问题
+        example_questions = [
+            "如何报名西门子杯？",
+            "挑战杯的参赛流程是什么？",
+            "大唐杯比赛内容是什么？",
+            "RoboMaster机甲大师赛参赛条件？",
+            "中国国际大学生创新大赛评分标准？"
+        ]
 
-    if question:
-        # 添加用户消息
-        st.session_state.chat_history.append({
-            "role": "user",
-            "content": question
-        })
+        st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
+        cols = st.columns(3)
+        for i, q in enumerate(example_questions):
+            with cols[i % 3]:
+                if st.button(q, key=f"example_{i}", use_container_width=True):
+                    if st.session_state.assistant is not None:
+                        st.session_state.chat_history.append({
+                            "role": "user",
+                            "content": q
+                        })
+                        with st.spinner("🤔 思考中..."):
+                            result = st.session_state.assistant.query(q)
+                        st.session_state.chat_history.append({
+                            "role": "assistant",
+                            "content": result["answer"],
+                            "sources": result["sources"]
+                        })
+                        st.rerun()
+                    else:
+                        st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
 
-        # 流式生成AI回答
-        placeholder = st.empty()
-        full_response = ""
-        
-        # 逐步输出
-        for token in st.session_state.assistant.query_stream(question):
-            full_response += token
-            placeholder.markdown(f"""
-            <div class="chat-message assistant-message">
-                <div class="message-avatar">🤖 助教</div>
-                <div>{full_response}▌</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # 获取来源信息
-        sources = st.session_state.assistant._last_sources
-        
-        # 保存到聊天历史
-        st.session_state.chat_history.append({
-            "role": "assistant",
-            "content": full_response,
-            "sources": sources
-        })
+    # 显示聊天历史
+    chat_container = st.container()
+    with chat_container:
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        for msg in st.session_state.chat_history:
+            if msg["role"] == "user":
+                st.markdown(f"""
+                <div class="chat-message user-message">
+                    <div class="message-avatar">👤 你</div>
+                    <div>{msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-message assistant-message">
+                    <div class="message-avatar">🤖 助教</div>
+                    <div>{msg["content"]}</div>
+                """, unsafe_allow_html=True)
+                if "sources" in msg and msg["sources"]:
+                    with st.expander("📖 查看参考来源"):
+                        for i, source in enumerate(msg["sources"], 1):
+                            # 转换为项目根目录的相对路径
+                            abs_path = source["source"]
+                            try:
+                                rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
+                            except ValueError:
+                                # 如果跨盘，只保留文件名
+                                rel_path = os.path.basename(abs_path)
+                            st.markdown(f"**来源 {i}**: `{rel_path}`")
+                            st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        # 清空占位符
-        placeholder.empty()
-        
-        # 重新渲染显示完整对话
-        st.rerun()
+    # 输入框
+    st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+    if st.session_state.assistant is None:
+        st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
+    else:
+        question = st.chat_input("请输入您的问题，按回车发送...")
+
+        if question:
+            # 添加用户消息
+            st.session_state.chat_history.append({
+                "role": "user",
+                "content": question
+            })
+
+            # 流式生成AI回答
+            placeholder = st.empty()
+            full_response = ""
+            
+            # 逐步输出
+            for token in st.session_state.assistant.query_stream(question):
+                full_response += token
+                placeholder.markdown(f"""
+                <div class="chat-message assistant-message">
+                    <div class="message-avatar">🤖 助教</div>
+                    <div>{full_response}▌</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # 获取来源信息
+            sources = st.session_state.assistant._last_sources
+            
+            # 保存到聊天历史
+            st.session_state.chat_history.append({
+                "role": "assistant",
+                "content": full_response,
+                "sources": sources
+            })
+
+            # 清空占位符
+            placeholder.empty()
+            
+            # 重新渲染显示完整对话
+            st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+elif st.session_state.page == "skill_tree":
+    # 技能树页面
+    if st.session_state.skill_tree_manager and st.session_state.progress_service:
+        render_skill_tree(
+            st.session_state.skill_tree_manager,
+            st.session_state.progress_service,
+            st.session_state.user_id
+        )
+    else:
+        st.warning("技能树模块正在初始化，请稍候...")
+elif st.session_state.page == "progress":
+    # 学习进度页面
+    if st.session_state.progress_service:
+        render_progress_tracking(
+            st.session_state.progress_service,
+            st.session_state.user_id
+        )
+    else:
+        st.warning("技能树模块正在初始化，请稍候...")
+elif st.session_state.page == "competition":
+    # 竞赛技能推荐页面
+    if st.session_state.competition_service:
+        render_competition_association(
+            st.session_state.competition_service
+        )
+    else:
+        st.warning("技能树模块正在初始化，请稍候...")
 
 # 页脚
 st.divider()

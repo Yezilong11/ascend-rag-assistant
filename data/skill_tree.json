@@ -1,0 +1,380 @@
+{
+  "skill_domains": [
+    {
+      "id": "tech",
+      "name": "技术类",
+      "description": "技术相关技能，包括编程、算法、硬件开发等",
+      "categories": [
+        {
+          "id": "programming",
+          "name": "编程",
+          "description": "编程相关技能，包括各种编程语言和框架",
+          "skills": [
+            {
+              "id": "python",
+              "name": "Python编程",
+              "description": "Python编程语言相关技能",
+              "difficulty": "中等",
+              "estimated_time": "40小时",
+              "sub_skills": [
+                {
+                  "id": "python_basic",
+                  "name": "Python基础",
+                  "description": "Python语言基础，包括语法、数据类型、控制流等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "Python官方教程",
+                      "url": "https://docs.python.org/zh-cn/3/tutorial/"
+                    },
+                    {
+                      "type": "video",
+                      "title": "Python入门视频教程",
+                      "url": "https://www.bilibili.com/video/BV1o4411M71o/"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "Python中如何定义函数？",
+                      "options": ["def 函数名():", "function 函数名():", "func 函数名():", "define 函数名():"],
+                      "correct_answer": "def 函数名():"
+                    },
+                    {
+                      "id": "q2",
+                      "question": "Python中列表的方法是？",
+                      "options": ["append()", "add()", "push()", "insert()"],
+                      "correct_answer": "append()"
+                    }
+                  ]
+                },
+                {
+                  "id": "python_advanced",
+                  "name": "Python高级",
+                  "description": "Python高级特性，包括面向对象、装饰器、生成器等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "Python高级特性",
+                      "url": "https://docs.python.org/zh-cn/3/tutorial/classes.html"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "Python中装饰器的作用是？",
+                      "options": ["修改函数行为", "创建函数", "删除函数", "调用函数"],
+                      "correct_answer": "修改函数行为"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c_cpp",
+              "name": "C/C++编程",
+              "description": "C/C++编程语言相关技能",
+              "difficulty": "困难",
+              "estimated_time": "60小时",
+              "sub_skills": [
+                {
+                  "id": "c_basic",
+                  "name": "C语言基础",
+                  "description": "C语言基础，包括语法、指针、内存管理等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "C语言教程",
+                      "url": "https://www.runoob.com/cprogramming/c-tutorial.html"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "C语言中指针的作用是？",
+                      "options": ["存储地址", "存储值", "存储函数", "存储数组"],
+                      "correct_answer": "存储地址"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "algorithm",
+          "name": "算法",
+          "description": "算法相关技能，包括数据结构、算法设计等",
+          "skills": [
+            {
+              "id": "data_structure",
+              "name": "数据结构",
+              "description": "数据结构相关技能，包括链表、树、图等",
+              "difficulty": "中等",
+              "estimated_time": "30小时",
+              "sub_skills": [
+                {
+                  "id": "basic_data_structure",
+                  "name": "基础数据结构",
+                  "description": "基础数据结构，包括数组、链表、栈、队列等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "数据结构教程",
+                      "url": "https://www.runoob.com/data-structures/data-structures-tutorial.html"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "栈的特点是？",
+                      "options": ["先进后出", "先进先出", "随机访问", "顺序访问"],
+                      "correct_answer": "先进后出"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "设计类",
+      "description": "设计相关技能，包括产品设计、UI/UX设计、工业设计等",
+      "categories": [
+        {
+          "id": "ui_ux",
+          "name": "UI/UX设计",
+          "description": "UI/UX设计相关技能，包括界面设计、用户体验设计等",
+          "skills": [
+            {
+              "id": "ui_design",
+              "name": "UI设计",
+              "description": "UI设计相关技能，包括界面布局、色彩搭配等",
+              "difficulty": "中等",
+              "estimated_time": "30小时",
+              "sub_skills": [
+                {
+                  "id": "ui_basic",
+                  "name": "UI设计基础",
+                  "description": "UI设计基础，包括设计原则、色彩理论等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "UI设计教程",
+                      "url": "https://www.figma.com/resources/learn-design/ui-design/"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "UI设计中色彩搭配的原则是？",
+                      "options": ["对比鲜明", "颜色越多越好", "随意搭配", "只使用一种颜色"],
+                      "correct_answer": "对比鲜明"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "academic",
+      "name": "学术类",
+      "description": "学术相关技能，包括学术研究、论文写作、数据分析等",
+      "categories": [
+        {
+          "id": "paper_writing",
+          "name": "论文写作",
+          "description": "论文写作相关技能，包括学术论文、科技论文等",
+          "skills": [
+            {
+              "id": "academic_paper",
+              "name": "学术论文写作",
+              "description": "学术论文写作相关技能，包括论文结构、引用格式等",
+              "difficulty": "中等",
+              "estimated_time": "20小时",
+              "sub_skills": [
+                {
+                  "id": "paper_structure",
+                  "name": "论文结构",
+                  "description": "论文结构相关技能，包括摘要、引言、方法、结果、讨论等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "学术论文写作指南",
+                      "url": "https://www.sciencedirect.com/topics/computer-science/academic-writing"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "学术论文的基本结构包括？",
+                      "options": ["摘要、引言、方法、结果、讨论、结论", "引言、方法、结果、讨论", "摘要、方法、结果、结论", "引言、结果、讨论、结论"],
+                      "correct_answer": "摘要、引言、方法、结果、讨论、结论"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "data_analysis",
+          "name": "数据分析",
+          "description": "数据分析相关技能，包括数据处理、统计分析等",
+          "skills": [
+            {
+              "id": "statistical_analysis",
+              "name": "统计分析",
+              "description": "统计分析相关技能，包括描述性统计、推断性统计等",
+              "difficulty": "中等",
+              "estimated_time": "30小时",
+              "sub_skills": [
+                {
+                  "id": "basic_statistics",
+                  "name": "基础统计",
+                  "description": "基础统计知识，包括均值、中位数、标准差等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "统计学教程",
+                      "url": "https://www.coursera.org/learn/statistics"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "均值的计算方法是？",
+                      "options": ["所有数据之和除以数据个数", "数据排序后中间的值", "出现次数最多的值", "最大值减去最小值"],
+                      "correct_answer": "所有数据之和除以数据个数"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "comprehensive",
+      "name": "综合类",
+      "description": "综合能力相关技能，包括团队协作、项目管理、演讲表达等",
+      "categories": [
+        {
+          "id": "teamwork",
+          "name": "团队协作",
+          "description": "团队协作相关技能，包括沟通、协调、合作等",
+          "skills": [
+            {
+              "id": "team_communication",
+              "name": "团队沟通",
+              "description": "团队沟通相关技能，包括有效沟通、倾听、反馈等",
+              "difficulty": "简单",
+              "estimated_time": "15小时",
+              "sub_skills": [
+                {
+                  "id": "effective_communication",
+                  "name": "有效沟通",
+                  "description": "有效沟通技巧，包括表达清晰、倾听认真、反馈及时等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "有效沟通技巧",
+                      "url": "https://www.mindtools.com/CommSkll/CommunicationIntro.htm"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "有效沟通的要素包括？",
+                      "options": ["清晰表达、认真倾听、及时反馈", "只说不听、不反馈", "大声说话、打断别人", "使用专业术语、不考虑对方理解"],
+                      "correct_answer": "清晰表达、认真倾听、及时反馈"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "presentation",
+          "name": "演讲表达",
+          "description": "演讲表达相关技能，包括演讲技巧、PPT制作等",
+          "skills": [
+            {
+              "id": "public_speaking",
+              "name": "公共演讲",
+              "description": "公共演讲相关技能，包括演讲准备、表达技巧、现场互动等",
+              "difficulty": "中等",
+              "estimated_time": "20小时",
+              "sub_skills": [
+                {
+                  "id": "speech_preparation",
+                  "name": "演讲准备",
+                  "description": "演讲准备相关技能，包括主题确定、内容组织、材料准备等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "演讲准备指南",
+                      "url": "https://www.toastmasters.org/resources/public-speaking-tips"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "演讲准备的第一步是？",
+                      "options": ["确定演讲主题", "制作PPT", "练习演讲", "准备服装"],
+                      "correct_answer": "确定演讲主题"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "project_management",
+          "name": "项目管理",
+          "description": "项目管理相关技能，包括计划、执行、监控、收尾等",
+          "skills": [
+            {
+              "id": "basic_project_management",
+              "name": "基础项目管理",
+              "description": "基础项目管理技能，包括项目规划、时间管理、资源分配等",
+              "difficulty": "中等",
+              "estimated_time": "25小时",
+              "sub_skills": [
+                {
+                  "id": "project_planning",
+                  "name": "项目规划",
+                  "description": "项目规划相关技能，包括目标设定、任务分解、时间安排等",
+                  "resources": [
+                    {
+                      "type": "tutorial",
+                      "title": "项目规划指南",
+                      "url": "https://www.projectmanager.com/blog/project-planning-guide"
+                    }
+                  ],
+                  "quiz": [
+                    {
+                      "id": "q1",
+                      "question": "项目规划的核心是？",
+                      "options": ["设定明确的目标", "分配资源", "制定时间表", "监控进度"],
+                      "correct_answer": "设定明确的目标"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
