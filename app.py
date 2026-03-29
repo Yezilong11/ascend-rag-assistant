@@ -234,6 +234,8 @@ if 'kb' not in st.session_state:
     st.session_state.kb = None
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'preset_question' not in st.session_state:
+    st.session_state.preset_question = None
 
 # 页面标题
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
@@ -483,8 +485,47 @@ with st.sidebar:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 主界面 - 聊天区域
-# 显示欢迎卡片
+# ========== 主界面 - 聊天区域 ==========
+
+# 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
+if st.session_state.preset_question and st.session_state.assistant is not None:
+    question = st.session_state.preset_question
+    st.session_state.preset_question = None  # 清空，避免重复处理
+    
+    # 添加用户消息到历史
+    st.session_state.chat_history.append({
+        "role": "user",
+        "content": question
+    })
+    
+    # 生成回答并流式输出
+    with st.chat_message("user"):
+        st.markdown(question)
+    
+    placeholder = st.empty()
+    full_response = ""
+    
+    for token in st.session_state.assistant.query_stream(question):
+        full_response += token
+        placeholder.markdown(f"""
+        <div class="chat-message assistant-message">
+            <div class="message-avatar">🤖 助教</div>
+            <div>{full_response}▌</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    sources = st.session_state.assistant._last_sources
+    
+    st.session_state.chat_history.append({
+        "role": "assistant",
+        "content": full_response,
+        "sources": sources
+    })
+    
+    placeholder.empty()
+    st.rerun()
+
+# 显示欢迎卡片（仅在无历史时）
 if not st.session_state.chat_history:
     st.markdown("""
     <div class="welcome-card">
@@ -508,17 +549,8 @@ if not st.session_state.chat_history:
         with cols[i % 3]:
             if st.button(q, key=f"example_{i}", use_container_width=True):
                 if st.session_state.assistant is not None:
-                    st.session_state.chat_history.append({
-                        "role": "user",
-                        "content": q
-                    })
-                    with st.spinner("🤔 思考中..."):
-                        result = st.session_state.assistant.query(q)
-                    st.session_state.chat_history.append({
-                        "role": "assistant",
-                        "content": result["answer"],
-                        "sources": result["sources"]
-                    })
+                    # 将问题存入 session_state，然后刷新页面
+                    st.session_state.preset_question = q
                     st.rerun()
                 else:
                     st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
@@ -568,7 +600,6 @@ else:
         # 立即在聊天区域显示用户消息
         with st.chat_message("user"):
             st.markdown(question)
-        
         
         # 添加用户消息
         st.session_state.chat_history.append({
