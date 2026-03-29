@@ -558,6 +558,11 @@ else:
     question = st.chat_input("请输入您的问题，按回车发送...")
 
     if question:
+        # 立即在聊天区域显示用户消息
+        with st.chat_message("user"):
+            st.markdown(question)
+        
+        
         # 添加用户消息
         st.session_state.chat_history.append({
             "role": "user",
