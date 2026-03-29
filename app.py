@@ -227,7 +227,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 初始化session state
+# ========== 初始化 session state ==========
 if 'assistant' not in st.session_state:
     st.session_state.assistant = None
 if 'kb' not in st.session_state:
@@ -236,6 +236,10 @@ if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if 'preset_question' not in st.session_state:
     st.session_state.preset_question = None
+if 'is_loading_model' not in st.session_state:
+    st.session_state.is_loading_model = False
+if 'is_processing_preset' not in st.session_state:
+    st.session_state.is_processing_preset = False
 
 # 页面标题
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
@@ -251,10 +255,8 @@ with st.sidebar:
         with st.spinner("初始化知识库..."):
             kb = KnowledgeBase()
             
-            # 检查是否已有数据，如果没有才自动导入所有竞赛资料
             def auto_ingest_all_data(kb):
                 """自动导入所有竞赛资料，只在数据库为空时执行"""
-                # 检查集合是否已有数据
                 collection = kb.db._collection
                 count = collection.count()
                 if count > 0:
@@ -290,7 +292,6 @@ with st.sidebar:
                 
                 return total_files, success_count
             
-            # 执行自动导入
             total, success = auto_ingest_all_data(kb)
             st.session_state.kb = kb
             
@@ -319,19 +320,16 @@ with st.sidebar:
         if st.button("📥 添加到知识库", use_container_width=True):
             for file in uploaded_file:
                 with st.spinner(f"处理 {file.name}..."):
-                    # 保存临时文件
                     temp_path = f"temp_{file.name}"
                     with open(temp_path, "wb") as f:
                         f.write(file.getvalue())
 
-                    # 导入知识库
                     try:
                         st.session_state.kb.ingest(temp_path)
                         st.success(f"✅ {file.name} 导入成功")
                     except Exception as e:
                         st.error(f"❌ {file.name} 导入失败: {str(e)}")
                     finally:
-                        # 清理临时文件
                         if os.path.exists(temp_path):
                             os.remove(temp_path)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -355,7 +353,8 @@ with st.sidebar:
         options=model_options,
         format_func=lambda x: x.split(": ")[1] if ": " in x else x,
         index=0,
-        help="选择要使用的大语言模型"
+        help="选择要使用的大语言模型",
+        disabled=st.session_state.is_loading_model  # 加载时禁用
     )
 
     # 提取model_key
@@ -369,14 +368,13 @@ with st.sidebar:
     # ========== 重排序配置区域 ==========
     st.markdown('<div class="sidebar-title">🎯 重排序配置</div>', unsafe_allow_html=True)
     
-    # 是否启用重排序
     use_reranker = st.toggle(
         "启用重排序功能",
         value=True,
-        help="启用后，系统会先检索更多候选文档，再用重排序模型精排，提升答案质量"
+        help="启用后，系统会先检索更多候选文档，再用重排序模型精排，提升答案质量",
+        disabled=st.session_state.is_loading_model  # 加载时禁用
     )
     
-    # 重排序模型选择
     available_rerankers = RAGAssistant.get_available_rerankers()
     reranker_options = [f"{k}: {v['name']} ({v['size']})" for k, v in available_rerankers.items()]
     selected_reranker = st.selectbox(
@@ -384,17 +382,15 @@ with st.sidebar:
         options=reranker_options,
         format_func=lambda x: x.split(": ")[1] if ": " in x else x,
         index=0,
-        disabled=not use_reranker,
+        disabled=not use_reranker or st.session_state.is_loading_model,
         help="选择用于精排的Cross-Encoder模型，bge-reranker-v2-m3效果最佳"
     )
     
-    # 提取reranker_key
     if ": " in selected_reranker:
         reranker_key = selected_reranker.split(": ")[0]
     else:
         reranker_key = list(available_rerankers.keys())[0]
     
-    # 高级配置（折叠）
     with st.expander("⚙️ 高级配置", expanded=False):
         initial_retrieval_k = st.slider(
             "初始检索数量",
@@ -402,7 +398,7 @@ with st.sidebar:
             max_value=20,
             value=10,
             step=1,
-            disabled=not use_reranker,
+            disabled=not use_reranker or st.session_state.is_loading_model,
             help="先检索这么多候选文档，再让重排序模型精排"
         )
         
@@ -412,7 +408,7 @@ with st.sidebar:
             max_value=5,
             value=3,
             step=1,
-            disabled=not use_reranker,
+            disabled=not use_reranker or st.session_state.is_loading_model,
             help="重排序后保留最相关的几个文档喂给大模型"
         )
         
@@ -424,31 +420,51 @@ with st.sidebar:
     model_dir = st.text_input(
         "模型下载路径",
         value="./models",
-        help="指定模型下载保存的目录路径"
+        help="指定模型下载保存的目录路径",
+        disabled=st.session_state.is_loading_model  # 加载时禁用
     )
 
     st.divider()
 
-    # 模型初始化
-    if st.button("启动AI引擎", type="primary", use_container_width=True):
+    # 模型初始化按钮（带防误触）
+    button_disabled = st.session_state.is_loading_model or st.session_state.is_processing_preset
+    if st.button("启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
+        st.session_state.is_loading_model = True
         with st.spinner("加载大模型中，请稍候..."):
-            st.session_state.assistant = RAGAssistant(
-                knowledge_base=st.session_state.kb,
-                model_key=model_key,
-                model_dir=model_dir,
-                use_reranker=use_reranker,
-                reranker_model=reranker_key,
-                reranker_top_k=reranker_top_k,
-                initial_retrieval_k=initial_retrieval_k
-            )
-        st.success("✅ AI引擎已就绪！")
+            try:
+                st.session_state.assistant = RAGAssistant(
+                    knowledge_base=st.session_state.kb,
+                    model_key=model_key,
+                    model_dir=model_dir,
+                    use_reranker=use_reranker,
+                    reranker_model=reranker_key,
+                    reranker_top_k=reranker_top_k,
+                    initial_retrieval_k=initial_retrieval_k
+                )
+                st.success("✅ AI引擎已就绪！")
+            except Exception as e:
+                st.error(f"❌ 模型加载失败: {str(e)}")
+            finally:
+                st.session_state.is_loading_model = False
+        st.rerun()
 
-    # 清空对话按钮
+    # 清空对话按钮（带确认弹窗）
     if st.session_state.chat_history:
         st.markdown('<div class="clear-btn">', unsafe_allow_html=True)
-        if st.button("🗑️ 清空对话历史", use_container_width=True):
-            st.session_state.chat_history = []
-            st.rerun()
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            if st.button("🗑️ 清空对话历史", use_container_width=True, disabled=button_disabled):
+                # 使用确认弹窗
+                st.session_state.show_clear_confirm = True
+        with col2:
+            if st.session_state.get("show_clear_confirm", False):
+                if st.button("确认", use_container_width=True):
+                    st.session_state.chat_history = []
+                    st.session_state.show_clear_confirm = False
+                    st.rerun()
+                if st.button("取消", use_container_width=True):
+                    st.session_state.show_clear_confirm = False
+                    st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -469,7 +485,6 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    # 显示重排序状态
     if use_reranker:
         st.markdown("""
         <div style="font-size: 0.85rem; color: #1f77b4; margin-top: 0.5rem;">
@@ -488,9 +503,10 @@ with st.sidebar:
 # ========== 主界面 - 聊天区域 ==========
 
 # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
-if st.session_state.preset_question and st.session_state.assistant is not None:
+if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
+    st.session_state.is_processing_preset = True
     question = st.session_state.preset_question
-    st.session_state.preset_question = None  # 清空，避免重复处理
+    st.session_state.preset_question = None
     
     # 添加用户消息到历史
     st.session_state.chat_history.append({
@@ -505,25 +521,29 @@ if st.session_state.preset_question and st.session_state.assistant is not None:
     placeholder = st.empty()
     full_response = ""
     
-    for token in st.session_state.assistant.query_stream(question):
-        full_response += token
-        placeholder.markdown(f"""
-        <div class="chat-message assistant-message">
-            <div class="message-avatar">🤖 助教</div>
-            <div>{full_response}▌</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    sources = st.session_state.assistant._last_sources
-    
-    st.session_state.chat_history.append({
-        "role": "assistant",
-        "content": full_response,
-        "sources": sources
-    })
-    
-    placeholder.empty()
-    st.rerun()
+    try:
+        for token in st.session_state.assistant.query_stream(question):
+            full_response += token
+            placeholder.markdown(f"""
+            <div class="chat-message assistant-message">
+                <div class="message-avatar">🤖 助教</div>
+                <div>{full_response}▌</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        sources = st.session_state.assistant._last_sources
+        
+        st.session_state.chat_history.append({
+            "role": "assistant",
+            "content": full_response,
+            "sources": sources
+        })
+    except Exception as e:
+        st.error(f"生成回答时出错: {str(e)}")
+    finally:
+        placeholder.empty()
+        st.session_state.is_processing_preset = False
+        st.rerun()
 
 # 显示欢迎卡片（仅在无历史时）
 if not st.session_state.chat_history:
@@ -545,11 +565,13 @@ if not st.session_state.chat_history:
 
     st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
     cols = st.columns(3)
+    
+    # 预制问题按钮（带防误触）
+    button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
     for i, q in enumerate(example_questions):
         with cols[i % 3]:
-            if st.button(q, key=f"example_{i}", use_container_width=True):
+            if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
                 if st.session_state.assistant is not None:
-                    # 将问题存入 session_state，然后刷新页面
                     st.session_state.preset_question = q
                     st.rerun()
                 else:
@@ -576,12 +598,10 @@ with chat_container:
             if "sources" in msg and msg["sources"]:
                 with st.expander("📖 查看参考来源"):
                     for i, source in enumerate(msg["sources"], 1):
-                        # 转换为项目根目录的相对路径
                         abs_path = source["source"]
                         try:
                             rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
                         except ValueError:
-                            # 如果跨盘，只保留文件名
                             rel_path = os.path.basename(abs_path)
                         st.markdown(f"**来源 {i}**: `{rel_path}`")
                         st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
@@ -594,9 +614,12 @@ st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
 if st.session_state.assistant is None:
     st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
 else:
-    question = st.chat_input("请输入您的问题，按回车发送...")
+    # 流式生成期间输入框会自动被 Streamlit 禁用（因为正在 rerun）
+    question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
 
-    if question:
+    if question and not st.session_state.is_processing_preset:
+        st.session_state.is_processing_preset = True
+        
         # 立即在聊天区域显示用户消息
         with st.chat_message("user"):
             st.markdown(question)
@@ -611,31 +634,29 @@ else:
         placeholder = st.empty()
         full_response = ""
         
-        # 逐步输出
-        for token in st.session_state.assistant.query_stream(question):
-            full_response += token
-            placeholder.markdown(f"""
-            <div class="chat-message assistant-message">
-                <div class="message-avatar">🤖 助教</div>
-                <div>{full_response}▌</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # 获取来源信息
-        sources = st.session_state.assistant._last_sources
-        
-        # 保存到聊天历史
-        st.session_state.chat_history.append({
-            "role": "assistant",
-            "content": full_response,
-            "sources": sources
-        })
-
-        # 清空占位符
-        placeholder.empty()
-        
-        # 重新渲染显示完整对话
-        st.rerun()
+        try:
+            for token in st.session_state.assistant.query_stream(question):
+                full_response += token
+                placeholder.markdown(f"""
+                <div class="chat-message assistant-message">
+                    <div class="message-avatar">🤖 助教</div>
+                    <div>{full_response}▌</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            sources = st.session_state.assistant._last_sources
+            
+            st.session_state.chat_history.append({
+                "role": "assistant",
+                "content": full_response,
+                "sources": sources
+            })
+        except Exception as e:
+            st.error(f"生成回答时出错: {str(e)}")
+        finally:
+            placeholder.empty()
+            st.session_state.is_processing_preset = False
+            st.rerun()
 
 st.markdown('</div>', unsafe_allow_html=True)
 
