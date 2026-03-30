@@ -1,0 +1,56 @@
+"""
+技能树API服务器
+独立启动FastAPI服务
+"""
+
+import os
+import yaml
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from src.skill_tree.api.routes import router as skill_tree_router
+
+# 读取配置文件
+config_path = "./config/config.yaml"
+with open(config_path, 'r', encoding='utf-8') as f:
+    config = yaml.safe_load(f)
+
+# 获取服务端口配置
+server_config = config.get('server', {})
+api_port = server_config.get('api_port', 8000)
+host = server_config.get('host', '127.0.0.1')
+
+# 初始化FastAPI应用
+app = FastAPI(
+    title="技能树API",
+    description="竞赛技能树管理API",
+    version="1.0.0"
+)
+
+# 配置CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 注册路由
+app.include_router(skill_tree_router)
+
+# 添加根路由
+@app.get("/")
+async def root():
+    return {"message": "技能树API服务正常运行", "docs": "/docs"}
+
+if __name__ == "__main__":
+    print(f"Starting skill tree API server...")
+    print(f"API address: http://localhost:{api_port}")
+    print(f"API docs: http://localhost:{api_port}/docs")
+    uvicorn.run(
+        "server:app",
+        host=host,
+        port=api_port,
+        reload=False
+    )

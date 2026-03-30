@@ -1,8 +1,34 @@
 import os
+import yaml
 import streamlit as st
+import requests
 
 from src.knowledge_base import KnowledgeBase
 from src.rag_engine import RAGAssistant
+
+# 读取配置文件
+config_path = "./config/config.yaml"
+with open(config_path, 'r', encoding='utf-8') as f:
+    config = yaml.safe_load(f)
+
+# 获取服务端口配置
+server_config = config.get('server', {})
+web_port = server_config.get('web_port', 8501)
+api_port = server_config.get('api_port', 8000)
+host = server_config.get('host', '127.0.0.1')
+
+# 技能树API地址
+API_BASE = f"http://localhost:{api_port}/api"
+
+# 检查API服务是否已启动
+try:
+    response = requests.get(f"http://localhost:{api_port}/", timeout=2)
+    if response.status_code == 200:
+        print(f"✓ 技能树API已连接 (http://localhost:{api_port})")
+except requests.exceptions.RequestException:
+    print(f"⚠ 技能树API未启动，请先运行: python server.py")
+    st.warning(f"⚠ 技能树API服务未启动，请先在另一个终端运行: python server.py")
+
 
 # 页面配置
 st.set_page_config(
@@ -245,8 +271,12 @@ if 'is_processing_preset' not in st.session_state:
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手，为你解答竞赛报名、规则、评分等各类问题</p>', unsafe_allow_html=True)
 
+# 标签页导航
+tab1, tab2 = st.tabs(["💬 智能问答", "🌳 技能树"])  # 添加技能树标签页
+
 # 侧边栏 - 知识库管理
 with st.sidebar:
+    # 知识库管理部分
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">📚 知识库管理</div>', unsafe_allow_html=True)
 
@@ -257,11 +287,22 @@ with st.sidebar:
             
             def auto_ingest_all_data(kb):
                 """自动导入所有竞赛资料，只在数据库为空时执行"""
-                collection = kb.db._collection
-                count = collection.count()
-                if count > 0:
-                    print(f"知识库已有 {count} 个片段，跳过自动导入")
-                    return 0, 0
+                # 检查知识库是否为空
+                try:
+                    # 尝试访问Chroma数据库的collection
+                    collection = kb.db._collection
+                    count = collection.count()
+                    if count > 0:
+                        print(f"知识库已有 {count} 个片段，跳过自动导入")
+                        return 0, 0
+                except AttributeError:
+                    # 对于SimpleMemoryDB，检查documents属性
+                    if hasattr(kb.db, 'documents') and len(kb.db.documents) > 0:
+                        print(f"知识库已有 {len(kb.db.documents)} 个片段，跳过自动导入")
+                        return 0, 0
+                except Exception as e:
+                    print(f"检查知识库状态时出错: {str(e)}")
+                    # 继续执行导入
 
                 data_dirs = [
                     "data/常见问题FAQ",
@@ -334,6 +375,8 @@ with st.sidebar:
                             os.remove(temp_path)
     st.markdown('</div>', unsafe_allow_html=True)
 
+# 侧边栏 - AI引擎控制
+with st.sidebar:
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">🚀 AI引擎控制</div>', unsafe_allow_html=True)
 
@@ -356,6 +399,7 @@ with st.sidebar:
         help="选择要使用的大语言模型",
         disabled=st.session_state.is_loading_model  # 加载时禁用
     )
+    st.session_state.selected_model = selected_model
 
     # 提取model_key
     if ": " in selected_model:
@@ -413,6 +457,7 @@ with st.sidebar:
         )
         
         st.caption(f"💡 流程：检索 {initial_retrieval_k} 个 → 重排序 → 取前 {reranker_top_k} 个 → 生成答案")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.divider()
 
@@ -424,52 +469,19 @@ with st.sidebar:
         disabled=st.session_state.is_loading_model  # 加载时禁用
     )
 
-    st.divider()
-
-    # 模型初始化按钮（带防误触）
-    button_disabled = st.session_state.is_loading_model or st.session_state.is_processing_preset
-    if st.button("启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
-        st.session_state.is_loading_model = True
-        with st.spinner("加载大模型中，请稍候..."):
-            try:
-                st.session_state.assistant = RAGAssistant(
-                    knowledge_base=st.session_state.kb,
-                    model_key=model_key,
-                    model_dir=model_dir,
-                    use_reranker=use_reranker,
-                    reranker_model=reranker_key,
-                    reranker_top_k=reranker_top_k,
-                    initial_retrieval_k=initial_retrieval_k
-                )
-                st.success("✅ AI引擎已就绪！")
-            except Exception as e:
-                st.error(f"❌ 模型加载失败: {str(e)}")
-            finally:
-                st.session_state.is_loading_model = False
-        st.rerun()
-
-    # 清空对话按钮（带确认弹窗）
-    if st.session_state.chat_history:
-        st.markdown('<div class="clear-btn">', unsafe_allow_html=True)
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            if st.button("🗑️ 清空对话历史", use_container_width=True, disabled=button_disabled):
-                # 使用确认弹窗
-                st.session_state.show_clear_confirm = True
-        with col2:
-            if st.session_state.get("show_clear_confirm", False):
-                if st.button("确认", use_container_width=True):
-                    st.session_state.chat_history = []
-                    st.session_state.show_clear_confirm = False
-                    st.rerun()
-                if st.button("取消", use_container_width=True):
-                    st.session_state.show_clear_confirm = False
-                    st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+    # 保存配置到session state
+    st.session_state.use_reranker = use_reranker
+    st.session_state.selected_reranker = selected_reranker
+    st.session_state.reranker_key = reranker_key
+    st.session_state.initial_retrieval_k = initial_retrieval_k
+    st.session_state.reranker_top_k = reranker_top_k
+    st.session_state.model_dir = model_dir
+    st.session_state.model_key = model_key
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # 系统信息
+# 侧边栏 - 系统信息
+with st.sidebar:
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">ℹ️ 系统信息</div>', unsafe_allow_html=True)
     st.markdown("""
@@ -485,152 +497,68 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    if use_reranker:
-        st.markdown("""
-        <div style="font-size: 0.85rem; color: #1f77b4; margin-top: 0.5rem;">
-            ✅ 重排序功能已启用
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
-            ⚪ 重排序功能未启用
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ========== 主界面 - 聊天区域 ==========
-
-# 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
-if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
-    st.session_state.is_processing_preset = True
-    question = st.session_state.preset_question
-    st.session_state.preset_question = None
-    
-    # 添加用户消息到历史
-    st.session_state.chat_history.append({
-        "role": "user",
-        "content": question
-    })
-    
-    # 生成回答并流式输出
-    with st.chat_message("user"):
-        st.markdown(question)
-    
-    placeholder = st.empty()
-    full_response = ""
-    
-    try:
-        for token in st.session_state.assistant.query_stream(question):
-            full_response += token
-            placeholder.markdown(f"""
-            <div class="chat-message assistant-message">
-                <div class="message-avatar">🤖 助教</div>
-                <div>{full_response}▌</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        sources = st.session_state.assistant._last_sources
-        
-        st.session_state.chat_history.append({
-            "role": "assistant",
-            "content": full_response,
-            "sources": sources
-        })
-    except Exception as e:
-        st.error(f"生成回答时出错: {str(e)}")
-    finally:
-        placeholder.empty()
-        st.session_state.is_processing_preset = False
-        st.rerun()
-
-# 显示欢迎卡片（仅在无历史时）
-if not st.session_state.chat_history:
-    st.markdown("""
-    <div class="welcome-card">
-        <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
-        <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 示例问题
-    example_questions = [
-        "如何报名西门子杯？",
-        "挑战杯的参赛流程是什么？",
-        "大唐杯比赛内容是什么？",
-        "RoboMaster机甲大师赛参赛条件？",
-        "中国国际大学生创新大赛评分标准？"
-    ]
-
-    st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
-    cols = st.columns(3)
-    
-    # 预制问题按钮（带防误触）
-    button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
-    for i, q in enumerate(example_questions):
-        with cols[i % 3]:
-            if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
-                if st.session_state.assistant is not None:
-                    st.session_state.preset_question = q
-                    st.rerun()
-                else:
-                    st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
-
-# 显示聊天历史
-chat_container = st.container()
-with chat_container:
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    for msg in st.session_state.chat_history:
-        if msg["role"] == "user":
-            st.markdown(f"""
-            <div class="chat-message user-message">
-                <div class="message-avatar">👤 你</div>
-                <div>{msg["content"]}</div>
+    if 'use_reranker' in locals() or 'use_reranker' in globals():
+        if use_reranker:
+            st.markdown("""
+            <div style="font-size: 0.85rem; color: #1f77b4; margin-top: 0.5rem;">
+                ✅ 重排序功能已启用
             </div>
             """, unsafe_allow_html=True)
         else:
-            st.markdown(f"""
-            <div class="chat-message assistant-message">
-                <div class="message-avatar">🤖 助教</div>
-                <div>{msg["content"]}</div>
+            st.markdown("""
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+                ⚪ 重排序功能未启用
+            </div>
             """, unsafe_allow_html=True)
-            if "sources" in msg and msg["sources"]:
-                with st.expander("📖 查看参考来源"):
-                    for i, source in enumerate(msg["sources"], 1):
-                        abs_path = source["source"]
-                        try:
-                            rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
-                        except ValueError:
-                            rel_path = os.path.basename(abs_path)
-                        st.markdown(f"**来源 {i}**: `{rel_path}`")
-                        st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 输入框
-st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
-
-if st.session_state.assistant is None:
-    st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
-else:
-    # 流式生成期间输入框会自动被 Streamlit 禁用（因为正在 rerun）
-    question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
-
-    if question and not st.session_state.is_processing_preset:
+# ========== 主界面 - 智能问答标签页 ==========
+with tab1:
+    # AI引擎启动按钮（独立区域，避免form冲突）
+    if st.session_state.assistant is None:
+        col_btn1, col_btn2 = st.columns([1, 2])
+        with col_btn1:
+            st.markdown("### 🚀 启动AI引擎")
+        with col_btn2:
+            button_disabled = st.session_state.is_loading_model
+            if st.button("🚀 启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
+                st.session_state.is_loading_model = True
+                with st.spinner("加载大模型中，请稍候..."):
+                    try:
+                        st.session_state.assistant = RAGAssistant(
+                            knowledge_base=st.session_state.kb,
+                            model_key=st.session_state.model_key,
+                            model_dir=st.session_state.model_dir,
+                            use_reranker=st.session_state.use_reranker,
+                            reranker_model=st.session_state.reranker_key,
+                            reranker_top_k=st.session_state.reranker_top_k,
+                            initial_retrieval_k=st.session_state.initial_retrieval_k
+                        )
+                        st.success("✅ AI引擎已就绪！")
+                    except Exception as e:
+                        st.error(f"❌ 模型加载失败: {str(e)}")
+                    finally:
+                        st.session_state.is_loading_model = False
+                st.rerun()
+        st.divider()
+    
+    # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
+    if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
         st.session_state.is_processing_preset = True
+        question = st.session_state.preset_question
+        st.session_state.preset_question = None
         
-        # 立即在聊天区域显示用户消息
-        with st.chat_message("user"):
-            st.markdown(question)
-        
-        # 添加用户消息
+        # 添加用户消息到历史
         st.session_state.chat_history.append({
             "role": "user",
             "content": question
         })
-
-        # 流式生成AI回答
+        
+        # 生成回答并流式输出
+        with st.chat_message("user"):
+            st.markdown(question)
+        
         placeholder = st.empty()
         full_response = ""
         
@@ -658,7 +586,701 @@ else:
             st.session_state.is_processing_preset = False
             st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
+    # 显示欢迎卡片（仅在无历史时）
+    if not st.session_state.chat_history:
+        st.markdown("""
+        <div class="welcome-card">
+            <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
+            <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 示例问题
+        example_questions = [
+            "如何报名西门子杯？",
+            "挑战杯的参赛流程是什么？",
+            "大唐杯比赛内容是什么？",
+            "RoboMaster机甲大师赛参赛条件？",
+            "中国国际大学生创新大赛评分标准？"
+        ]
+
+        st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
+        cols = st.columns(3)
+        
+        # 预制问题按钮（带防误触）
+        button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
+        for i, q in enumerate(example_questions):
+            with cols[i % 3]:
+                if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
+                    if st.session_state.assistant is not None:
+                        st.session_state.preset_question = q
+                        st.rerun()
+                    else:
+                        st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
+
+    # 显示聊天历史
+    chat_container = st.container()
+    with chat_container:
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        for msg in st.session_state.chat_history:
+            if msg["role"] == "user":
+                st.markdown(f"""
+                <div class="chat-message user-message">
+                    <div class="message-avatar">👤 你</div>
+                    <div>{msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-message assistant-message">
+                    <div class="message-avatar">🤖 助教</div>
+                    <div>{msg["content"]}</div>
+                """, unsafe_allow_html=True)
+                if "sources" in msg and msg["sources"]:
+                    with st.expander("📖 查看参考来源"):
+                        for i, source in enumerate(msg["sources"], 1):
+                            abs_path = source["source"]
+                            try:
+                                rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
+                            except ValueError:
+                                rel_path = os.path.basename(abs_path)
+                            st.markdown(f"**来源 {i}**: `{rel_path}`")
+                            st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # 输入框
+    st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
+
+    if st.session_state.assistant is None:
+        st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
+    else:
+        # 流式生成期间输入框会自动被 Streamlit 禁用（因为正在 rerun）
+        question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
+
+        if question and not st.session_state.is_processing_preset:
+            st.session_state.is_processing_preset = True
+            
+            # 立即在聊天区域显示用户消息
+            with st.chat_message("user"):
+                st.markdown(question)
+            
+            # 添加用户消息
+            st.session_state.chat_history.append({
+                "role": "user",
+                "content": question
+            })
+
+            # 流式生成AI回答
+            placeholder = st.empty()
+            full_response = ""
+            
+            try:
+                for token in st.session_state.assistant.query_stream(question):
+                    full_response += token
+                    placeholder.markdown(f"""
+                    <div class="chat-message assistant-message">
+                        <div class="message-avatar">🤖 助教</div>
+                        <div>{full_response}▌</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                sources = st.session_state.assistant._last_sources
+                
+                st.session_state.chat_history.append({
+                    "role": "assistant",
+                    "content": full_response,
+                    "sources": sources
+                })
+            except Exception as e:
+                st.error(f"生成回答时出错: {str(e)}")
+            finally:
+                placeholder.empty()
+                st.session_state.is_processing_preset = False
+                st.rerun()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ========== 主界面 - 技能树标签页 ==========
+with tab2:
+    # 技能树模块前端界面
+    st.markdown("""
+    <style>
+        /* 技能树样式 */
+        .skill-tree-container {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-tree-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-tree-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .skill-node {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .skill-node:hover {
+            border-color: #1f77b4;
+            box-shadow: 0 4px 6px rgba(31, 119, 180, 0.1);
+        }
+        
+        .skill-node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-node-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .skill-node-level {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+        
+        .level-beginner {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .level-intermediate {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .level-advanced {
+            background-color: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .level-expert {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .skill-node-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+        }
+        
+        .skill-node-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        
+        .skill-relation {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .relation-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+        
+        .relation-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .relation-tag {
+            background-color: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .learning-path {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .path-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .path-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .path-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .path-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .path-skill {
+            background-color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            color: #475569;
+        }
+        
+        /* 表单样式 */
+        .form-section {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1f77b4;
+            box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #1f77b4;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a5688;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+        
+        /* 加载状态 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(31, 119, 180, 0.3);
+            border-radius: 50%;
+            border-top-color: #1f77b4;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+     </style>
+""", unsafe_allow_html=True)
+
+# 技能树管理功能
+import requests
+
+# 初始化session state
+if 'skill_trees' not in st.session_state:
+    st.session_state.skill_trees = []
+if 'selected_skill_tree' not in st.session_state:
+    st.session_state.selected_skill_tree = None
+if 'skill_tree_skills' not in st.session_state:
+    st.session_state.skill_tree_skills = {}
+if 'learning_paths' not in st.session_state:
+    st.session_state.learning_paths = {}
+    
+# 获取技能树列表
+def fetch_skill_trees():
+    with st.spinner("加载技能树列表..."):
+        try:
+            response = requests.get(f"{API_BASE}/skill-tree/")
+            if response.status_code == 200:
+                result = response.json()
+                # 确保返回的数据格式正确
+                if isinstance(result, dict) and "data" in result:
+                    st.session_state.skill_trees = result["data"]
+                else:
+                    st.session_state.skill_trees = result
+                st.success("技能树列表加载成功！")
+            else:
+                st.error(f"获取技能树列表失败: {response.status_code}")
+        except Exception as e:
+            st.error(f"获取技能树列表时出错: {str(e)}")
+    
+# 获取技能树详情
+def fetch_skill_tree_detail(skill_tree_id):
+    try:
+        response = requests.get(f"{API_BASE}/skill-tree/{skill_tree_id}")
+        if response.status_code == 200:
+            result = response.json()
+            # 确保返回的数据格式正确
+            if isinstance(result, dict) and "data" in result:
+                return result["data"]
+            else:
+                return result
+        else:
+            st.error(f"获取技能树详情失败: {response.status_code}")
+            return None
+    except Exception as e:
+        st.error(f"获取技能树详情时出错: {str(e)}")
+        return None
+    
+# 创建技能树
+def create_skill_tree(name, description):
+    try:
+        response = requests.post(
+            f"{API_BASE}/skill-tree/",
+            json={"name": name, "description": description}
+        )
+        if response.status_code == 200:
+            st.success("技能树创建成功！")
+            fetch_skill_trees()
+        else:
+            st.error(f"创建技能树失败: {response.status_code}")
+    except Exception as e:
+        st.error(f"创建技能树时出错: {str(e)}")
+    
+# 添加技能
+def add_skill(skill_tree_id, name, description, level, skill_type, learning_time):
+    try:
+        response = requests.post(
+            f"{API_BASE}/skill-tree/{skill_tree_id}/skills",
+            json={
+                "name": name,
+                "description": description,
+                "level": level,
+                "skill_type": skill_type,
+                "learning_time": learning_time
+            }
+        )
+        if response.status_code == 200:
+            st.success("技能添加成功！")
+            # 刷新技能树详情
+            fetch_skill_trees()
+        else:
+            st.error(f"添加技能失败: {response.status_code}")
+    except Exception as e:
+        st.error(f"添加技能时出错: {str(e)}")
+    
+# 建立技能关系
+def establish_relation(skill_tree_id, source_skill_id, target_skill_id, relation_type):
+    try:
+        response = requests.post(
+            f"{API_BASE}/skill-tree/{skill_tree_id}/skills/relation",
+            json={
+                "source_skill_id": source_skill_id,
+                "target_skill_id": target_skill_id,
+                "relation_type": relation_type
+            }
+        )
+        if response.status_code == 200:
+            st.success("技能关系建立成功！")
+            # 刷新技能树详情
+            fetch_skill_trees()
+        else:
+            st.error(f"建立技能关系失败: {response.status_code}")
+    except Exception as e:
+        st.error(f"建立技能关系时出错: {str(e)}")
+    
+# 生成学习路径
+def generate_learning_paths(skill_tree_id):
+    try:
+        response = requests.post(f"{API_BASE}/skill-tree/{skill_tree_id}/paths/generate")
+        if response.status_code == 200:
+            st.success("学习路径生成成功！")
+            # 刷新技能树详情
+            fetch_skill_trees()
+        else:
+            st.error(f"生成学习路径失败: {response.status_code}")
+    except Exception as e:
+        st.error(f"生成学习路径时出错: {str(e)}")
+    
+# 删除技能树
+def delete_skill_tree(skill_tree_id):
+    try:
+        response = requests.delete(f"{API_BASE}/skill-tree/{skill_tree_id}")
+        if response.status_code == 200:
+            st.success("技能树删除成功！")
+            fetch_skill_trees()
+            st.session_state.selected_skill_tree = None
+        else:
+            st.error(f"删除技能树失败: {response.status_code}")
+    except Exception as e:
+        st.error(f"删除技能树时出错: {str(e)}")
+    
+# 页面标题
+st.markdown('<h2 style="color: #1e293b; margin-bottom: 1.5rem;">🌳 竞赛技能树</h2>', unsafe_allow_html=True)
+
+# 技能树管理区域
+with st.expander("📋 技能树管理", expanded=True):
+    col1, col2 = st.columns([2, 1])
+    
+    # 左侧：创建技能树
+    with col1:
+        st.markdown('<div class="form-section">', unsafe_allow_html=True)
+        st.markdown('<div class="form-title">创建新技能树</div>', unsafe_allow_html=True)
+        
+        with st.form(key="create_skill_tree_form"):
+            name = st.text_input("技能树名称")
+            description = st.text_area("技能树描述")
+            submit_button = st.form_submit_button("创建技能树", type="primary")
+            
+            if submit_button:
+                if name and description:
+                    create_skill_tree(name, description)
+                else:
+                    st.error("请填写技能树名称和描述")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 右侧：技能树列表
+    with col2:
+        st.markdown('<div class="form-section">', unsafe_allow_html=True)
+        st.markdown('<div class="form-title">现有技能树</div>', unsafe_allow_html=True)
+        
+        # 刷新技能树列表
+        if st.button("刷新列表"):
+            fetch_skill_trees()
+        
+        # 显示技能树列表
+        if st.session_state.skill_trees:
+            for skill_tree in st.session_state.skill_trees:
+                with st.expander(f"{skill_tree['name']}"):
+                    st.write(f"描述: {skill_tree['description']}")
+                    st.write(f"版本: {skill_tree['version']}")
+                    
+                    # 选择技能树
+                    if st.button(f"选择", key=f"select_{skill_tree['id']}"):
+                        st.session_state.selected_skill_tree = skill_tree
+                    
+                    # 删除技能树
+                    if st.button(f"删除", key=f"delete_{skill_tree['id']}", type="secondary"):
+                        delete_skill_tree(skill_tree['id'])
+        else:
+            st.info("暂无技能树，请创建新技能树")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# 选中技能树后显示详情
+if st.session_state.selected_skill_tree:
+    skill_tree = st.session_state.selected_skill_tree
+    st.markdown(f"""
+    <div class="skill-tree-container">
+        <div class="skill-tree-header">
+            <h3 class="skill-tree-title">{skill_tree['name']}</h3>
+            <div>
+                <button class="btn btn-primary" onclick="generatePaths('{skill_tree['id']}')">生成学习路径</button>
+            </div>
+        </div>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">{skill_tree['description']}</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 添加技能区域
+    with st.expander("➕ 添加技能", expanded=False):
+        st.markdown('<div class="form-section">', unsafe_allow_html=True)
+        st.markdown('<div class="form-title">添加新技能</div>', unsafe_allow_html=True)
+         
+        with st.form(key="add_skill_form"):
+            skill_name = st.text_input("技能名称")
+            skill_description = st.text_area("技能描述")
+            skill_level = st.selectbox("技能难度", ["beginner", "intermediate", "advanced", "expert"], format_func=lambda x: x.capitalize())
+            skill_type = st.selectbox("技能类型", ["technical", "theoretical", "practical", "competition"], format_func=lambda x: x.capitalize())
+            learning_time = st.number_input("预估学习时间（小时）", min_value=0, step=1)
+            submit_button = st.form_submit_button("添加技能", type="primary")
+            
+            if submit_button:
+                if skill_name and skill_description:
+                    add_skill(
+                    skill_tree['id'],
+                    skill_name,
+                    skill_description,
+                    skill_level,
+                    skill_type,
+                    learning_time
+                )
+            else:
+                st.error("请填写技能名称和描述")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 建立技能关系区域
+    with st.expander("🔗 建立技能关系", expanded=False):
+        st.markdown('<div class="form-section">', unsafe_allow_html=True)
+        st.markdown('<div class="form-title">建立技能关系</div>', unsafe_allow_html=True)
+        
+        # 获取技能树中的技能列表
+    skill_tree_detail = fetch_skill_tree_detail(skill_tree['id'])
+    if skill_tree_detail and 'skill_nodes' in skill_tree_detail:
+        skills = skill_tree_detail['skill_nodes']
+        skill_options = [(skill['id'], skill['name']) for skill in skills.values()]
+        
+        with st.form(key="establish_relation_form"):
+            source_skill = st.selectbox("源技能", options=skill_options, format_func=lambda x: x[1])
+            target_skill = st.selectbox("目标技能", options=skill_options, format_func=lambda x: x[1])
+            relation_type = st.selectbox("关系类型", ["prerequisite", "related", "advanced"])
+            submit_button = st.form_submit_button("建立关系", type="primary")
+            
+            if submit_button:
+                if source_skill[0] != target_skill[0]:
+                    establish_relation(
+                        skill_tree['id'],
+                        source_skill[0],
+                        target_skill[0],
+                        relation_type
+                    )
+                else:
+                    st.error("源技能和目标技能不能相同")
+    else:
+        st.info("请先添加技能")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 技能列表区域
+    with st.expander("📚 技能列表", expanded=True):
+        st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
+        st.markdown('<div class="skill-tree-title">技能节点</div>', unsafe_allow_html=True)
+        
+        if skill_tree_detail and 'skill_nodes' in skill_tree_detail:
+            skills = skill_tree_detail['skill_nodes']
+            for skill_id, skill in skills.items():
+                # 难度级别样式
+                level_class = f"level-{skill['level'].lower()}"
+                
+                st.markdown(f"""
+                <div class="skill-node">
+                    <div class="skill-node-header">
+                        <span class="skill-node-name">{skill['name']}</span>
+                        <span class="skill-node-level {level_class}">{skill['level']}</span>
+                    </div>
+                    <div class="skill-node-description">{skill['description']}</div>
+                     <div class="skill-node-meta">
+                         <span>类型: {skill['type']}</span>
+                         <span>学习时间: {skill['learning_time']}小时</span>
+                         <span>完成率: {skill['completion_rate']}%</span>
+                     </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("暂无技能节点，请添加技能")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 学习路径区域
+    with st.expander("🗺️ 学习路径", expanded=True):
+        st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
+        st.markdown('<div class="skill-tree-title">学习路径</div>', unsafe_allow_html=True)
+        
+        if skill_tree_detail and 'learning_paths' in skill_tree_detail:
+            paths = skill_tree_detail['learning_paths']
+            if paths:
+                for path_id, path in paths.items():
+                    # 难度级别样式
+                    level_class = f"level-{path['difficulty'].lower()}"
+                    
+                    st.markdown(f"""
+                    <div class="learning-path">
+                        <div class="path-header">
+                            <span class="path-name">学习路径 {path_id[:8]}</span>
+                            <div class="path-meta">
+                                <span class="skill-node-level {level_class}">{path['difficulty']}</span>
+                                <span>预估时间: {path['estimated_time']}小时</span>
+                            </div>
+                        </div>
+                        <div class="path-skills">
+                            {''.join([f'<span class="path-skill">{skill_tree_detail["skill_nodes"][skill_id]["name"]}</span>' for skill_id in path['skill_ids']])}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("暂无学习路径，请生成学习路径")
+        else:
+            st.info("暂无学习路径，请生成学习路径")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# 初始化时获取技能树列表
+if not st.session_state.skill_trees:
+    fetch_skill_trees()
 
 # 页脚
 st.divider()
