@@ -1152,12 +1152,14 @@ if st.session_state.selected_skill_tree:
         <div class="skill-tree-header">
             <h3 class="skill-tree-title">{skill_tree['name']}</h3>
             <div>
-                <button class="btn btn-primary" onclick="generatePaths('{skill_tree['id']}')">生成学习路径</button>
             </div>
         </div>
         <p style="color: #64748b; margin-bottom: 1.5rem;">{skill_tree['description']}</p>
     </div>
     """, unsafe_allow_html=True)
+    # 使用 Streamlit 原生按钮替代 HTML 按钮（修复 JavaScript 函数未定义问题）
+    if st.button("🗺️ 生成学习路径", key=f"generate_paths_{skill_tree['id']}", type="primary"):
+        generate_learning_paths(skill_tree['id'])
     
     # 添加技能区域
     with st.expander("➕ 添加技能", expanded=False):
