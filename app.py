@@ -160,6 +160,97 @@ st.markdown("""
         background-color: transparent;
         padding-top: 1rem;
     }
+    
+    /* 现代化聊天输入框 */
+    .modern-input-container {
+        width: min(560px, 100%);
+        max-width: 560px;
+        margin: 0 auto 1rem;
+        border-radius: 20px;
+        padding: 2px; /* 渐变边框厚度 */
+        background: linear-gradient(135deg, #1f77b4, #6a5acd);
+        box-shadow: 0 8px 20px rgba(23, 43, 76, 0.2);
+    }
+
+    .modern-input-inner {
+        background-color: white;
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .input-area {
+        position: relative;
+        width: 100%;
+    }
+    
+    .input-area textarea {
+        width: 100%;
+        max-width: 100%;
+        border: none;
+        resize: none;
+        min-height: 40px;
+        max-height: 100px;
+        height: 40px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background-color: #f8fafc;
+        font-family: inherit;
+    }
+    
+    .input-area textarea:focus {
+        outline: none;
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.1);
+    }
+    
+    .upload-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 6px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .upload-btn:hover {
+        background-color: #f1f5f9;
+    }
+    
+    .send-btn {
+        background-color: #1f77b4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .send-btn:hover {
+        background-color: #1a5688;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(31, 119, 180, 0.2);
+    }
+    
+    .send-btn:disabled {
+        background-color: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 
     /* 滚动条美化 */
     ::-webkit-scrollbar {
@@ -266,13 +357,28 @@ if 'is_loading_model' not in st.session_state:
     st.session_state.is_loading_model = False
 if 'is_processing_preset' not in st.session_state:
     st.session_state.is_processing_preset = False
+if 'show_upload_window' not in st.session_state:
+    st.session_state.show_upload_window = False
 
 # 页面标题
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手，为你解答竞赛报名、规则、评分等各类问题</p>', unsafe_allow_html=True)
 
-# 标签页导航
-tab1, tab2 = st.tabs(["💬 智能问答", "🌳 技能树"])  # 添加技能树标签页
+# 侧边栏 - 导航菜单
+with st.sidebar:
+    # 导航选项
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">🚀 功能导航</div>', unsafe_allow_html=True)
+    
+    # 使用radio创建导航选择
+    nav_option = st.radio(
+        "选择功能",
+        options=["💬 智能问答", "🌳 技能树"],
+        index=0,
+        key="nav_option",
+        horizontal=False
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # 侧边栏 - 知识库管理
 with st.sidebar:
@@ -349,30 +455,7 @@ with st.sidebar:
 
     st.divider()
 
-    # 文件上传
-    uploaded_file = st.file_uploader(
-        "上传竞赛资料",
-        type=["pdf", "txt", "md"],
-        accept_multiple_files=True,
-        help="支持PDF、TXT、Markdown格式"
-    )
-
-    if uploaded_file:
-        if st.button("📥 添加到知识库", use_container_width=True):
-            for file in uploaded_file:
-                with st.spinner(f"处理 {file.name}..."):
-                    temp_path = f"temp_{file.name}"
-                    with open(temp_path, "wb") as f:
-                        f.write(file.getvalue())
-
-                    try:
-                        st.session_state.kb.ingest(temp_path)
-                        st.success(f"✅ {file.name} 导入成功")
-                    except Exception as e:
-                        st.error(f"❌ {file.name} 导入失败: {str(e)}")
-                    finally:
-                        if os.path.exists(temp_path):
-                            os.remove(temp_path)
+    # 上传功能已移至主界面的+按钮
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 侧边栏 - AI引擎控制
@@ -386,26 +469,34 @@ with st.sidebar:
     else:
         st.markdown('<span class="status-badge status-not-ready">❌ AI引擎未启动</span>', unsafe_allow_html=True)
 
-    st.divider()
-
-    # 模型选择
-    available_models = RAGAssistant.get_available_models()
-    model_options = [f"{k}: {v['name']}" for k, v in available_models.items()]
-    selected_model = st.selectbox(
-        "选择模型",
-        options=model_options,
-        format_func=lambda x: x.split(": ")[1] if ": " in x else x,
-        index=0,
-        help="选择要使用的大语言模型",
-        disabled=st.session_state.is_loading_model  # 加载时禁用
-    )
-    st.session_state.selected_model = selected_model
-
-    # 提取model_key
-    if ": " in selected_model:
-        model_key = selected_model.split(": ")[0]
-    else:
-        model_key = list(available_models.keys())[0]
+    # 启动AI引擎按钮
+    if st.session_state.assistant is None:
+        button_disabled = st.session_state.is_loading_model
+        if st.button("🚀 启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
+            st.session_state.is_loading_model = True
+            with st.spinner("加载大模型中，请稍候..."):
+                try:
+                    # 确保model_key已初始化
+                    if 'model_key' not in st.session_state or st.session_state.model_key is None:
+                        available_models = RAGAssistant.get_available_models()
+                        if available_models:
+                            st.session_state.model_key = list(available_models.keys())[0]
+                    
+                    st.session_state.assistant = RAGAssistant(
+                        knowledge_base=st.session_state.kb,
+                        model_key=st.session_state.model_key,
+                        model_dir=st.session_state.model_dir,
+                        use_reranker=st.session_state.use_reranker,
+                        reranker_model=st.session_state.reranker_key,
+                        reranker_top_k=st.session_state.reranker_top_k,
+                        initial_retrieval_k=st.session_state.initial_retrieval_k
+                    )
+                    st.success("✅ AI引擎已就绪！")
+                except Exception as e:
+                    st.error(f"❌ 模型加载失败: {str(e)}")
+                finally:
+                    st.session_state.is_loading_model = False
+                st.rerun()
 
     st.divider()
 
@@ -476,7 +567,6 @@ with st.sidebar:
     st.session_state.initial_retrieval_k = initial_retrieval_k
     st.session_state.reranker_top_k = reranker_top_k
     st.session_state.model_dir = model_dir
-    st.session_state.model_key = model_key
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -513,35 +603,9 @@ with st.sidebar:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ========== 主界面 - 智能问答标签页 ==========
-with tab1:
-    # AI引擎启动按钮（独立区域，避免form冲突）
-    if st.session_state.assistant is None:
-        col_btn1, col_btn2 = st.columns([1, 2])
-        with col_btn1:
-            st.markdown("### 🚀 启动AI引擎")
-        with col_btn2:
-            button_disabled = st.session_state.is_loading_model
-            if st.button("🚀 启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
-                st.session_state.is_loading_model = True
-                with st.spinner("加载大模型中，请稍候..."):
-                    try:
-                        st.session_state.assistant = RAGAssistant(
-                            knowledge_base=st.session_state.kb,
-                            model_key=st.session_state.model_key,
-                            model_dir=st.session_state.model_dir,
-                            use_reranker=st.session_state.use_reranker,
-                            reranker_model=st.session_state.reranker_key,
-                            reranker_top_k=st.session_state.reranker_top_k,
-                            initial_retrieval_k=st.session_state.initial_retrieval_k
-                        )
-                        st.success("✅ AI引擎已就绪！")
-                    except Exception as e:
-                        st.error(f"❌ 模型加载失败: {str(e)}")
-                    finally:
-                        st.session_state.is_loading_model = False
-                st.rerun()
-        st.divider()
+# ========== 主界面 - 智能问答 ==========
+if nav_option == "💬 智能问答":
+
     
     # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
     if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
@@ -555,36 +619,8 @@ with tab1:
             "content": question
         })
         
-        # 生成回答并流式输出
-        with st.chat_message("user"):
-            st.markdown(question)
-        
-        placeholder = st.empty()
-        full_response = ""
-        
-        try:
-            for token in st.session_state.assistant.query_stream(question):
-                full_response += token
-                placeholder.markdown(f"""
-                <div class="chat-message assistant-message">
-                    <div class="message-avatar">🤖 助教</div>
-                    <div>{full_response}▌</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            sources = st.session_state.assistant._last_sources
-            
-            st.session_state.chat_history.append({
-                "role": "assistant",
-                "content": full_response,
-                "sources": sources
-            })
-        except Exception as e:
-            st.error(f"生成回答时出错: {str(e)}")
-        finally:
-            placeholder.empty()
-            st.session_state.is_processing_preset = False
-            st.rerun()
+        # 立即重新渲染以显示用户消息
+        st.rerun()
 
     # 显示欢迎卡片（仅在无历史时）
     if not st.session_state.chat_history:
@@ -617,6 +653,8 @@ with tab1:
                         st.rerun()
                     else:
                         st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
+        
+
 
     # 显示聊天历史
     chat_container = st.container()
@@ -647,6 +685,16 @@ with tab1:
                             st.markdown(f"**来源 {i}**: `{rel_path}`")
                             st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
+        
+        # 如果正在处理中，显示"思考中……"提示
+        if st.session_state.is_processing_preset:
+            st.markdown("""
+            <div class="chat-message assistant-message" style="opacity: 0.7;">
+                <div class="message-avatar">🤖 助教</div>
+                <div>思考中……</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
         st.markdown('</div>', unsafe_allow_html=True)
 
     # 输入框
@@ -655,54 +703,232 @@ with tab1:
     if st.session_state.assistant is None:
         st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
     else:
-        # 流式生成期间输入框会自动被 Streamlit 禁用（因为正在 rerun）
-        question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
+        # 上传竞赛资料模态窗口
+        if st.session_state.show_upload_window:
+            # 添加模态窗口样式
+            st.markdown("""
+            <style>
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
+                .modal-content {
+                    background-color: white;
+                    border-radius: 12px;
+                    padding: 2rem;
+                    width: 90%;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    animation: modalFadeIn 0.3s ease-in-out;
+                }
+                @keyframes modalFadeIn {
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            # 创建模态窗口
+            st.markdown('<div class="modal-overlay" id="uploadModal">', unsafe_allow_html=True)
+            st.markdown('<div class="modal-content">', unsafe_allow_html=True)
+            
+            # 添加关闭按钮和标题
+            st.markdown("### 📤 上传竞赛资料")
+            
+            # 上传文件区域
+            uploaded_files = st.file_uploader(
+                "选择要上传的文件",
+                type=["pdf", "txt", "md"],
+                accept_multiple_files=True,
+                help="支持PDF、TXT、Markdown格式"
+            )
+            
+            if uploaded_files:
+                if st.button("📥 添加到知识库", key="add_to_kb", use_container_width=True):
+                    for file in uploaded_files:
+                        with st.spinner(f"处理 {file.name}..."):
+                            temp_path = f"temp_{file.name}"
+                            with open(temp_path, "wb") as f:
+                                f.write(file.getvalue())
 
-        if question and not st.session_state.is_processing_preset:
+                            try:
+                                st.session_state.kb.ingest(temp_path)
+                                st.success(f"✅ {file.name} 导入成功")
+                            except Exception as e:
+                                st.error(f"❌ {file.name} 导入失败: {str(e)}")
+                            finally:
+                                if os.path.exists(temp_path):
+                                    os.remove(temp_path)
+            
+            # 添加关闭按钮
+            if st.button("关闭", key="close_upload_window", use_container_width=True):
+                st.session_state.show_upload_window = False
+            
+            st.markdown('</div>', unsafe_allow_html=True)  # 结束modal-content
+            st.markdown('</div>', unsafe_allow_html=True)  # 结束modal-overlay
+            
+            # 添加点击外部关闭的逻辑
+            st.markdown("""
+            <script>
+                // 点击模态窗口外部关闭
+                document.addEventListener('click', function(e) {
+                    const modalOverlay = document.getElementById('uploadModal');
+                    const modalContent = modalOverlay.querySelector('.modal-content');
+                    if (modalOverlay && !modalContent.contains(e.target)) {
+                        // 触发关闭按钮的点击事件
+                        const closeButton = document.querySelector('button[data-testid="stButton"]');
+                        if (closeButton && closeButton.textContent.includes('关闭')) {
+                            closeButton.click();
+                        }
+                    }
+                });
+            </script>
+            """, unsafe_allow_html=True)
+        
+        # 现代化聊天输入框组件（统一渐变边框）
+        st.markdown('<div class="modern-input-container">', unsafe_allow_html=True)
+        st.markdown('<div class="modern-input-inner">', unsafe_allow_html=True)
+
+        # 中间输入区域
+        st.markdown('<div class="input-area">', unsafe_allow_html=True)
+        question = st.text_area(
+            "",
+            height=40,
+            max_chars=1000,
+            disabled=st.session_state.is_processing_preset,
+            key="user_input",
+            placeholder="请输入您的问题，按回车发送"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)  # 结束input-area
+
+        st.markdown("""
+        <script>
+            const inputArea = document.querySelector('textarea[data-testid="stTextArea"]');
+            if (inputArea) {
+                inputArea.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const sendButton = Array.from(document.querySelectorAll('button')).find(btn => btn.innerText.trim().includes('发送'));
+                        if (sendButton) {
+                            sendButton.click();
+                        }
+                    }
+                });
+            }
+        </script>
+        """, unsafe_allow_html=True)
+
+        # 底部操作按钮（嵌入到输入框内部）
+        col1, col2, col3 = st.columns([1, 2, 1])
+
+        with col1:
+            if st.button("上传竞赛资料", key="upload_button"):
+                st.session_state.show_upload_window = True
+
+        with col2:
+            available_models = RAGAssistant.get_available_models()
+            model_options = [f"{k}: {v['name']}" for k, v in available_models.items()]
+
+            for i, option in enumerate(model_options):
+                if "deepseek-R1" in option:
+                    model_options[i] = option.replace("deepseek-R1模型", "Qwen2-1.5b模型")
+
+            selected_model = st.selectbox(
+                "",
+                options=model_options,
+                format_func=lambda x: x.split(": ")[1] if ": " in x else x,
+                index=0,
+                disabled=st.session_state.is_loading_model or st.session_state.is_processing_preset,
+                label_visibility="collapsed"
+            )
+            st.session_state.selected_model = selected_model
+
+            if ": " in selected_model:
+                model_key = selected_model.split(": ")[0]
+            else:
+                model_key = list(available_models.keys())[0]
+
+            if "deepseek-R1" in model_key:
+                model_key = "qwen2-1.5b"
+
+            st.session_state.model_key = model_key
+
+        with col3:
+            send_button = st.button("发送", disabled=st.session_state.is_processing_preset)
+
+        st.markdown('</div>', unsafe_allow_html=True)  # 结束modern-input-inner
+        st.markdown('</div>', unsafe_allow_html=True)  # 结束modern-input-container
+
+        # 确保model_key已初始化
+        if 'model_key' not in st.session_state or st.session_state.model_key is None:
+            available_models = RAGAssistant.get_available_models()
+            if available_models:
+                st.session_state.model_key = list(available_models.keys())[0]
+
+        # 处理用户输入
+        if st.session_state.is_processing_preset:
+            # 获取最后一条用户消息
+            last_user_msg = None
+            for msg in reversed(st.session_state.chat_history):
+                if msg["role"] == "user":
+                    last_user_msg = msg["content"]
+                    break
+            
+            if last_user_msg and st.session_state.assistant:
+                # 生成回答并添加到聊天历史
+                try:
+                    # 流式生成AI回答
+                    full_response = ""
+                    for token in st.session_state.assistant.query_stream(last_user_msg):
+                        full_response += token
+                        # 实时更新聊天历史中的最后一条消息
+                        if st.session_state.chat_history and st.session_state.chat_history[-1]["role"] == "assistant":
+                            st.session_state.chat_history[-1]["content"] = full_response
+                        else:
+                            # 添加新的助手消息
+                            st.session_state.chat_history.append({
+                                "role": "assistant",
+                                "content": full_response
+                            })
+                        # 立即重新渲染以显示实时更新
+                        st.rerun()
+                    
+                    # 完成生成后添加来源信息
+                    sources = st.session_state.assistant._last_sources
+                    if st.session_state.chat_history and st.session_state.chat_history[-1]["role"] == "assistant":
+                        st.session_state.chat_history[-1]["sources"] = sources
+                except Exception as e:
+                    st.error(f"生成回答时出错: {str(e)}")
+                finally:
+                    st.session_state.is_processing_preset = False
+                    st.rerun()
+        
+        elif (question and send_button):
             st.session_state.is_processing_preset = True
             
-            # 立即在聊天区域显示用户消息
-            with st.chat_message("user"):
-                st.markdown(question)
-            
-            # 添加用户消息
+            # 添加用户消息到历史
             st.session_state.chat_history.append({
                 "role": "user",
                 "content": question
             })
-
-            # 流式生成AI回答
-            placeholder = st.empty()
-            full_response = ""
             
-            try:
-                for token in st.session_state.assistant.query_stream(question):
-                    full_response += token
-                    placeholder.markdown(f"""
-                    <div class="chat-message assistant-message">
-                        <div class="message-avatar">🤖 助教</div>
-                        <div>{full_response}▌</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                sources = st.session_state.assistant._last_sources
-                
-                st.session_state.chat_history.append({
-                    "role": "assistant",
-                    "content": full_response,
-                    "sources": sources
-                })
-            except Exception as e:
-                st.error(f"生成回答时出错: {str(e)}")
-            finally:
-                placeholder.empty()
-                st.session_state.is_processing_preset = False
-                st.rerun()
+            # 立即重新渲染以显示用户消息
+            st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ========== 主界面 - 技能树标签页 ==========
-with tab2:
+# ========== 主界面 - 技能树 ==========
+elif nav_option == "🌳 技能树":
     # 技能树模块前端界面
     st.markdown("""
     <style>
