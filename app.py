@@ -24,9 +24,9 @@ API_BASE = f"http://localhost:{api_port}/api"
 try:
     response = requests.get(f"http://localhost:{api_port}/", timeout=2)
     if response.status_code == 200:
-        print(f"✓ 技能树API已连接 (http://localhost:{api_port})")
+        print(f"技能树API已连接 (http://localhost:{api_port})")
 except requests.exceptions.RequestException:
-    print(f"⚠ 技能树API未启动，请先运行: python server.py")
+    print(f"技能树API未启动，请先运行: python server.py")
     st.warning(f"⚠ 技能树API服务未启动，请先在另一个终端运行: python server.py")
 
 
@@ -44,43 +44,65 @@ st.markdown("""
     /* 全局样式 */
     .main {
         background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
+    /* 排版优化 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     /* 主标题 */
     .main-title {
         font-size: 2.5rem;
-        font-weight: bold;
+        font-weight: 700;
         background: linear-gradient(135deg, #1f77b4 0%, #6a5acd 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-bottom: 0.5rem;
+        text-align: center;
+        animation: titleFadeIn 0.8s ease-out;
+    }
+
+    @keyframes titleFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .subtitle {
         color: #64748b;
         font-size: 1.1rem;
-        margin-bottom: 2rem;
+        font-weight: 400;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        line-height: 1.6;
     }
 
     /* 聊天消息样式 */
     .chat-container {
         max-height: 600px;
         overflow-y: auto;
-        padding: 1rem 0;
+        padding: 1.5rem 0;
+        margin: 0 auto;
+        width: min(800px, 100%);
     }
 
     .chat-message {
-        padding: 1rem 1.5rem;
-        border-radius: 1rem;
-        margin-bottom: 1rem;
-        max-width: 85%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        animation: fadeIn 0.3s ease-in-out;
+        padding: 1.25rem 1.5rem;
+        border-radius: 1.25rem;
+        margin-bottom: 1.25rem;
+        max-width: 80%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        animation: messageFadeIn 0.4s ease-out;
+        position: relative;
+        overflow: hidden;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+    @keyframes messageFadeIn {
+        from { opacity: 0; transform: translateY(15px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
@@ -88,6 +110,7 @@ st.markdown("""
         background: linear-gradient(135deg, #1f77b4 0%, #4a90d9 100%);
         color: white;
         margin-left: auto;
+        border-bottom-right-radius: 0.5rem;
     }
 
     .assistant-message {
@@ -95,52 +118,86 @@ st.markdown("""
         color: #1e293b;
         margin-right: auto;
         border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 0.5rem;
     }
 
     .message-avatar {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
         font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     /* 来源框 */
     .source-box {
         background-color: #f1f5f9;
         padding: 0.75rem;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         font-size: 0.85rem;
         color: #475569;
-        margin-top: 0.5rem;
-        border-left: 3px solid #1f77b4;
+        margin-top: 0.75rem;
+        border-left: 4px solid #1f77b4;
+        transition: all 0.3s ease;
+    }
+
+    .source-box:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(31, 119, 180, 0.1);
     }
 
     /* 侧边栏 */
     .sidebar-section {
         background-color: white;
         padding: 1.5rem;
-        border-radius: 0.75rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .sidebar-section:hover {
+        box-shadow: 0 6px 20px rgba(31, 119, 180, 0.15);
+        transform: translateY(-2px);
+        border-color: rgba(31, 119, 180, 0.2);
     }
 
     .sidebar-title {
         font-size: 1.1rem;
-        font-weight: bold;
+        font-weight: 600;
         color: #1e293b;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    /* 侧边栏图标 */
+    .sidebar-title::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1f77b4, #6a5acd);
     }
 
     /* 状态指示器 */
     .status-badge {
         display: inline-flex;
         align-items: center;
-        padding: 0.25rem 0.75rem;
+        padding: 0.375rem 1rem;
         border-radius: 9999px;
         font-size: 0.875rem;
         font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .status-badge:hover {
+        transform: scale(1.05);
     }
 
     .status-ready {
@@ -158,27 +215,31 @@ st.markdown("""
         position: sticky;
         bottom: 0;
         background-color: transparent;
-        padding-top: 1rem;
+        padding: 1rem 0 2rem;
+        backdrop-filter: blur(10px);
     }
     
     /* 现代化聊天输入框 */
     .modern-input-container {
-        width: min(560px, 100%);
-        max-width: 560px;
-        margin: 0 auto 1rem;
-        border-radius: 20px;
-        padding: 2px; /* 渐变边框厚度 */
-        background: linear-gradient(135deg, #1f77b4, #6a5acd);
-        box-shadow: 0 8px 20px rgba(23, 43, 76, 0.2);
-    }
-
-    .modern-input-inner {
+        width: min(600px, 100%);
+        max-width: 600px;
+        margin: 0 auto;
         background-color: white;
-        border-radius: 18px;
-        padding: 14px;
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        background-clip: padding-box, border-box;
+        background-origin: padding-box, border-box;
+        background-image: linear-gradient(to right, white, white), linear-gradient(135deg, #1f77b4, #6a5acd);
+    }
+    
+    .modern-input-container:focus-within {
+        box-shadow: 0 6px 20px rgba(31, 119, 180, 0.15);
     }
     
     .input-area {
@@ -186,26 +247,41 @@ st.markdown("""
         width: 100%;
     }
     
-    .input-area textarea {
+    /* 输入框样式优化 */
+    textarea[data-testid="stTextArea"] {
         width: 100%;
         max-width: 100%;
-        border: none;
+        border: 1px solid #e2e8f0;
         resize: none;
         min-height: 40px;
-        max-height: 100px;
+        max-height: 120px;
         height: 40px;
         font-size: 0.95rem;
         line-height: 1.5;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background-color: #f8fafc;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background-color: white;
         font-family: inherit;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     
-    .input-area textarea:focus {
+    textarea[data-testid="stTextArea"]:focus {
         outline: none;
-        background-color: white;
-        box-shadow: 0 0 0 2px rgba(31, 119, 180, 0.1);
+        border-color: #1f77b4;
+        box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.15);
+        height: 60px;
+        transform: translateY(-1px);
+    }
+    
+    textarea[data-testid="stTextArea"]::placeholder {
+        color: #94a3b8;
+        font-style: italic;
+        transition: all 0.3s ease;
+    }
+    
+    textarea[data-testid="stTextArea"]:focus::placeholder {
+        color: #cbd5e1;
     }
     
     .upload-btn {
@@ -213,9 +289,9 @@ st.markdown("""
         border: none;
         cursor: pointer;
         font-size: 1.1rem;
-        padding: 6px;
-        border-radius: 6px;
-        transition: all 0.2s;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -223,26 +299,29 @@ st.markdown("""
     
     .upload-btn:hover {
         background-color: #f1f5f9;
+        transform: translateY(-1px);
     }
     
     .send-btn {
         background-color: #1f77b4;
         color: white;
         border: none;
-        border-radius: 6px;
-        padding: 8px 16px;
+        border-radius: 8px;
+        padding: 10px 20px;
         cursor: pointer;
-        font-size: 0.875rem;
-        transition: all 0.2s;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 0.5rem;
     }
     
     .send-btn:hover {
         background-color: #1a5688;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(31, 119, 180, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.3);
     }
     
     .send-btn:disabled {
@@ -254,17 +333,18 @@ st.markdown("""
 
     /* 滚动条美化 */
     ::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
     }
 
     ::-webkit-scrollbar-track {
         background: #f1f5f9;
-        border-radius: 3px;
+        border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb {
         background: #94a3b8;
-        border-radius: 3px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
     }
 
     ::-webkit-scrollbar-thumb:hover {
@@ -274,20 +354,31 @@ st.markdown("""
     /* 欢迎卡片 */
     .welcome-card {
         background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-        border-radius: 1rem;
-        padding: 2rem;
+        border-radius: 1.25rem;
+        padding: 2.5rem;
         text-align: center;
-        margin-bottom: 1rem;
+        margin: 0 auto 2rem;
+        width: min(800px, 100%);
+        box-shadow: 0 4px 16px rgba(31, 119, 180, 0.1);
+        animation: cardFadeIn 0.6s ease-out;
+    }
+
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .welcome-card h3 {
         color: #075985;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
+        font-size: 1.5rem;
+        font-weight: 600;
     }
 
     .welcome-card p {
         color: #0369a1;
         line-height: 1.6;
+        font-size: 1.05rem;
     }
 
     /* 示例问题标签 */
@@ -296,31 +387,58 @@ st.markdown("""
         background-color: white;
         border: 1px solid #cbd5e1;
         border-radius: 9999px;
-        padding: 0.25rem 0.75rem;
-        margin: 0.25rem;
+        padding: 0.375rem 1rem;
+        margin: 0.375rem;
         font-size: 0.875rem;
         color: #475569;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .example-question:hover {
         border-color: #1f77b4;
         color: #1f77b4;
-        transform: scale(1.05);
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.15);
     }
 
     /* 按钮样式优化 */
     .stButton > button {
         width: 100%;
-        border-radius: 0.5rem;
+        border-radius: 0.875rem;
         font-weight: 500;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        padding: 0.875rem 1.5rem;
+        border: none;
+        font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stButton > button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .stButton > button:hover::before {
+        left: 100%;
     }
 
     .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(31, 119, 180, 0.35);
+    }
+
+    .stButton > button:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.2);
     }
 
     /* 清空按钮 */
@@ -331,15 +449,152 @@ st.markdown("""
 
     .clear-btn > button:hover {
         background-color: #dc2626;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+    }
+
+    /* 主按钮样式 */
+    .stButton > button[type="primary"] {
+        background: linear-gradient(135deg, #1f77b4, #6a5acd);
+        color: white;
+        font-weight: 600;
+    }
+
+    .stButton > button[type="primary"]:hover {
+        background: linear-gradient(135deg, #1a5688, #5a4bb8);
+        box-shadow: 0 8px 20px rgba(31, 119, 180, 0.4);
     }
 
     /* 重排序配置折叠面板 */
     .reranker-config {
         background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-top: 0.75rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .reranker-config:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* 下拉选择框样式 */
+    .stSelectbox {
+        margin: 0.5rem 0;
+    }
+
+    .stSelectbox > div {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .stSelectbox > div:hover {
+        border-color: #1f77b4;
+        box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+    }
+
+    .stSelectbox > div:focus-within {
+        border-color: #1f77b4;
+        box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.15);
+    }
+
+    /* 滑块样式 */
+    .stSlider > div > div {
         border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
+    }
+
+    .stSlider > div > div > div {
+        background: linear-gradient(135deg, #1f77b4, #6a5acd);
+    }
+
+    /* 开关按钮样式 */
+    .stToggle > div {
+        border-radius: 9999px;
+    }
+
+    .stToggle > div > div {
+        background: linear-gradient(135deg, #1f77b4, #6a5acd);
+    }
+
+    /* 模态窗口样式优化 */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    @keyframes overlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        animation: modalSlideIn 0.4s ease-out;
+        position: relative;
+    }
+
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+        }
+        
+        .chat-container {
+            padding: 1rem 0;
+        }
+        
+        .chat-message {
+            max-width: 90%;
+            padding: 1rem 1.25rem;
+        }
+        
+        .welcome-card {
+            padding: 2rem;
+        }
+        
+        .modern-input-container {
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-title {
+            font-size: 1.75rem;
+        }
+        
+        .chat-message {
+            max-width: 95%;
+        }
+        
+        .welcome-card {
+            padding: 1.5rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -367,7 +622,6 @@ st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手�
 # 侧边栏 - 导航菜单
 with st.sidebar:
     # 导航选项
-    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">🚀 功能导航</div>', unsafe_allow_html=True)
     
     # 使用radio创建导航选择
@@ -383,7 +637,6 @@ with st.sidebar:
 # 侧边栏 - 知识库管理
 with st.sidebar:
     # 知识库管理部分
-    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">📚 知识库管理</div>', unsafe_allow_html=True)
 
     # 初始化知识库
@@ -460,7 +713,6 @@ with st.sidebar:
 
 # 侧边栏 - AI引擎控制
 with st.sidebar:
-    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">🚀 AI引擎控制</div>', unsafe_allow_html=True)
 
     # 显示AI引擎状态
@@ -572,7 +824,6 @@ with st.sidebar:
 
 # 侧边栏 - 系统信息
 with st.sidebar:
-    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">ℹ️ 系统信息</div>', unsafe_allow_html=True)
     st.markdown("""
     <div style="font-size: 0.85rem; color: #64748b;">
@@ -604,6 +855,8 @@ with st.sidebar:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ========== 主界面 - 智能问答 ==========
+# 注意：此代码块仅在左侧导航栏选择"💬 智能问答"时执行
+# 不会显示任何技能树相关内容
 if nav_option == "💬 智能问答":
 
     
@@ -630,29 +883,6 @@ if nav_option == "💬 智能问答":
             <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
         </div>
         """, unsafe_allow_html=True)
-
-        # 示例问题
-        example_questions = [
-            "如何报名西门子杯？",
-            "挑战杯的参赛流程是什么？",
-            "大唐杯比赛内容是什么？",
-            "RoboMaster机甲大师赛参赛条件？",
-            "中国国际大学生创新大赛评分标准？"
-        ]
-
-        st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
-        cols = st.columns(3)
-        
-        # 预制问题按钮（带防误触）
-        button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
-        for i, q in enumerate(example_questions):
-            with cols[i % 3]:
-                if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
-                    if st.session_state.assistant is not None:
-                        st.session_state.preset_question = q
-                        st.rerun()
-                    else:
-                        st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
         
 
 
@@ -696,6 +926,30 @@ if nav_option == "💬 智能问答":
             """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
+
+    # 示例问题 - 仅在非处理状态下显示
+    if not st.session_state.is_processing_preset:
+        example_questions = [
+            "如何报名西门子杯？",
+            "挑战杯的参赛流程是什么？",
+            "大唐杯比赛内容是什么？",
+            "RoboMaster机甲大师赛参赛条件？",
+            "中国国际大学生创新大赛评分标准？"
+        ]
+
+        st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
+        cols = st.columns(3)
+        
+        # 预制问题按钮（带防误触）
+        button_disabled = st.session_state.assistant is None
+        for i, q in enumerate(example_questions):
+            with cols[i % 3]:
+                if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
+                    if st.session_state.assistant is not None:
+                        st.session_state.preset_question = q
+                        st.rerun()
+                    else:
+                        st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
 
     # 输入框
     st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
@@ -795,12 +1049,7 @@ if nav_option == "💬 智能问答":
             </script>
             """, unsafe_allow_html=True)
         
-        # 现代化聊天输入框组件（统一渐变边框）
-        st.markdown('<div class="modern-input-container">', unsafe_allow_html=True)
-        st.markdown('<div class="modern-input-inner">', unsafe_allow_html=True)
-
         # 中间输入区域
-        st.markdown('<div class="input-area">', unsafe_allow_html=True)
         question = st.text_area(
             "",
             height=40,
@@ -809,7 +1058,6 @@ if nav_option == "💬 智能问答":
             key="user_input",
             placeholder="请输入您的问题，按回车发送"
         )
-        st.markdown('</div>', unsafe_allow_html=True)  # 结束input-area
 
         st.markdown("""
         <script>
@@ -828,7 +1076,7 @@ if nav_option == "💬 智能问答":
         </script>
         """, unsafe_allow_html=True)
 
-        # 底部操作按钮（嵌入到输入框内部）
+        # 底部操作按钮
         col1, col2, col3 = st.columns([1, 2, 1])
 
         with col1:
@@ -866,9 +1114,6 @@ if nav_option == "💬 智能问答":
         with col3:
             send_button = st.button("发送", disabled=st.session_state.is_processing_preset)
 
-        st.markdown('</div>', unsafe_allow_html=True)  # 结束modern-input-inner
-        st.markdown('</div>', unsafe_allow_html=True)  # 结束modern-input-container
-
         # 确保model_key已初始化
         if 'model_key' not in st.session_state or st.session_state.model_key is None:
             available_models = RAGAssistant.get_available_models()
@@ -887,26 +1132,22 @@ if nav_option == "💬 智能问答":
             if last_user_msg and st.session_state.assistant:
                 # 生成回答并添加到聊天历史
                 try:
+                    # 先添加一个空的助手消息
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": ""
+                    })
+                    
                     # 流式生成AI回答
                     full_response = ""
                     for token in st.session_state.assistant.query_stream(last_user_msg):
                         full_response += token
-                        # 实时更新聊天历史中的最后一条消息
-                        if st.session_state.chat_history and st.session_state.chat_history[-1]["role"] == "assistant":
-                            st.session_state.chat_history[-1]["content"] = full_response
-                        else:
-                            # 添加新的助手消息
-                            st.session_state.chat_history.append({
-                                "role": "assistant",
-                                "content": full_response
-                            })
-                        # 立即重新渲染以显示实时更新
-                        st.rerun()
+                        # 更新助手消息内容
+                        st.session_state.chat_history[-1]["content"] = full_response
                     
                     # 完成生成后添加来源信息
                     sources = st.session_state.assistant._last_sources
-                    if st.session_state.chat_history and st.session_state.chat_history[-1]["role"] == "assistant":
-                        st.session_state.chat_history[-1]["sources"] = sources
+                    st.session_state.chat_history[-1]["sources"] = sources
                 except Exception as e:
                     st.error(f"生成回答时出错: {str(e)}")
                 finally:
@@ -928,6 +1169,8 @@ if nav_option == "💬 智能问答":
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ========== 主界面 - 技能树 ==========
+# 注意：此代码块仅在左侧导航栏明确选择"🌳 技能树"时执行
+# 只有当导航状态为技能树模式时，才会显示技能树相关页面内容
 elif nav_option == "🌳 技能树":
     # 技能树模块前端界面
     st.markdown("""
@@ -1370,139 +1613,139 @@ with st.expander("📋 技能树管理", expanded=True):
             st.info("暂无技能树，请创建新技能树")
         st.markdown('</div>', unsafe_allow_html=True)
 
-# 选中技能树后显示详情
-if st.session_state.selected_skill_tree:
-    skill_tree = st.session_state.selected_skill_tree
-    st.markdown(f"""
-    <div class="skill-tree-container">
-        <div class="skill-tree-header">
-            <h3 class="skill-tree-title">{skill_tree['name']}</h3>
-            <div>
-                <button class="btn btn-primary" onclick="generatePaths('{skill_tree['id']}')">生成学习路径</button>
+    # 选中技能树后显示详情
+    if st.session_state.selected_skill_tree:
+        skill_tree = st.session_state.selected_skill_tree
+        st.markdown(f"""
+        <div class="skill-tree-container">
+            <div class="skill-tree-header">
+                <h3 class="skill-tree-title">{skill_tree['name']}</h3>
+                <div>
+                    <button class="btn btn-primary" onclick="generatePaths('{skill_tree['id']}')">生成学习路径</button>
+                </div>
             </div>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">{skill_tree['description']}</p>
         </div>
-        <p style="color: #64748b; margin-bottom: 1.5rem;">{skill_tree['description']}</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # 添加技能区域
-    with st.expander("➕ 添加技能", expanded=False):
-        st.markdown('<div class="form-section">', unsafe_allow_html=True)
-        st.markdown('<div class="form-title">添加新技能</div>', unsafe_allow_html=True)
-         
-        with st.form(key="add_skill_form"):
-            skill_name = st.text_input("技能名称")
-            skill_description = st.text_area("技能描述")
-            skill_level = st.selectbox("技能难度", ["beginner", "intermediate", "advanced", "expert"], format_func=lambda x: x.capitalize())
-            skill_type = st.selectbox("技能类型", ["technical", "theoretical", "practical", "competition"], format_func=lambda x: x.capitalize())
-            learning_time = st.number_input("预估学习时间（小时）", min_value=0, step=1)
-            submit_button = st.form_submit_button("添加技能", type="primary")
-            
-            if submit_button:
-                if skill_name and skill_description:
-                    add_skill(
-                    skill_tree['id'],
-                    skill_name,
-                    skill_description,
-                    skill_level,
-                    skill_type,
-                    learning_time
-                )
-            else:
-                st.error("请填写技能名称和描述")
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 建立技能关系区域
-    with st.expander("🔗 建立技能关系", expanded=False):
-        st.markdown('<div class="form-section">', unsafe_allow_html=True)
-        st.markdown('<div class="form-title">建立技能关系</div>', unsafe_allow_html=True)
-        
-        # 获取技能树中的技能列表
-    skill_tree_detail = fetch_skill_tree_detail(skill_tree['id'])
-    if skill_tree_detail and 'skill_nodes' in skill_tree_detail:
-        skills = skill_tree_detail['skill_nodes']
-        skill_options = [(skill['id'], skill['name']) for skill in skills.values()]
-        
-        with st.form(key="establish_relation_form"):
-            source_skill = st.selectbox("源技能", options=skill_options, format_func=lambda x: x[1])
-            target_skill = st.selectbox("目标技能", options=skill_options, format_func=lambda x: x[1])
-            relation_type = st.selectbox("关系类型", ["prerequisite", "related", "advanced"])
-            submit_button = st.form_submit_button("建立关系", type="primary")
-            
-            if submit_button:
-                if source_skill[0] != target_skill[0]:
-                    establish_relation(
+        """, unsafe_allow_html=True)
+
+        # 添加技能区域
+        with st.expander("➕ 添加技能", expanded=False):
+            st.markdown('<div class="form-section">', unsafe_allow_html=True)
+            st.markdown('<div class="form-title">添加新技能</div>', unsafe_allow_html=True)
+
+            with st.form(key="add_skill_form"):
+                skill_name = st.text_input("技能名称")
+                skill_description = st.text_area("技能描述")
+                skill_level = st.selectbox("技能难度", ["beginner", "intermediate", "advanced", "expert"], format_func=lambda x: x.capitalize())
+                skill_type = st.selectbox("技能类型", ["technical", "theoretical", "practical", "competition"], format_func=lambda x: x.capitalize())
+                learning_time = st.number_input("预估学习时间（小时）", min_value=0, step=1)
+                submit_button = st.form_submit_button("添加技能", type="primary")
+
+                if submit_button:
+                    if skill_name and skill_description:
+                        add_skill(
                         skill_tree['id'],
-                        source_skill[0],
-                        target_skill[0],
-                        relation_type
+                        skill_name,
+                        skill_description,
+                        skill_level,
+                        skill_type,
+                        learning_time
                     )
                 else:
-                    st.error("源技能和目标技能不能相同")
-    else:
-        st.info("请先添加技能")
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 技能列表区域
-    with st.expander("📚 技能列表", expanded=True):
-        st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
-        st.markdown('<div class="skill-tree-title">技能节点</div>', unsafe_allow_html=True)
-        
+                    st.error("请填写技能名称和描述")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # 建立技能关系区域
+        with st.expander("🔗 建立技能关系", expanded=False):
+            st.markdown('<div class="form-section">', unsafe_allow_html=True)
+            st.markdown('<div class="form-title">建立技能关系</div>', unsafe_allow_html=True)
+
+            # 获取技能树中的技能列表
+        skill_tree_detail = fetch_skill_tree_detail(skill_tree['id'])
         if skill_tree_detail and 'skill_nodes' in skill_tree_detail:
             skills = skill_tree_detail['skill_nodes']
-            for skill_id, skill in skills.items():
-                # 难度级别样式
-                level_class = f"level-{skill['level'].lower()}"
-                
-                st.markdown(f"""
-                <div class="skill-node">
-                    <div class="skill-node-header">
-                        <span class="skill-node-name">{skill['name']}</span>
-                        <span class="skill-node-level {level_class}">{skill['level']}</span>
-                    </div>
-                    <div class="skill-node-description">{skill['description']}</div>
-                     <div class="skill-node-meta">
-                         <span>类型: {skill['type']}</span>
-                         <span>学习时间: {skill['learning_time']}小时</span>
-                         <span>完成率: {skill['completion_rate']}%</span>
-                     </div>
-                </div>
-                """, unsafe_allow_html=True)
+            skill_options = [(skill['id'], skill['name']) for skill in skills.values()]
+
+            with st.form(key="establish_relation_form"):
+                source_skill = st.selectbox("源技能", options=skill_options, format_func=lambda x: x[1])
+                target_skill = st.selectbox("目标技能", options=skill_options, format_func=lambda x: x[1])
+                relation_type = st.selectbox("关系类型", ["prerequisite", "related", "advanced"])
+                submit_button = st.form_submit_button("建立关系", type="primary")
+
+                if submit_button:
+                    if source_skill[0] != target_skill[0]:
+                        establish_relation(
+                            skill_tree['id'],
+                            source_skill[0],
+                            target_skill[0],
+                            relation_type
+                        )
+                    else:
+                        st.error("源技能和目标技能不能相同")
         else:
-            st.info("暂无技能节点，请添加技能")
+            st.info("请先添加技能")
         st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 学习路径区域
-    with st.expander("🗺️ 学习路径", expanded=True):
-        st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
-        st.markdown('<div class="skill-tree-title">学习路径</div>', unsafe_allow_html=True)
-        
-        if skill_tree_detail and 'learning_paths' in skill_tree_detail:
-            paths = skill_tree_detail['learning_paths']
-            if paths:
-                for path_id, path in paths.items():
+
+        # 技能列表区域
+        with st.expander("📚 技能列表", expanded=True):
+            st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
+            st.markdown('<div class="skill-tree-title">技能节点</div>', unsafe_allow_html=True)
+
+            if skill_tree_detail and 'skill_nodes' in skill_tree_detail:
+                skills = skill_tree_detail['skill_nodes']
+                for skill_id, skill in skills.items():
                     # 难度级别样式
-                    level_class = f"level-{path['difficulty'].lower()}"
-                    
+                    level_class = f"level-{skill['level'].lower()}"
+
                     st.markdown(f"""
-                    <div class="learning-path">
-                        <div class="path-header">
-                            <span class="path-name">学习路径 {path_id[:8]}</span>
-                            <div class="path-meta">
-                                <span class="skill-node-level {level_class}">{path['difficulty']}</span>
-                                <span>预估时间: {path['estimated_time']}小时</span>
-                            </div>
+                    <div class="skill-node">
+                        <div class="skill-node-header">
+                            <span class="skill-node-name">{skill['name']}</span>
+                            <span class="skill-node-level {level_class}">{skill['level']}</span>
                         </div>
-                        <div class="path-skills">
-                            {''.join([f'<span class="path-skill">{skill_tree_detail["skill_nodes"][skill_id]["name"]}</span>' for skill_id in path['skill_ids']])}
-                        </div>
+                        <div class="skill-node-description">{skill['description']}</div>
+                         <div class="skill-node-meta">
+                             <span>类型: {skill['type']}</span>
+                             <span>学习时间: {skill['learning_time']}小时</span>
+                             <span>完成率: {skill['completion_rate']}%</span>
+                         </div>
                     </div>
                     """, unsafe_allow_html=True)
             else:
+                st.info("暂无技能节点，请添加技能")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # 学习路径区域
+        with st.expander("🗺️ 学习路径", expanded=True):
+            st.markdown('<div class="skill-tree-container">', unsafe_allow_html=True)
+            st.markdown('<div class="skill-tree-title">学习路径</div>', unsafe_allow_html=True)
+
+            if skill_tree_detail and 'learning_paths' in skill_tree_detail:
+                paths = skill_tree_detail['learning_paths']
+                if paths:
+                    for path_id, path in paths.items():
+                        # 难度级别样式
+                        level_class = f"level-{path['difficulty'].lower()}"
+
+                        st.markdown(f"""
+                        <div class="learning-path">
+                            <div class="path-header">
+                                <span class="path-name">学习路径 {path_id[:8]}</span>
+                                <div class="path-meta">
+                                    <span class="skill-node-level {level_class}">{path['difficulty']}</span>
+                                    <span>预估时间: {path['estimated_time']}小时</span>
+                                </div>
+                            </div>
+                            <div class="path-skills">
+                                {''.join([f'<span class="path-skill">{skill_tree_detail["skill_nodes"][skill_id]["name"]}</span>' for skill_id in path['skill_ids']])}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.info("暂无学习路径，请生成学习路径")
+            else:
                 st.info("暂无学习路径，请生成学习路径")
-        else:
-            st.info("暂无学习路径，请生成学习路径")
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
 # 初始化时获取技能树列表
 if not st.session_state.skill_trees:
