@@ -1130,27 +1130,31 @@ if nav_option == "💬 智能问答":
                     break
             
             if last_user_msg and st.session_state.assistant:
-                # 生成回答并添加到聊天历史
+                # 流式生成AI回答
+                placeholder = st.empty()
+                full_response = ""
+                
                 try:
-                    # 先添加一个空的助手消息
-                    st.session_state.chat_history.append({
-                        "role": "assistant",
-                        "content": ""
-                    })
-                    
-                    # 流式生成AI回答
-                    full_response = ""
                     for token in st.session_state.assistant.query_stream(last_user_msg):
                         full_response += token
-                        # 更新助手消息内容
-                        st.session_state.chat_history[-1]["content"] = full_response
+                        placeholder.markdown(f"""
+                        <div class="chat-message assistant-message">
+                            <div class="message-avatar">🤖 助教</div>
+                            <div>{full_response}▌</div>
+                        </div>
+                        """, unsafe_allow_html=True)
                     
-                    # 完成生成后添加来源信息
                     sources = st.session_state.assistant._last_sources
-                    st.session_state.chat_history[-1]["sources"] = sources
+                    
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": full_response,
+                        "sources": sources
+                    })
                 except Exception as e:
                     st.error(f"生成回答时出错: {str(e)}")
                 finally:
+                    placeholder.empty()
                     st.session_state.is_processing_preset = False
                     st.rerun()
         

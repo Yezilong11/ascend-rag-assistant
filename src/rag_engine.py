@@ -291,7 +291,7 @@ class RAGAssistant:
             "text-generation",
             model=self.model,
             tokenizer=self.tokenizer,
-            max_new_tokens=1024,  # 增加生成长度，确保回答详细完整
+            max_new_tokens=256,  # 限制生成长度，提升速度
             temperature=0.7,
             top_p=0.9,
             repetition_penalty=1.1,
@@ -467,22 +467,15 @@ class RAGAssistant:
         context = "\n\n".join([doc.page_content for doc in docs])
 
         # 构建Prompt
-        template = """基于以下检索到的相关信息，详细、全面地回答用户的问题。
-
-【回答要求】
-1. 提供详细、完整的回答，不要过于简洁
-2. 结合检索到的相关信息，提供专业、准确的内容
-3. 结构化回答，使用适当的分段和标点
-4. 如果有多个要点，使用列表格式呈现
-5. 确保回答逻辑清晰，易于理解
-6. 如果无法从信息中找到答案，请明确告知并说明原因
+        template = """基于以下检索到的相关信息，回答用户的问题。
+如果无法从信息中找到答案，请明确告知。
 
 相关信息：
 {context}
 
 用户问题：{question}
 
-请提供详细、专业、准确的回答："""
+请提供专业、准确的回答："""
 
         prompt_text = template.format(context=context, question=question)
 
@@ -498,7 +491,7 @@ class RAGAssistant:
         generation_kwargs = dict(
             inputs,
             streamer=streamer,
-            max_new_tokens=1024,  # 增加生成长度，确保回答详细完整
+            max_new_tokens=256,
             temperature=0.7,
             top_p=0.9,
             repetition_penalty=1.1,
