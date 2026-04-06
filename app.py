@@ -357,11 +357,19 @@ if 'is_processing_preset' not in st.session_state:
 st.markdown('<p class="main-title">昇腾AI竞赛智能助教 🤖</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">基于RAG技术的全天候竞赛知识助手，为你解答竞赛报名、规则、评分等各类问题</p>', unsafe_allow_html=True)
 
-# 标签页导航
-tab1, tab2 = st.tabs(["💬 智能问答", "🌳 技能树"])  # 添加技能树标签页
+# # 标签页导航
+# tab1, tab2 = st.tabs(["💬 智能问答", "🌳 技能树"])  # 添加技能树标签页
 
 # 侧边栏 - 知识库管理
 with st.sidebar:
+    # ========== 页面切换（侧边栏顶部） ==========
+    page = st.sidebar.radio(
+        "📌 选择功能页面",
+        options=["智能问答", "技能树"],
+        index=0,
+        label_visibility="collapsed"  # 隐藏标签文字，节省空间
+    )
+    st.sidebar.markdown("---")  # 分隔线
     # 知识库管理部分
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-title">📚 知识库管理</div>', unsafe_allow_html=True)
@@ -622,147 +630,21 @@ with st.sidebar:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+if page == "智能问答":
 # ========== 主界面 - 智能问答标签页 ==========
-with tab1:
+    # with tab1:
 
-    # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
-    if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
-        st.session_state.is_processing_preset = True
-        question = st.session_state.preset_question
-        st.session_state.preset_question = None
-        
-        # 添加用户消息到历史
-        st.session_state.chat_history.append({
-            "role": "user",
-            "content": question
-        })
-        
-        # 立即显示用户消息（右侧气泡，自定义HTML）
-        st.markdown(f"""
-        <div class="chat-message user-message" style="align-self: flex-end; margin-left: auto; margin-right: 0;">
-            <div class="message-avatar">👤 你</div>
-            <div>{question}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 显示"思考中……"状态提示（放在用户消息下一行左侧）
-        thinking_placeholder = st.empty()
-        thinking_placeholder.markdown("""
-        <div class="thinking-indicator">
-            <div>
-                <span>思考中</span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        placeholder = st.empty()
-        full_response = ""
-        first_token_received = False
-        
-        try:
-            for token in st.session_state.assistant.query_stream(question):
-                if not first_token_received:
-                    thinking_placeholder.empty()
-                    first_token_received = True
-                full_response += token
-                placeholder.markdown(f"""
-                <div class="chat-message assistant-message" style="align-self: flex-start; margin-right: auto; margin-left: 0;">
-                    <div class="message-avatar">🤖 助教</div>
-                    <div>{full_response}▌</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            sources = st.session_state.assistant._last_sources
-            
-            st.session_state.chat_history.append({
-                "role": "assistant",
-                "content": full_response,
-                "sources": sources
-            })
-        except Exception as e:
-            thinking_placeholder.empty()
-            st.error(f"生成回答时出错: {str(e)}")
-        finally:
-            thinking_placeholder.empty()
-            placeholder.empty()
-            st.session_state.is_processing_preset = False
-            st.rerun()
-
-    # 显示欢迎卡片（仅在无历史时）
-    if not st.session_state.chat_history:
-        st.markdown("""
-        <div class="welcome-card">
-            <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
-            <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # 示例问题
-        example_questions = [
-            "如何报名西门子杯？",
-            "挑战杯的参赛流程是什么？",
-            "大唐杯比赛内容是什么？",
-            "RoboMaster机甲大师赛参赛条件？",
-            "中国国际大学生创新大赛评分标准？"
-        ]
-
-        st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
-        cols = st.columns(3)
-        
-        button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
-        for i, q in enumerate(example_questions):
-            with cols[i % 3]:
-                if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
-                    if st.session_state.assistant is not None:
-                        st.session_state.preset_question = q
-                        st.rerun()
-                    else:
-                        st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
-
-    # 显示聊天历史（使用自定义HTML，确保用户消息右对齐）
-    chat_container = st.container()
-    with chat_container:
-        # 使用 flex 列容器包装所有消息
-        for msg in st.session_state.chat_history:
-            if msg["role"] == "user":
-                st.markdown(f"""
-                <div class="chat-message user-message" style="align-self: flex-end; margin-left: auto; margin-right: 0;">
-                    <div class="message-avatar">👤 你</div>
-                    <div>{msg["content"]}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                # 助手消息
-                st.markdown(f"""
-                <div class="chat-message assistant-message" style="align-self: flex-start; margin-right: auto; margin-left: 0;">
-                    <div class="message-avatar">🤖 助教</div>
-                    <div>{msg["content"]}</div>
-                """, unsafe_allow_html=True)
-                if "sources" in msg and msg["sources"]:
-                    with st.expander("📖 查看参考来源"):
-                        for i, source in enumerate(msg["sources"], 1):
-                            abs_path = source["source"]
-                            try:
-                                rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
-                            except ValueError:
-                                rel_path = os.path.basename(abs_path)
-                            st.markdown(f"**来源 {i}**: `{rel_path}`")
-                            st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-
-    # 输入框
-    st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
-
-    if st.session_state.assistant is None:
-        st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
-    else:
-        question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
-
-        if question and not st.session_state.is_processing_preset:
+        # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
+        if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
             st.session_state.is_processing_preset = True
+            question = st.session_state.preset_question
+            st.session_state.preset_question = None
+            
+            # 添加用户消息到历史
+            st.session_state.chat_history.append({
+                "role": "user",
+                "content": question
+            })
             
             # 立即显示用户消息（右侧气泡，自定义HTML）
             st.markdown(f"""
@@ -772,13 +654,7 @@ with tab1:
             </div>
             """, unsafe_allow_html=True)
             
-            # 添加用户消息到历史
-            st.session_state.chat_history.append({
-                "role": "user",
-                "content": question
-            })
-
-            # 显示"思考中……"状态提示（位于用户消息下一行左侧）
+            # 显示"思考中……"状态提示（放在用户消息下一行左侧）
             thinking_placeholder = st.empty()
             thinking_placeholder.markdown("""
             <div class="thinking-indicator">
@@ -790,8 +666,7 @@ with tab1:
                 </div>
             </div>
             """, unsafe_allow_html=True)
-
-            # 流式生成AI回答
+            
             placeholder = st.empty()
             full_response = ""
             first_token_received = False
@@ -825,267 +700,402 @@ with tab1:
                 st.session_state.is_processing_preset = False
                 st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+        # 显示欢迎卡片（仅在无历史时）
+        if not st.session_state.chat_history:
+            st.markdown("""
+            <div class="welcome-card">
+                <h3>👋 你好！我是昇腾AI竞赛智能助教</h3>
+                <p>我已经预置了近百场大学生竞赛的官方资料，你可以随时向我提问。试试点击下方常见问题，或者在输入框输入你的问题吧！</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-# ========== 主界面 - 技能树标签页 ==========
-with tab2:
-    # 技能树模块前端界面（此处保持原样，未作修改）
-    st.markdown("""
-    <style>
-        /* 技能树样式 */
-        .skill-tree-container {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-        
-        .skill-tree-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .skill-tree-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #1e293b;
-        }
-        
-        .skill-node {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            transition: all 0.2s;
-        }
-        
-        .skill-node:hover {
-            border-color: #1f77b4;
-            box-shadow: 0 4px 6px rgba(31, 119, 180, 0.1);
-        }
-        
-        .skill-node-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .skill-node-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        
-        .skill-node-level {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-weight: 500;
-        }
-        
-        .level-beginner {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        
-        .level-intermediate {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .level-advanced {
-            background-color: #fce7f3;
-            color: #9d174d;
-        }
-        
-        .level-expert {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .skill-node-description {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-bottom: 0.75rem;
-        }
-        
-        .skill-node-meta {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
-        
-        .skill-relation {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .relation-title {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #475569;
-            margin-bottom: 0.5rem;
-        }
-        
-        .relation-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .relation-tag {
-            background-color: #f1f5f9;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-        
-        .learning-path {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .path-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-        }
-        
-        .path-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        
-        .path-meta {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-        
-        .path-skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .path-skill {
-            background-color: #e2e8f0;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            color: #475569;
-        }
-        
-        /* 表单样式 */
-        .form-section {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 1.25rem;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #475569;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #1f77b4;
-            box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
-        }
-        
-        /* 按钮样式 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary {
-            background-color: #1f77b4;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #1a5688;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background-color: #e2e8f0;
-            color: #475569;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #cbd5e1;
-            transform: translateY(-1px);
-        }
-        
-        /* 加载状态 */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(31, 119, 180, 0.3);
-            border-radius: 50%;
-            border-top-color: #1f77b4;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-     </style>
-""", unsafe_allow_html=True)
+            # 示例问题
+            example_questions = [
+                "如何报名西门子杯？",
+                "挑战杯的参赛流程是什么？",
+                "大唐杯比赛内容是什么？",
+                "RoboMaster机甲大师赛参赛条件？",
+                "中国国际大学生创新大赛评分标准？"
+            ]
+
+            st.markdown("<div style='text-align: center; margin-bottom: 1rem;'><b>💡 常见问题示例</b></div>", unsafe_allow_html=True)
+            cols = st.columns(3)
+            
+            button_disabled = st.session_state.is_processing_preset or st.session_state.assistant is None
+            for i, q in enumerate(example_questions):
+                with cols[i % 3]:
+                    if st.button(q, key=f"example_{i}", use_container_width=True, disabled=button_disabled):
+                        if st.session_state.assistant is not None:
+                            st.session_state.preset_question = q
+                            st.rerun()
+                        else:
+                            st.warning("👈 请先点击侧边栏的「启动AI引擎」按钮")
+
+        # 显示聊天历史（使用自定义HTML，确保用户消息右对齐）
+        chat_container = st.container()
+        with chat_container:
+            # 使用 flex 列容器包装所有消息
+            for msg in st.session_state.chat_history:
+                if msg["role"] == "user":
+                    st.markdown(f"""
+                    <div class="chat-message user-message" style="align-self: flex-end; margin-left: auto; margin-right: 0;">
+                        <div class="message-avatar">👤 你</div>
+                        <div>{msg["content"]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    # 助手消息
+                    st.markdown(f"""
+                    <div class="chat-message assistant-message" style="align-self: flex-start; margin-right: auto; margin-left: 0;">
+                        <div class="message-avatar">🤖 助教</div>
+                        <div>{msg["content"]}</div>
+                    """, unsafe_allow_html=True)
+                    if "sources" in msg and msg["sources"]:
+                        with st.expander("📖 查看参考来源"):
+                            for i, source in enumerate(msg["sources"], 1):
+                                abs_path = source["source"]
+                                try:
+                                    rel_path = os.path.relpath(abs_path, os.path.dirname(__file__))
+                                except ValueError:
+                                    rel_path = os.path.basename(abs_path)
+                                st.markdown(f"**来源 {i}**: `{rel_path}`")
+                                st.markdown(f"<div class='source-box'>{source['content']}...</div>", unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
+
+        # 输入框
+        st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
+
+        if st.session_state.assistant is None:
+            st.info("👈 请先点击侧边栏的「启动AI引擎」按钮开始对话", icon="ℹ️")
+        else:
+            question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
+
+            if question and not st.session_state.is_processing_preset:
+                st.session_state.is_processing_preset = True
+                
+                # 立即显示用户消息（右侧气泡，自定义HTML）
+                st.markdown(f"""
+                <div class="chat-message user-message" style="align-self: flex-end; margin-left: auto; margin-right: 0;">
+                    <div class="message-avatar">👤 你</div>
+                    <div>{question}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # 添加用户消息到历史
+                st.session_state.chat_history.append({
+                    "role": "user",
+                    "content": question
+                })
+
+                # 显示"思考中……"状态提示（位于用户消息下一行左侧）
+                thinking_placeholder = st.empty()
+                thinking_placeholder.markdown("""
+                <div class="thinking-indicator">
+                    <div>
+                        <span>思考中</span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # 流式生成AI回答
+                placeholder = st.empty()
+                full_response = ""
+                first_token_received = False
+                
+                try:
+                    for token in st.session_state.assistant.query_stream(question):
+                        if not first_token_received:
+                            thinking_placeholder.empty()
+                            first_token_received = True
+                        full_response += token
+                        placeholder.markdown(f"""
+                        <div class="chat-message assistant-message" style="align-self: flex-start; margin-right: auto; margin-left: 0;">
+                            <div class="message-avatar">🤖 助教</div>
+                            <div>{full_response}▌</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    sources = st.session_state.assistant._last_sources
+                    
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": full_response,
+                        "sources": sources
+                    })
+                except Exception as e:
+                    thinking_placeholder.empty()
+                    st.error(f"生成回答时出错: {str(e)}")
+                finally:
+                    thinking_placeholder.empty()
+                    placeholder.empty()
+                    st.session_state.is_processing_preset = False
+                    st.rerun()
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+elif page == "技能树":
+    # ========== 主界面 - 技能树标签页 ==========
+    # with tab2:
+        # 技能树模块前端界面（此处保持原样，未作修改）
+        st.markdown("""
+        <style>
+            /* 技能树样式 */
+            .skill-tree-container {
+                background-color: white;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                margin-bottom: 1.5rem;
+            }
+            
+            .skill-tree-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+            }
+            
+            .skill-tree-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+                color: #1e293b;
+            }
+            
+            .skill-node {
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                transition: all 0.2s;
+            }
+            
+            .skill-node:hover {
+                border-color: #1f77b4;
+                box-shadow: 0 4px 6px rgba(31, 119, 180, 0.1);
+            }
+            
+            .skill-node-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .skill-node-name {
+                font-weight: 600;
+                color: #1e293b;
+            }
+            
+            .skill-node-level {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                border-radius: 9999px;
+                font-weight: 500;
+            }
+            
+            .level-beginner {
+                background-color: #dcfce7;
+                color: #166534;
+            }
+            
+            .level-intermediate {
+                background-color: #dbeafe;
+                color: #1e40af;
+            }
+            
+            .level-advanced {
+                background-color: #fce7f3;
+                color: #9d174d;
+            }
+            
+            .level-expert {
+                background-color: #fef3c7;
+                color: #92400e;
+            }
+            
+            .skill-node-description {
+                font-size: 0.875rem;
+                color: #64748b;
+                margin-bottom: 0.75rem;
+            }
+            
+            .skill-node-meta {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.75rem;
+                color: #94a3b8;
+            }
+            
+            .skill-relation {
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid #e2e8f0;
+            }
+            
+            .relation-title {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: #475569;
+                margin-bottom: 0.5rem;
+            }
+            
+            .relation-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .relation-tag {
+                background-color: #f1f5f9;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                color: #64748b;
+            }
+            
+            .learning-path {
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .path-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
+            }
+            
+            .path-name {
+                font-weight: 600;
+                color: #1e293b;
+            }
+            
+            .path-meta {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.75rem;
+                color: #64748b;
+            }
+            
+            .path-skills {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+            
+            .path-skill {
+                background-color: #e2e8f0;
+                padding: 0.25rem 0.5rem;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                color: #475569;
+            }
+            
+            /* 表单样式 */
+            .form-section {
+                background-color: white;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-title {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #1e293b;
+                margin-bottom: 1.25rem;
+            }
+            
+            .form-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .form-label {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: #475569;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+            
+            .form-input {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: #1f77b4;
+                box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+            }
+            
+            /* 按钮样式 */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .btn-primary {
+                background-color: #1f77b4;
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background-color: #1a5688;
+                transform: translateY(-1px);
+            }
+            
+            .btn-secondary {
+                background-color: #e2e8f0;
+                color: #475569;
+            }
+            
+            .btn-secondary:hover {
+                background-color: #cbd5e1;
+                transform: translateY(-1px);
+            }
+            
+            /* 加载状态 */
+            .loading-spinner {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(31, 119, 180, 0.3);
+                border-radius: 50%;
+                border-top-color: #1f77b4;
+                animation: spin 1s ease-in-out infinite;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 # 技能树管理功能
 import requests
