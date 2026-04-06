@@ -250,6 +250,44 @@ st.markdown("""
         padding: 0.5rem;
         margin-top: 0.5rem;
     }
+    
+    /* 思考中提示样式 - 优化左侧对齐和美观 */
+    .thinking-indicator {
+        display: flex;
+        align-items: center;
+        margin-left: 0rem;
+        margin-bottom: 1rem;
+        margin-top: 0rem;
+        animation: pulse 1.2s infinite ease-in-out;
+    }
+    .thinking-indicator > div {
+        background-color: #f1f5f9;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .thinking-indicator .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #64748b;
+        border-radius: 50%;
+        display: inline-block;
+        animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .thinking-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+    .thinking-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -386,6 +424,29 @@ with st.sidebar:
     else:
         st.markdown('<span class="status-badge status-not-ready">❌ AI引擎未启动</span>', unsafe_allow_html=True)
 
+    # 启动AI引擎按钮
+    if st.session_state.assistant is None:
+        button_disabled = st.session_state.is_loading_model
+        if st.button("🚀 启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
+            st.session_state.is_loading_model = True
+            with st.spinner("加载大模型中，请稍候..."):
+                try:
+                    st.session_state.assistant = RAGAssistant(
+                        knowledge_base=st.session_state.kb,
+                        model_key=st.session_state.model_key,
+                        model_dir=st.session_state.model_dir,
+                        use_reranker=st.session_state.use_reranker,
+                        reranker_model=st.session_state.reranker_key,
+                        reranker_top_k=st.session_state.reranker_top_k,
+                        initial_retrieval_k=st.session_state.initial_retrieval_k
+                    )
+                    st.success("✅ AI引擎已就绪！")
+                except Exception as e:
+                    st.error(f"❌ 模型加载失败: {str(e)}")
+                finally:
+                    st.session_state.is_loading_model = False
+                st.rerun()
+
     st.divider()
 
     # 模型选择
@@ -515,33 +576,7 @@ with st.sidebar:
 
 # ========== 主界面 - 智能问答标签页 ==========
 with tab1:
-    # AI引擎启动按钮（独立区域，避免form冲突）
-    if st.session_state.assistant is None:
-        col_btn1, col_btn2 = st.columns([1, 2])
-        with col_btn1:
-            st.markdown("### 🚀 启动AI引擎")
-        with col_btn2:
-            button_disabled = st.session_state.is_loading_model
-            if st.button("🚀 启动AI引擎", type="primary", use_container_width=True, disabled=button_disabled):
-                st.session_state.is_loading_model = True
-                with st.spinner("加载大模型中，请稍候..."):
-                    try:
-                        st.session_state.assistant = RAGAssistant(
-                            knowledge_base=st.session_state.kb,
-                            model_key=st.session_state.model_key,
-                            model_dir=st.session_state.model_dir,
-                            use_reranker=st.session_state.use_reranker,
-                            reranker_model=st.session_state.reranker_key,
-                            reranker_top_k=st.session_state.reranker_top_k,
-                            initial_retrieval_k=st.session_state.initial_retrieval_k
-                        )
-                        st.success("✅ AI引擎已就绪！")
-                    except Exception as e:
-                        st.error(f"❌ 模型加载失败: {str(e)}")
-                    finally:
-                        st.session_state.is_loading_model = False
-                st.rerun()
-        st.divider()
+
     
     # 处理预制问题（在显示聊天历史和欢迎卡片之前处理）
     if st.session_state.preset_question and st.session_state.assistant is not None and not st.session_state.is_processing_preset:
@@ -559,11 +594,29 @@ with tab1:
         with st.chat_message("user"):
             st.markdown(question)
         
+        # 显示"思考中……"状态提示（放在用户消息下一行左侧）
+        thinking_placeholder = st.empty()
+        thinking_placeholder.markdown("""
+        <div class="thinking-indicator">
+            <div>
+                <span>思考中</span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         placeholder = st.empty()
         full_response = ""
+        first_token_received = False  # 标记是否已收到第一个token
         
         try:
             for token in st.session_state.assistant.query_stream(question):
+                if not first_token_received:
+                    # 第一个token到达，立即隐藏"思考中……"提示
+                    thinking_placeholder.empty()
+                    first_token_received = True
                 full_response += token
                 placeholder.markdown(f"""
                 <div class="chat-message assistant-message">
@@ -580,8 +633,11 @@ with tab1:
                 "sources": sources
             })
         except Exception as e:
+            # 出错时隐藏"思考中……"提示
+            thinking_placeholder.empty()
             st.error(f"生成回答时出错: {str(e)}")
         finally:
+            thinking_placeholder.empty()
             placeholder.empty()
             st.session_state.is_processing_preset = False
             st.rerun()
@@ -661,7 +717,7 @@ with tab1:
         if question and not st.session_state.is_processing_preset:
             st.session_state.is_processing_preset = True
             
-            # 立即在聊天区域显示用户消息
+            # 立即在聊天区域显示用户消息（右侧气泡）
             with st.chat_message("user"):
                 st.markdown(question)
             
@@ -671,12 +727,30 @@ with tab1:
                 "content": question
             })
 
+            # 显示"思考中……"状态提示（位于用户消息下一行左侧）
+            thinking_placeholder = st.empty()
+            thinking_placeholder.markdown("""
+            <div class="thinking-indicator">
+                <div>
+                    <span>思考中</span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
             # 流式生成AI回答
             placeholder = st.empty()
             full_response = ""
+            first_token_received = False  # 标记是否已收到第一个token
             
             try:
                 for token in st.session_state.assistant.query_stream(question):
+                    if not first_token_received:
+                        # 第一个token到达，立即隐藏"思考中……"提示
+                        thinking_placeholder.empty()
+                        first_token_received = True
                     full_response += token
                     placeholder.markdown(f"""
                     <div class="chat-message assistant-message">
@@ -693,8 +767,11 @@ with tab1:
                     "sources": sources
                 })
             except Exception as e:
+                # 出错时隐藏"思考中……"提示
+                thinking_placeholder.empty()
                 st.error(f"生成回答时出错: {str(e)}")
             finally:
+                thinking_placeholder.empty()
                 placeholder.empty()
                 st.session_state.is_processing_preset = False
                 st.rerun()
