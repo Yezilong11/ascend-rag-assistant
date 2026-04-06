@@ -629,37 +629,7 @@ if page == "💬 智能问答":
         </div>
         """, unsafe_allow_html=True)
 
-                # ========== 主区域底部：上传竞赛资料（图标样式） ==========
-        # 放在 chat-input-container 之后，与输入框在同一视觉区域
-        st.markdown("---")  # 可选分割线
-        col_left, col_right = st.columns([1, 10])
-        with col_left:
-            # 使用 popover 实现点击图标弹出上传界面
-            with st.popover("📎", help="上传竞赛资料"):
-                st.markdown("**添加竞赛资料到知识库**")
-                uploaded_files = st.file_uploader(
-                    "选择文件",
-                    type=["pdf", "txt", "md"],
-                    accept_multiple_files=True,
-                    label_visibility="collapsed"
-                )
-                if uploaded_files:
-                    if st.button("📥 添加到知识库", key="upload_btn_main"):
-                        for file in uploaded_files:
-                            temp_path = f"temp_{file.name}"
-                            with open(temp_path, "wb") as f:
-                                f.write(file.getvalue())
-                            try:
-                                st.session_state.kb.ingest(temp_path)
-                                st.success(f"✅ {file.name} 导入成功")
-                            except Exception as e:
-                                st.error(f"❌ {file.name} 导入失败: {str(e)}")
-                            finally:
-                                if os.path.exists(temp_path):
-                                    os.remove(temp_path)
-                        st.rerun()
-        with col_right:
-            st.caption("点击左侧图标上传竞赛资料（PDF/TXT/MD）")
+
         
         thinking_placeholder = st.empty()
         thinking_placeholder.markdown("""
@@ -773,8 +743,35 @@ if page == "💬 智能问答":
         # 输入框
         question = st.chat_input("请输入您的问题，按回车发送...", disabled=st.session_state.is_processing_preset)
 
-        # 模型选择器（放在输入框下方，居中显示）
-        with st.container():
+        # 上传竞赛资料和模型选择器区域
+        col_upload, col_model = st.columns([3, 7])
+        with col_upload:
+            # 使用 popover 实现点击图标弹出上传界面
+            with st.popover("📎", help="上传竞赛资料"):
+                st.markdown("**添加竞赛资料到知识库**")
+                uploaded_files = st.file_uploader(
+                    "选择文件",
+                    type=["pdf", "txt", "md"],
+                    accept_multiple_files=True,
+                    label_visibility="collapsed"
+                )
+                if uploaded_files:
+                    if st.button("📥 添加到知识库", key="upload_btn_main"):
+                        for file in uploaded_files:
+                            temp_path = f"temp_{file.name}"
+                            with open(temp_path, "wb") as f:
+                                f.write(file.getvalue())
+                            try:
+                                st.session_state.kb.ingest(temp_path)
+                                st.success(f"✅ {file.name} 导入成功")
+                            except Exception as e:
+                                st.error(f"❌ {file.name} 导入失败: {str(e)}")
+                            finally:
+                                if os.path.exists(temp_path):
+                                    os.remove(temp_path)
+                        st.rerun()
+        with col_model:
+            # 模型选择器（仅保留下拉选择框本身）
             available_models = RAGAssistant.get_available_models()
             model_options = []
             for k, v in available_models.items():
@@ -784,12 +781,12 @@ if page == "💬 智能问答":
                     display_name = "Qwen2-1.5B"
                 model_options.append(f"{k}: {display_name}")
             selected_model = st.selectbox(
-                "选择模型",
+                "",  # 移除标签文字
                 options=model_options,
                 format_func=lambda x: x.split(": ")[1] if ": " in x else x,
                 index=[k for k in available_models.keys()].index(st.session_state.model_key) if st.session_state.model_key in available_models else 0,
                 key="model_selector_main",
-                label_visibility="visible",
+                label_visibility="collapsed",  # 隐藏标签
                 help="选择要使用的大语言模型"
             )
             if ": " in selected_model:
