@@ -18,7 +18,8 @@
 ### ✨ 核心特性
 
 - 🧠 **基于RAG的知识问答** - 结合私域知识库与大语言模型，提供准确可靠的回答
-- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU
+- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B/310B NPU
+- 🍊 **完美支持香橙派** - 可完整部署到香橙派AiPro 20T开发板，边缘AI推理
 - 🎯 **可切换模型** - 侧边栏自由切换不同大小的模型
 - 🚀 **ModelScope一键下载** - 自动从魔搭下载模型到项目文件夹，国内访问更快
 - ✨ **流式输出** - 打字机逐字显示效果，大幅改善等待体验
@@ -66,6 +67,7 @@
 - Python 3.10+
 - PyTorch 2.0+
 - (可选) 华为昇腾NPU + CANN工具链
+- (可选) 香橙派AiPro 20T开发板（支持完整边缘部署）
 
 ### 安装步骤
 
@@ -225,12 +227,15 @@ streamlit run app.py
 - 自动生成从根到叶的完整学习路径
 - 计算技能难度和总学习时间
 
-**性能参考（CPU/CUDA）**:
+**性能参考**:
 | 硬件 | 模型 | 平均生成速度 | 300字回答时间 |
 |------|------|-------------|--------------|
-| CPU | Qwen2-0.5B | ~8-12 tokens/s | 25-40秒 |
-| CPU | Qwen2-1.5B | ~3-5 tokens/s | 60-100秒 |
+| CPU (x86) | Qwen2-0.5B | ~8-12 tokens/s | 25-40秒 |
+| CPU (x86) | Qwen2-1.5B | ~3-5 tokens/s | 60-100秒 |
 | CUDA GPU | Qwen2-1.5B | ~15-20 tokens/s | 15-20秒 |
+| 香橙派AiPro 20T (NPU) | Qwen2.5-0.5B | ~10-20 tokens/s | 15-30秒 |
+| 香橙派AiPro 20T (NPU) | Qwen2.5-1.5B | ~5-12 tokens/s | 25-60秒 |
+| 香橙派AiPro 20T (NPU) | Qwen2.5-7B | ~2-5 tokens/s | 60-150秒 |
 
 ## ⚡ 性能优化指南
 
@@ -239,6 +244,204 @@ streamlit run app.py
 1. **使用更小模型** - 使用 `Qwen/Qwen2-0.5B-Instruct`，速度提升2-3倍
 2. **限制生成长度** - 默认`max_new_tokens=256`，可根据需要调整
 3. **关闭采样** - 设置`do_sample=False`使用贪婪搜索，速度略快但多样性减少
+
+## 🍊 部署到香橙派AiPro 20T
+
+本项目原生支持昇腾NPU，可以完美部署到香橙派AiPro 20T开发板上，实现边缘AI推理。
+
+### 硬件规格适配
+
+| 香橙派AiPro 20T | 参数 | 适配建议 |
+|-----------------|------|---------|
+| NPU | 昇腾310B 20TOPS INT8 | ✅ 完美支持，INT4/INT8量化加速 |
+| CPU | 4核 Cortex-A55 | ✅ 足够处理预处理和调度 |
+| 内存 | 8GB LPDDR4X | ✅ 推荐配置（Qwen2.5-1.5B + 重排序）完全放下 |
+| 存储 | eMMC + 可扩展 | ✅ 推荐使用128GB U盘扩展存储全部内容 |
+
+### 存储规划
+
+由于板载eMMC通常较小（8GB/64GB），推荐使用**U盘扩展存储**方案：
+
+| 内容 | 推荐位置 | 大小预估 |
+|------|---------|---------|
+| 系统 | eMMC | ~3-4GB |
+| 项目代码 | U盘 | ~10MB |
+| conda环境 + 依赖 | U盘 | ~2-2.5GB |
+| 模型（Qwen2.5-1.5B + BGE-large + 重排序） | U盘 | ~3GB |
+| 向量库 | U盘 | ~1-2GB |
+| **U盘总计** | | **≈ 6-7.5GB** |
+
+128GB U盘完全足够，剩余大量空间可以扩展更多模型。
+
+### 分步部署指南
+
+#### 1. 准备U盘
+- 容量：**推荐128GB**，最少64GB
+- 格式：ext4（Linux原生，性能最好）
+
+#### 2. 挂载U盘
+```bash
+# 查看设备名
+lsblk
+
+# 创建挂载点
+sudo mkdir -p /mnt/usb
+
+# 格式化（如果是新U盘，这会清空数据）
+sudo mkfs.ext4 /dev/sda1
+
+# 挂载
+sudo mount /dev/sda1 /mnt/usb
+
+# 设置开机自动挂载
+UUID=$(blkid -s UUID -o value /dev/sda1)
+echo "UUID=$UUID  /mnt/usb  ext4  defaults  0  0" | sudo tee -a /etc/fstab
+```
+
+#### 3. 克隆项目到U盘
+```bash
+cd /mnt/usb
+git clone https://github.com/yzl13/ascend-rag-assistant.git
+cd ascend-rag-assistant
+```
+
+#### 4. 创建conda环境（放在U盘）
+```bash
+# 创建conda环境目录
+sudo mkdir -p /mnt/usb/conda/envs
+conda config --add envs_dirs /mnt/usb/conda/envs
+
+# 创建环境
+conda create -p /mnt/usb/conda/envs/ascend-rag python=3.10 -y
+conda activate /mnt/usb/conda/envs/ascend-rag
+```
+
+#### 5. 安装依赖
+```bash
+# conda安装基础库（预编译aarch64，省时间）
+conda install pytorch torchvision numpy pandas scipy scikit-learn -y
+
+# pip安装剩余依赖
+pip install -r requirements.txt
+
+# 安装bitsandbytes（INT4量化必需）
+pip install bitsandbytes
+```
+
+#### 6. 推荐配置
+
+编辑 `config/config.yaml`，针对香橙派优化：
+
+```yaml
+# 推荐配置：Qwen2.5-1.5B INT4 + BGE-large + bge-reranker-v2-m3
+# 总内存占用 ≈ 4-5GB，8GB完全容纳
+
+system:
+  name: "昇腾AI竞赛智能助教-OrangePi"
+  debug: false
+
+knowledge_base:
+  persist_dir: "./chroma_db"
+  embedding_model: "BAAI/bge-large-zh-v1.5"
+  chunk_size: 300
+  chunk_overlap: 30
+  top_k: 3
+  initial_retrieval_k: 10
+  use_reranker: true
+  reranker_model: "bge-reranker-v2-m3"
+  reranker_top_k: 3
+
+llm:
+  model_id: "Qwen/Qwen2.5-1.5B-Instruct"
+  device: "npu"
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.9
+
+ascend:
+  enabled: true
+  device_id: 0
+  quantization: "int4"
+  batch_size: 1
+
+server:
+  web_port: 8501
+  api_port: 8000
+  host: "0.0.0.0"
+```
+
+#### 7. 启动应用
+
+```bash
+# 激活环境
+conda activate /mnt/usb/conda/envs/ascend-rag
+cd /mnt/usb/ascend-rag-assistant
+
+# 直接启动前端（单进程模式，适合个人使用）
+streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+```
+
+启动完成后，在局域网浏览器访问 `http://<香橙派IP>:8501` 即可使用。
+
+### 推荐配置选型表
+
+根据你的需求选择合适配置：
+
+| 配置方案 | 模型 | 量化 | 嵌入 | 重排序 | 总内存占用 | 预期速度 | 推荐度 |
+|----------|------|------|------|--------|-----------|----------|--------|
+| 极致流畅 | Qwen2.5-0.5B | INT4 | BGE-small | 可选 | ~2-3GB | 10-20 tokens/s | ⭐⭐⭐⭐⭐ |
+| 均衡推荐 | Qwen2.5-1.5B | INT4 | BGE-large | ✅ 启用 | ~4-5GB | 5-12 tokens/s | ⭐⭐⭐⭐⭐ |
+| 高质量 | Qwen2.5-7B | INT4 | BGE-small | ✅ 启用 | ~5-6GB | 2-5 tokens/s | ⭐⭐⭐⭐ |
+
+### 预期性能参考（香橙派AiPro 20T）
+
+| 配置 | 模型加载时间 | 首Token延迟 | 生成速度 |
+|------|-------------|-------------|---------|
+| Qwen2.5-0.5B | ~30秒 | 200-500ms | 10-20 tokens/s |
+| Qwen2.5-1.5B | ~60-90秒 | 500-1000ms | 5-12 tokens/s |
+| Qwen2.5-7B | ~120-180秒 | 1000-2000ms | 2-5 tokens/s |
+
+### 常见问题
+
+**Q: 提示内存不足怎么办？**
+A:
+1. 换成更小模型（Qwen2.5-0.5B）
+2. 禁用重排序（`use_reranker: false`）节省1.2GB
+3. 确保启用`int4`量化
+
+**Q: 如何设置开机自启动？**
+A: 添加systemd服务：
+
+```ini
+# /etc/systemd/system/ascend-rag.service
+[Unit]
+Description=Ascend RAG Assistant
+After=network.target
+
+[Service]
+Type=simple
+User=orangepi
+WorkingDirectory=/mnt/usb/ascend-rag-assistant
+ExecStart=/home/orangepi/miniconda3/bin/conda run -p /mnt/usb/conda/envs/ascend-rag streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable ascend-rag
+sudo systemctl start ascend-rag
+```
+
+**Q: ACL初始化失败怎么办？**
+A: 检查环境变量：
+```bash
+echo 'export LD_LIBRARY_PATH=/usr/local/Ascend/ascend-toolkit/latest/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+```
 
 ## 📊 效果展示
 
