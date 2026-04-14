@@ -1,8 +1,10 @@
 import os
 import warnings
 import threading
+import json
 
 import torch
+import torch_npu  # 添加 NPU 支持
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
@@ -24,6 +26,86 @@ except ImportError:
     print("⚠️ 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
 
 warnings.filterwarnings("ignore")
+
+
+# ============ 读取 NPU 配置 ============
+def load_device_config(config_path="config/device_config.json"):
+    """从配置文件读取设备配置"""
+    default_config = {
+        "device_type": "auto",  # auto, cpu, cuda, npu
+        "npu_device_ids": [0],  # NPU 设备 ID 列表
+        "cuda_device_id": 0,    # CUDA 设备 ID
+    }
+    
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                return {**default_config, **config}
+        except Exception as e:
+            print(f"⚠️ 读取设备配置失败: {e}，使用默认配置")
+    
+    return default_config
+
+
+def get_optimal_device(config_path="config/device_config.json"):
+    """
+    根据配置文件和可用设备，返回最优设备和设备ID
+    Returns:
+        device (str): 设备类型字符串 ('cpu', 'cuda', 'npu')
+        device_id (int or list): 设备ID
+    """
+    config = load_device_config(config_path)
+    device_type = config.get("device_type", "auto")
+    
+    # 自动检测
+    if device_type == "auto":
+        # 优先级: NPU > CUDA > CPU
+        try:
+            if torch.npu.is_available():
+                device_type = "npu"
+                print("✅ 自动检测到 NPU 设备")
+            elif torch.cuda.is_available():
+                device_type = "cuda"
+                print("✅ 自动检测到 CUDA 设备")
+            else:
+                device_type = "cpu"
+                print("✅ 使用 CPU 设备")
+        except:
+            if torch.cuda.is_available():
+                device_type = "cuda"
+                print("✅ 自动检测到 CUDA 设备")
+            else:
+                device_type = "cpu"
+                print("✅ 使用 CPU 设备")
+    
+    # 根据设备类型返回
+    if device_type == "npu":
+        try:
+            if torch.npu.is_available():
+                device_ids = config.get("npu_device_ids", [0])
+                device_id = device_ids[0] if device_ids else 0
+                print(f"✅ 使用 NPU 设备，device_id={device_id}")
+                return "npu", device_id
+            else:
+                print("⚠️ 配置要求使用 NPU，但 NPU 不可用，回退到 CPU")
+                return "cpu", -1
+        except Exception as e:
+            print(f"⚠️ NPU 初始化失败: {e}，回退到 CPU")
+            return "cpu", -1
+    
+    elif device_type == "cuda":
+        if torch.cuda.is_available():
+            device_id = config.get("cuda_device_id", 0)
+            print(f"✅ 使用 CUDA 设备，device_id={device_id}")
+            return "cuda", device_id
+        else:
+            print("⚠️ 配置要求使用 CUDA，但 CUDA 不可用，回退到 CPU")
+            return "cpu", -1
+    
+    else:  # cpu
+        print("✅ 使用 CPU 设备")
+        return "cpu", -1
 
 
 # 预定义模型配置
@@ -86,15 +168,21 @@ class Reranker:
         Args:
             model_name: 模型名称，可选 bge-reranker-v2-m3 / bge-reranker-large / bge-reranker-base
             model_dir: 本地模型存放目录
-            device: 设备，None则自动检测
+            device: 设备，None则使用全局配置
         """
         if not RERANKER_AVAILABLE:
             raise ImportError("sentence-transformers未安装，无法使用重排序功能")
         
         self.model_name = model_name
         
+        # 使用全局设备配置
         if device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            device_type, device_id = get_optimal_device()
+            self.device = device_type
+            if device_type == "npu":
+                # 重排序器可能不支持 NPU，使用 CPU
+                self.device = "cpu"
+                print("⚠️ 重排序器暂不支持 NPU，使用 CPU")
         else:
             self.device = device
         
@@ -117,8 +205,7 @@ class Reranker:
             if MODELSCOPE_AVAILABLE:
                 print(f"🔍 本地重排序模型 {local_model_name} 未找到，正在从ModelScope下载...")
                 try:
-                    # ModelScope的BAAI命名格式
-                    modelscope_repo_id = model_id  # BAAI/bge-reranker-v2-m3
+                    modelscope_repo_id = model_id
                     target_dir = os.path.join(model_dir, local_model_name)
                     snapshot_download(
                         modelscope_repo_id,
@@ -143,56 +230,34 @@ class Reranker:
         print(f"✅ 重排序器初始化完成 [{model_config['description']}]")
     
     def rerank(self, query: str, documents: list, top_k: int = 3) -> list:
-        """
-        对检索结果进行重排序
-        Args:
-            query: 用户问题
-            documents: 原始文档块列表，每个元素是包含 page_content 和 metadata 的对象
-            top_k: 返回的最相关文档数量
-        Returns:
-            重排序后的文档块列表（按相关度降序）
-        """
+        """对检索结果进行重排序"""
         if not documents:
             return []
         
-        # 准备 query-document 对
         pairs = [(query, doc.page_content) for doc in documents]
-        
-        # 计算相关性分数
         scores = self.cross_encoder.predict(pairs)
-        
-        # 组合文档和分数
         doc_with_scores = list(zip(documents, scores))
-        
-        # 按分数降序排序
         doc_with_scores.sort(key=lambda x: x[1], reverse=True)
-        
-        # 返回 top_k 个文档（仅文档对象）
         reranked_docs = [doc for doc, _ in doc_with_scores[:top_k]]
         
         return reranked_docs
 
 
 class RAGAssistant:
-    """
-    RAG智能助教核心引擎
-    结合知识检索与大模型生成能力
-    支持多模型切换、流式输出、重排序
-    """
+    """RAG智能助教核心引擎"""
 
     @classmethod
     def get_available_models(cls):
-        """获取所有预定义模型列表"""
         return PREDEFINED_MODELS
 
     @classmethod
     def get_available_rerankers(cls):
-        """获取所有预定义重排序模型列表"""
         return PREDEFINED_RERANKERS
 
     def __init__(self, knowledge_base, model_key="qwen2-1.5b", model_dir="./models", 
                  use_reranker: bool = True, reranker_model: str = "bge-reranker-v2-m3",
-                 reranker_top_k: int = 3, initial_retrieval_k: int = 10):
+                 reranker_top_k: int = 3, initial_retrieval_k: int = 10,
+                 config_path: str = "config/device_config.json"):
         """
         初始化RAG助手
         Args:
@@ -203,6 +268,7 @@ class RAGAssistant:
             reranker_model: 重排序模型名称
             reranker_top_k: 重排序后返回的文档数量
             initial_retrieval_k: 初始检索的文档数量
+            config_path: 设备配置文件路径
         """
         self.kb = knowledge_base
         self.model_key = model_key
@@ -216,6 +282,9 @@ class RAGAssistant:
         self.initial_retrieval_k = initial_retrieval_k
         self.reranker = None
         
+        # ============ 修复1: 从配置文件读取设备信息 ============
+        self.device_type, self.device_id = get_optimal_device(config_path)
+        
         # 获取模型配置
         model_config = PREDEFINED_MODELS[model_key]
         model_id = model_config["repo_id"]
@@ -228,16 +297,13 @@ class RAGAssistant:
             model_path = local_model_path
             print(f"正在加载本地模型: {model_path}...")
         else:
-            # 本地不存在，尝试从ModelScope下载
             if MODELSCOPE_AVAILABLE:
                 print(f"🔍 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
                 try:
-                    # ModelScope的Qwen命名格式修正
                     if model_id.startswith("Qwen/"):
                         modelscope_repo_id = model_id.replace("Qwen/", "qwen/")
                     else:
                         modelscope_repo_id = model_id
-                    # 确保下载到项目的models文件夹
                     target_dir = os.path.join(model_dir, local_model_name)
                     snapshot_download(
                         modelscope_repo_id,
@@ -257,57 +323,75 @@ class RAGAssistant:
             trust_remote_code=True
         )
 
-        # 加载配置
         config = AutoConfig.from_pretrained(
             model_path,
             trust_remote_code=True
         )
 
-        # 普通加载
-        print("🔍 使用原始模型加载")
+        # ============ 修复2: 根据设备类型加载模型 ============
+        print(f"🔍 使用设备类型: {self.device_type}")
+        
+        # 确定数据类型
+        if self.device_type in ["cuda", "npu"]:
+            dtype = torch.float16
+        else:
+            dtype = torch.float32
+        
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             config=config,
             trust_remote_code=True,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            torch_dtype=dtype,
         )
 
         # 修复模型缺少的属性
         if not hasattr(self.model, 'all_tied_weights_keys'):
             self.model.all_tied_weights_keys = set()
 
-        # 移动到设备
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = self.model.to(device)
-
-        # 修复pipeline的device参数
-        if torch.cuda.is_available():
-            device_id = 0
+        # ============ 修复3: 移动到正确设备 ============
+        if self.device_type == "npu":
+            self.model = self.model.npu()
+            if hasattr(self, 'device_id'):
+                torch.npu.set_device(self.device_id)
+        elif self.device_type == "cuda":
+            self.model = self.model.cuda()
+            if hasattr(self, 'device_id'):
+                torch.cuda.set_device(self.device_id)
         else:
-            device_id = -1
+            self.model = self.model.cpu()
+
+        # ============ 修复4: pipeline使用正确的device_id ============
+        if self.device_type == "npu":
+            pipeline_device_id = self.device_id if hasattr(self, 'device_id') else 0
+        elif self.device_type == "cuda":
+            pipeline_device_id = self.device_id if hasattr(self, 'device_id') else 0
+        else:
+            pipeline_device_id = -1
 
         # 创建生成pipeline
         self.pipeline_obj = pipeline(
             "text-generation",
             model=self.model,
             tokenizer=self.tokenizer,
-            max_new_tokens=256,  # 限制生成长度，提升速度
+            max_new_tokens=256,
             temperature=0.7,
             top_p=0.9,
             repetition_penalty=1.1,
-            device=device_id,
+            device=pipeline_device_id,  # 使用配置文件中的device_id
             do_sample=True
         )
 
         llm = HuggingFacePipeline(pipeline=self.pipeline_obj)
 
-        # 初始化重排序器（如果启用）
+        # ============ 修复5: 重排序器使用正确的设备 ============
         if self.use_reranker and RERANKER_AVAILABLE:
             try:
+                # 重排序器使用独立设备配置
+                reranker_device = "cpu" if self.device_type == "npu" else self.device_type
                 self.reranker = Reranker(
                     model_name=reranker_model,
                     model_dir=model_dir,
-                    device=device
+                    device=reranker_device
                 )
                 print(f"✅ 已启用重排序功能，模型: {reranker_model}，精排后保留 {reranker_top_k} 个文档")
             except Exception as e:
@@ -339,23 +423,20 @@ class RAGAssistant:
             input_variables=["context", "question"]
         )
 
-        # 创建RAG链（使用自定义检索器，支持重排序）
+        # 创建RAG链
         self._init_qa_chain(llm, prompt)
         
-        print(f"✅ RAG引擎初始化完成 [{model_config['name']}]")
+        print(f"✅ RAG引擎初始化完成 [{model_config['name']}]，设备: {self.device_type.upper()}")
 
     def _init_qa_chain(self, llm, prompt):
-        """
-        初始化 QA 链，支持重排序
-        """
+        """初始化 QA 链，支持重排序"""
         from langchain_core.retrievers import BaseRetriever
         from langchain_core.callbacks import CallbackManagerForRetrieverRun
         from typing import List
         from langchain_core.documents import Document
 
-        # 定义一个符合 LangChain 标准的检索器
         class RerankCompatibleRetriever(BaseRetriever):
-            """自定义检索器，兼容 LangChain BaseRetriever，支持重排序"""
+            """自定义检索器"""
             rag_assistant: 'RAGAssistant'
             
             class Config:
@@ -364,13 +445,11 @@ class RAGAssistant:
             def _get_relevant_documents(
                 self, query: str, *, run_manager: CallbackManagerForRetrieverRun
             ) -> List[Document]:
-                # 1. 初步检索（获取更多候选）
                 docs = self.rag_assistant.kb.similarity_search(
                     query, 
                     k=self.rag_assistant.initial_retrieval_k
                 )
                 
-                # 2. 重排序（如果启用）
                 if self.rag_assistant.use_reranker and self.rag_assistant.reranker:
                     docs = self.rag_assistant.reranker.rerank(
                         query, 
@@ -378,17 +457,13 @@ class RAGAssistant:
                         top_k=self.rag_assistant.reranker_top_k
                     )
                 else:
-                    # 没有重排序，直接取前 top_k
                     docs = docs[:self.rag_assistant.reranker_top_k]
                 
-                # 保存检索结果，供后续使用
                 self.rag_assistant._last_reranked_docs = docs
                 return docs
         
-        # 创建自定义检索器实例
         custom_retriever = RerankCompatibleRetriever(rag_assistant=self)
         
-        # 创建 QA 链
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
@@ -397,24 +472,14 @@ class RAGAssistant:
             return_source_documents=True
         )
         
-        # 初始化存储最后检索文档的变量
         self._last_reranked_docs = []
 
     def query(self, question: str) -> dict:
-        """
-        完整问答，返回完整结果
-        Args:
-            question: 用户问题
-        Returns:
-            包含答案和来源的字典
-        """
+        """完整问答"""
         try:
-            # 清空上次的检索结果
             self._last_reranked_docs = []
-            
             result = self.qa_chain({"query": question})
             
-            # 获取来源（使用重排序后的文档）
             source_docs = self._last_reranked_docs if self._last_reranked_docs else result["source_documents"]
             
             return {
@@ -434,26 +499,16 @@ class RAGAssistant:
             }
 
     def query_stream(self, question: str):
-        """
-        流式问答，逐token返回生成结果
-        Args:
-            question: 用户问题
-        Yields:
-            逐字生成回答片段
-        """
-        # 清空上次的检索结果
+        """流式问答"""
         self._last_reranked_docs = []
         
-        # 1. 初步检索（获取更多候选）
         docs = self.kb.similarity_search(question, k=self.initial_retrieval_k)
         
-        # 2. 重排序（如果启用）
         if self.use_reranker and self.reranker:
             docs = self.reranker.rerank(question, docs, top_k=self.reranker_top_k)
         else:
             docs = docs[:self.reranker_top_k]
         
-        # 保存来源信息
         self._last_reranked_docs = docs
         self._last_sources = [
             {
@@ -463,10 +518,8 @@ class RAGAssistant:
             for doc in docs
         ]
         
-        # 构建上下文
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        # 构建Prompt
         template = """基于以下检索到的相关信息，回答用户的问题。
 如果无法从信息中找到答案，请明确告知。
 
@@ -479,15 +532,16 @@ class RAGAssistant:
 
         prompt_text = template.format(context=context, question=question)
 
-        # Tokenize
         inputs = self.tokenizer([prompt_text], return_tensors="pt")
-        if torch.cuda.is_available():
-            inputs = inputs.to("cuda")
+        
+        # ============ 修复6: 流式生成时使用正确设备 ============
+        if self.device_type == "npu":
+            inputs = inputs.npu()
+        elif self.device_type == "cuda":
+            inputs = inputs.cuda()
 
-        # 创建streamer
         streamer = TextIteratorStreamer(self.tokenizer, skip_prompt=True, skip_special_tokens=True)
 
-        # Generation kwargs
         generation_kwargs = dict(
             inputs,
             streamer=streamer,
@@ -498,11 +552,9 @@ class RAGAssistant:
             do_sample=True
         )
 
-        # 在后台线程生成
         thread = threading.Thread(target=self.model.generate, kwargs=generation_kwargs)
         thread.start()
 
-        # 逐步返回
         for new_text in streamer:
             yield new_text
 
