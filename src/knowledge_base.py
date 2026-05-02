@@ -427,7 +427,7 @@ class KnowledgeBase:
                             loader = TextLoader(file_path, encoding=enc)
                             docs = loader.load()
                             text = docs[0].page_content
-                            print(f"⚠️ 使用编码 {enc} 成功读取文件 {file_path}")
+                            print(f"[WARN] 使用编码 {enc} 成功读取文件 {file_path}")
                             break
                         except UnicodeDecodeError:
                             continue
@@ -448,10 +448,10 @@ class KnowledgeBase:
                 except Exception as e:
                     print(f"持久化数据库失败: {e}")
 
-            print(f"✅ 成功导入 {len(chunks)} 个文档片段（类型：{doc_type}）")
+            print(f"[OK] 成功导入 {len(chunks)} 个文档片段（类型：{doc_type}）")
             return True
         except Exception as e:
-            print(f"❌ 导入失败: {file_path}, 错误: {e}")
+            print(f"[ERROR] 导入失败: {file_path}, 错误: {e}")
             return False
 
     def similarity_search(self, query: str, k: int = 3):

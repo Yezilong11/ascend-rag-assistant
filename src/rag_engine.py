@@ -21,7 +21,7 @@ try:
     RERANKER_AVAILABLE = True
 except ImportError:
     RERANKER_AVAILABLE = False
-    print("⚠️ 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
+    print("[WARN] 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
 
 warnings.filterwarnings("ignore")
 
@@ -100,7 +100,7 @@ class Reranker:
         
         # 获取模型配置
         if model_name not in PREDEFINED_RERANKERS:
-            print(f"⚠️ 未知的重排序模型: {model_name}，使用默认 bge-reranker-v2-m3")
+            print(f"[WARN] 未知的重排序模型: {model_name}，使用默认 bge-reranker-v2-m3")
             model_name = "bge-reranker-v2-m3"
         
         model_config = PREDEFINED_RERANKERS[model_name]
@@ -115,7 +115,7 @@ class Reranker:
         else:
             # 本地不存在，尝试从ModelScope下载
             if MODELSCOPE_AVAILABLE:
-                print(f"🔍 本地重排序模型 {local_model_name} 未找到，正在从ModelScope下载...")
+                print(f"[INFO] 本地重排序模型 {local_model_name} 未找到，正在从ModelScope下载...")
                 try:
                     # ModelScope的BAAI命名格式
                     modelscope_repo_id = model_id  # BAAI/bge-reranker-v2-m3
@@ -125,9 +125,9 @@ class Reranker:
                         local_dir=target_dir
                     )
                     model_path = target_dir
-                    print(f"✅ ModelScope下载完成，保存到: {model_path}")
+                    print(f"[OK] ModelScope下载完成，保存到: {model_path}")
                 except Exception as e:
-                    print(f"⚠️ ModelScope下载失败: {str(e)}，尝试从HuggingFace加载")
+                    print(f"[WARN] ModelScope下载失败: {str(e)}，尝试从HuggingFace加载")
                     model_path = model_id
             else:
                 model_path = model_id
@@ -140,7 +140,7 @@ class Reranker:
             device=self.device,
             trust_remote_code=True
         )
-        print(f"✅ 重排序器初始化完成 [{model_config['description']}]")
+        print(f"[OK] 重排序器初始化完成 [{model_config['description']}]")
     
     def rerank(self, query: str, documents: list, top_k: int = 3) -> list:
         """
@@ -230,7 +230,7 @@ class RAGAssistant:
         else:
             # 本地不存在，尝试从ModelScope下载
             if MODELSCOPE_AVAILABLE:
-                print(f"🔍 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
+                print(f"[INFO] 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
                 try:
                     # ModelScope的Qwen命名格式修正
                     if model_id.startswith("Qwen/"):
@@ -244,9 +244,9 @@ class RAGAssistant:
                         local_dir=target_dir
                     )
                     model_path = target_dir
-                    print(f"✅ ModelScope下载完成，保存到: {model_path}")
+                    print(f"[OK] ModelScope下载完成，保存到: {model_path}")
                 except Exception as e:
-                    print(f"⚠️ ModelScope下载失败: {str(e)}，回退到HuggingFace")
+                    print(f"[WARN] ModelScope下载失败: {str(e)}，回退到HuggingFace")
                     model_path = model_id
             else:
                 model_path = model_id
@@ -264,7 +264,7 @@ class RAGAssistant:
         )
 
         # 普通加载
-        print("🔍 使用原始模型加载")
+        print("[INFO] 使用原始模型加载")
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             config=config,
@@ -309,9 +309,9 @@ class RAGAssistant:
                     model_dir=model_dir,
                     device=device
                 )
-                print(f"✅ 已启用重排序功能，模型: {reranker_model}，精排后保留 {reranker_top_k} 个文档")
+                print(f"[OK] 已启用重排序功能，模型: {reranker_model}，精排后保留 {reranker_top_k} 个文档")
             except Exception as e:
-                print(f"⚠️ 重排序器加载失败: {str(e)}，将不使用重排序")
+                print(f"[WARN] 重排序器加载失败: {str(e)}，将不使用重排序")
                 self.use_reranker = False
                 self.reranker = None
         else:
@@ -342,7 +342,7 @@ class RAGAssistant:
         # 创建RAG链（使用自定义检索器，支持重排序）
         self._init_qa_chain(llm, prompt)
         
-        print(f"✅ RAG引擎初始化完成 [{model_config['name']}]")
+        print(f"[OK] RAG引擎初始化完成 [{model_config['name']}]")
 
     def _init_qa_chain(self, llm, prompt):
         """

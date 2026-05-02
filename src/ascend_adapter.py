@@ -48,7 +48,7 @@ class AscendAdapter:
 
         if self.npu_available:
             # 昇腾NPU特定优化
-            print("🚀 应用昇腾NPU优化配置")
+            print("[INFO] 应用昇腾NPU优化配置")
             # 量化配置
             if config["quantization"] == "int8":
                 # INT8量化
