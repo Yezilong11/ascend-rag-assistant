@@ -32,3 +32,31 @@ server:
   web_port: 8501
   api_port: 8000
   host: "0.0.0.0"
+
+# 多模态RAG配置
+multimodal:
+  enabled: true
+  vlm_model: "qwen-vl-2b"
+  vlm_quantization: "int4"
+  ocr_engine: "paddleocr"
+  device_priority: "auto"
+
+# 显存配置（8GB基准）
+memory:
+  total_mb: 8192
+  gpu_reserved_mb: 3584
+  vlm_required_mb: 1536
+  cpu_memory_mb: 3072
+
+# PDF处理配置
+pdf:
+  extract_images: true
+  min_image_size: 100
+  output_dir: "./temp_pdf_images"
+  supported_types: [".pdf"]
+
+# 向量数据库配置（多模态）
+multimodal_vectorstore:
+  persist_dir: "./chroma_db_multimodal"
+  collection_name: "multimodal_image_chunks"
+  embedding_model: "BAAI/bge-large-zh-v1.5"

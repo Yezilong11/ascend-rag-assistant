@@ -577,6 +577,13 @@ with st.sidebar:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+# 侧边栏 - 多模态知识库
+try:
+    from src.multimodal.interface.ui.components import render_multimodal_sidebar
+    render_multimodal_sidebar(kb=st.session_state.kb)
+except ImportError as e:
+    st.sidebar.warning(f"多模态模块未安装: {e}")
+
 # 侧边栏 - 系统信息
 with st.sidebar:
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
