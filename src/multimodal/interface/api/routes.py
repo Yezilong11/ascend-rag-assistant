@@ -120,8 +120,8 @@ class CombinedProcessingService:
             return "VLM不可用，无法分析图片"
 
 
-def get_multimodal_service():
-    """获取多模态服务实例（依赖注入）"""
+def create_multimodal_service(vlm_enabled: bool = False):
+    """创建多模态服务实例"""
     from ...application.services import MultimodalIngestServiceImpl
     from ...infrastructure import (
         PaddleOCREngine,
@@ -131,13 +131,14 @@ def get_multimodal_service():
     )
 
     ocr_engine = PaddleOCREngine()
-    vlm_engine = QwenVLEngine()
+    vlm_engine = QwenVLEngine(vlm_enabled=vlm_enabled)
     pdf_extractor = PDFImageExtractor()
     repository = ChromaImageChunkRepository()
     indexing_wrapper = IndexingServiceWrapper(repository)
 
     print(f"[DEBUG] IndexingServiceWrapper type: {type(indexing_wrapper)}")
     print(f"[DEBUG] IndexingServiceWrapper.index_image_chunk: {hasattr(indexing_wrapper, 'index_image_chunk')}")
+    print(f"[DEBUG] VLM enabled: {vlm_enabled}")
 
     service = MultimodalIngestServiceImpl(
         processing_service=CombinedProcessingService(ocr_engine, vlm_engine),
@@ -154,10 +155,12 @@ def get_multimodal_service():
 async def ingest_image(
     files: List[UploadFile] = File(...),
     document_type: str = Form("unknown"),
-    service = Depends(get_multimodal_service, use_cache=False),
+    vlm_enabled: bool = Form(False),
 ):
     """UC1/UC2: 上传图片并导入知识库"""
     from ...application.dtos import ImageIngestDTO
+
+    service = create_multimodal_service(vlm_enabled=vlm_enabled)
 
     temp_paths = []
     try:
@@ -189,10 +192,12 @@ async def ingest_pdf(
     file: UploadFile = File(...),
     document_type: str = Form("unknown"),
     extract_images: bool = Form(True),
-    service = Depends(get_multimodal_service, use_cache=False),
+    vlm_enabled: bool = Form(False),
 ):
     """UC3: 上传PDF并导入（文本+内嵌图片）"""
     from ...application.dtos import PDFIngestDTO
+
+    service = create_multimodal_service(vlm_enabled=vlm_enabled)
 
     temp_path = None
     try:
@@ -220,9 +225,10 @@ async def ingest_pdf(
 @router.delete("/source/{source_file:path}")
 async def delete_by_source(
     source_file: str,
-    service = Depends(get_multimodal_service, use_cache=False),
+    vlm_enabled: bool = False,
 ):
     """删除指定来源的所有片段"""
+    service = create_multimodal_service(vlm_enabled=vlm_enabled)
     count = service.delete_by_source(source_file)
     return {"deleted_count": count}
 
@@ -230,7 +236,8 @@ async def delete_by_source(
 @router.get("/status/{source_file:path}")
 async def get_processing_status(
     source_file: str,
-    service = Depends(get_multimodal_service, use_cache=False),
+    vlm_enabled: bool = False,
 ):
     """获取处理状态"""
+    service = create_multimodal_service(vlm_enabled=vlm_enabled)
     return service.get_processing_status(source_file)

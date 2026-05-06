@@ -1,6 +1,6 @@
 """
 OCR Infrastructure - OCR引擎实现
-支持 PaddleOCR 和 EasyOCR 自动切换
+使用 EasyOCR 进行文字识别
 设备: CPU (异构计算设计)
 """
 
@@ -16,82 +16,37 @@ from ...domain.services.multimodal_processing_service import MultimodalProcessin
 class PaddleOCREngine(MultimodalProcessingService):
     """
     OCR引擎实现
-    优先使用 PaddleOCR，失败时自动切换 EasyOCR
+    使用 EasyOCR 进行文字识别
     设备: CPU (异构计算设计)
     """
 
     def __init__(self, config: Dict[str, Any] = None):
         self._config = config or {}
         self._easyocr_engine = None
-        self._paddleocr_engine = None
         self._initialized = False
         self._engine_type = "unknown"
 
     def _initialize(self):
-        """延迟初始化OCR引擎，同时初始化两个引擎"""
+        """延迟初始化OCR引擎"""
         if self._initialized:
             return
 
         import logging
         logging.getLogger("easyocr").setLevel(logging.ERROR)
-        logging.getLogger("ppocr").setLevel(logging.ERROR)
-        logging.getLogger("paddle").setLevel(logging.ERROR)
 
         import easyocr
         self._easyocr_engine = easyocr.Reader(['ch_sim', 'en'], gpu=False, verbose=False)
 
-        from paddleocr import PaddleOCR
-        self._paddleocr_engine = PaddleOCR(lang="ch", use_angle_cls=True)
-
         self._initialized = True
 
     def extract_text_from_image(self, image_path: str) -> Tuple[str, List[Dict]]:
-        """从图片提取文字（OCR），自动选择可用引擎"""
+        """从图片提取文字（OCR）"""
         self._initialize()
 
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"图片文件不存在: {image_path}")
 
-        if self._paddleocr_engine:
-            try:
-                result = self._extract_paddleocr(image_path)
-                self._engine_type = "paddleocr"
-                return result
-            except Exception as e:
-                print(f"PaddleOCR提取失败: {e}，切换到EasyOCR...")
-
         return self._extract_easyocr(image_path)
-
-    def _extract_paddleocr(self, image_path: str) -> Tuple[str, List[Dict]]:
-        """使用PaddleOCR提取"""
-        result = self._paddleocr_engine.ocr(image_path)
-
-        if not result or not result[0]:
-            return "", []
-
-        text_blocks = []
-        full_text_parts = []
-
-        for line in result[0]:
-            if len(line) >= 2:
-                bbox_data = line[0]
-                text = line[1][0]
-                confidence = line[1][1]
-
-                try:
-                    bbox = BoundingBox.from_paddleocr(bbox_data)
-                except Exception:
-                    continue
-
-                text_blocks.append({
-                    "text": text,
-                    "bbox": bbox,
-                    "confidence": confidence,
-                })
-                full_text_parts.append(text)
-
-        full_text = " ".join(full_text_parts)
-        return full_text, text_blocks
 
     def _extract_easyocr(self, image_path: str) -> Tuple[str, List[Dict]]:
         """使用EasyOCR提取"""

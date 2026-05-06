@@ -21,6 +21,7 @@ class QwenVLEngine(MultimodalProcessingService):
     """
     Qwen-VL-2B 视觉语言模型引擎
     设备: GPU/NPU (INT4量化, ~1.5GB显存)
+    VLM功能可通过 vlm_enabled 参数开关
     """
 
     PREDEFINED_VLMS = {
@@ -38,11 +39,13 @@ class QwenVLEngine(MultimodalProcessingService):
         model_key: str = "qwen-vl-2b",
         model_dir: str = "./models",
         config: Dict[str, Any] = None,
+        vlm_enabled: bool = False,
     ):
         self._model_key = model_key
         self._model_config = self.PREDEFINED_VLMS.get(model_key, self.PREDEFINED_VLMS["qwen-vl-2b"])
         self._model_dir = model_dir
         self._config = {**self._model_config, **(config or {})}
+        self._vlm_enabled = vlm_enabled
 
         self._model = None
         self._processor = None
@@ -92,9 +95,17 @@ class QwenVLEngine(MultimodalProcessingService):
         if self._initialized:
             return
 
+        if not self._vlm_enabled:
+            print("ℹ️ VLM功能已禁用（vlm_enabled=False），跳过模型加载")
+            self._initialized = True
+            return
+
         self._device = self._get_device()
         if self._device == "cpu":
-            raise RuntimeError("Qwen-VL需要GPU/NPU，不能在CPU上运行")
+            print("⚠️ Qwen-VL需要GPU/NPU才能运行，当前设备不支持")
+            print("   如需启用VLM功能，请确保已安装GPU版PyTorch")
+            self._initialized = True
+            return
 
         model_path = self._download_model()
 
@@ -129,6 +140,11 @@ class QwenVLEngine(MultimodalProcessingService):
         prompt: str = None,
     ) -> str:
         """生成图片描述"""
+        if not self._vlm_enabled:
+            if ocr_text:
+                return f"图片包含文字: {ocr_text}"
+            return "图片内容（VLM功能未启用）"
+
         self._initialize()
 
         if prompt is None:
@@ -157,6 +173,9 @@ class QwenVLEngine(MultimodalProcessingService):
 
     def analyze_image_with_query(self, image_path: str, query: str) -> str:
         """基于问题分析图片"""
+        if not self._vlm_enabled:
+            return "VLM功能未启用，无法分析图片。请在设置中开启VLM功能。"
+
         self._initialize()
         prompt = f"图片问题: {query}\n请根据图片内容回答。如果图片中没有相关信息，请说明。用中文回答。"
         return self.generate_image_description(image_path, prompt=prompt)

@@ -22,9 +22,22 @@ def render_multimodal_sidebar(kb: Any = None) -> None:
         help="支持图片和PDF内嵌图片的OCR识别和VLM分析"
     )
 
+    if "vlm_enabled" not in st.session_state:
+        st.session_state.vlm_enabled = False
+
     st.session_state.multimodal_enabled = multimodal_enabled
 
     if multimodal_enabled:
+        vlm_enabled = st.checkbox(
+            "启用VLM视觉理解",
+            value=st.session_state.vlm_enabled,
+            help="启用后使用Qwen-VL模型分析图片（需要GPU支持）"
+        )
+        st.session_state.vlm_enabled = vlm_enabled
+
+        if vlm_enabled:
+            st.info("ℹ️ VLM功能已开启，将使用GPU/NPU进行图片分析")
+
         tab1, tab2 = st.tabs(["📷 图片上传", "📄 PDF上传"])
 
         with tab1:
@@ -50,7 +63,7 @@ def render_multimodal_sidebar(kb: Any = None) -> None:
                 )
 
                 if st.button("📷 分析并添加到知识库", type="primary", key="process_images"):
-                    _process_images(uploaded_images, doc_type_img)
+                    _process_images(uploaded_images, doc_type_img, vlm_enabled)
 
         with tab2:
             uploaded_pdf = st.file_uploader(
@@ -76,7 +89,7 @@ def render_multimodal_sidebar(kb: Any = None) -> None:
                 extract_imgs = st.checkbox("提取PDF内嵌图片", value=True)
 
                 if st.button("📄 分析并添加到知识库", type="primary", key="process_pdf"):
-                    _process_pdf(uploaded_pdf, doc_type_pdf, extract_imgs)
+                    _process_pdf(uploaded_pdf, doc_type_pdf, extract_imgs, vlm_enabled)
 
         st.session_state.show_images = st.checkbox(
             "检索结果显示图片",
@@ -85,7 +98,7 @@ def render_multimodal_sidebar(kb: Any = None) -> None:
         )
 
 
-def _process_images(files, document_type: str):
+def _process_images(files, document_type: str, vlm_enabled: bool = False):
     """处理上传的图片"""
     import requests
     import io
@@ -100,6 +113,7 @@ def _process_images(files, document_type: str):
             files_data.append(("files", (f.name, file_io, f.type)))
 
         files_data.append(("document_type", (None, document_type)))
+        files_data.append(("vlm_enabled", (None, str(vlm_enabled))))
 
         response = requests.post(
             "http://localhost:8000/api/multimodal/image/ingest",
@@ -127,7 +141,7 @@ def _process_images(files, document_type: str):
                 pass
 
 
-def _process_pdf(file, document_type: str, extract_images: bool):
+def _process_pdf(file, document_type: str, extract_images: bool, vlm_enabled: bool = False):
     """处理上传的PDF"""
     import requests
     import io
@@ -142,6 +156,7 @@ def _process_pdf(file, document_type: str, extract_images: bool):
         ]
         files_data.append(("document_type", (None, document_type)))
         files_data.append(("extract_images", (None, str(extract_images))))
+        files_data.append(("vlm_enabled", (None, str(vlm_enabled))))
 
         response = requests.post(
             "http://localhost:8000/api/multimodal/pdf/ingest",
