@@ -11,9 +11,22 @@ RAG API 请求/响应模型模块
 - 代码规范.md 第 2.5.2 节 — 请求模型命名规范
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+
+PREDEFINED_MODELS = {
+    "qwen2-1.5b": "Qwen2-1.5B",
+    "qwen2-0.5b": "Qwen2-0.5B",
+    "chatglm3-6b": "ChatGLM3-6B",
+}
+
+PREDEFINED_RERANKERS = {
+    "bge-reranker-v2-m3": "BGE-Reranker-v2-m3",
+    "bge-reranker-large": "BGE-Reranker-Large",
+    "bge-reranker-base": "BGE-Reranker-Base",
+}
 
 
 class ChatRequest(BaseModel):
@@ -77,6 +90,20 @@ class ModelLoadRequest(BaseModel):
         le=30,
         description="初始检索的文档数量，范围 3-30",
     )
+
+    @field_validator("model_key")
+    @classmethod
+    def validate_model_key(cls, v: str) -> str:
+        if v not in PREDEFINED_MODELS:
+            raise ValueError(f"无效的模型key: {v}，可选值: {list(PREDEFINED_MODELS.keys())}")
+        return v
+
+    @field_validator("reranker_model")
+    @classmethod
+    def validate_reranker_model(cls, v: str) -> str:
+        if v not in PREDEFINED_RERANKERS:
+            raise ValueError(f"无效的重排序模型key: {v}，可选值: {list(PREDEFINED_RERANKERS.keys())}")
+        return v
 
 
 class ModelUnloadResponse(BaseModel):

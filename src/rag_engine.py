@@ -1,6 +1,8 @@
 import os
+import logging
 import warnings
 import threading
+from typing import Optional
 
 import torch
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
@@ -24,6 +26,23 @@ except ImportError:
     print("[WARN] 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
 
 warnings.filterwarnings("ignore")
+
+logger = logging.getLogger(__name__)
+
+
+def clean_source_path(source: str) -> str:
+    """
+    清理 source 路径显示，将临时路径和绝对路径转换为友好的文件名
+    Args:
+        source: 原始路径字符串
+    Returns:
+        清理后的友好文件名
+    """
+    if not source or source == "未知":
+        return source
+    # 提取文件名（处理正反斜杠）
+    filename = source.replace("\\", "/").split("/")[-1]
+    return filename
 
 
 # 预定义模型配置
@@ -422,7 +441,7 @@ class RAGAssistant:
                 "sources": [
                     {
                         "content": doc.page_content[:200],
-                        "source": doc.metadata.get("source", "未知")
+                        "source": clean_source_path(doc.metadata.get("source", "未知"))
                     }
                     for doc in source_docs
                 ]
@@ -458,7 +477,7 @@ class RAGAssistant:
         self._last_sources = [
             {
                 "content": doc.page_content[:200],
-                "source": doc.metadata.get("source", "未知")
+                "source": clean_source_path(doc.metadata.get("source", "未知"))
             }
             for doc in docs
         ]

@@ -1,27 +1,16 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { message } from 'antd'
 import { useRAGStatus } from '@/hooks/useRAGStatus'
+import { knowledgeBaseApi } from '@/services/knowledgeBaseApi'
 import EngineControl from '@/components/settings/EngineControl'
 import KnowledgeBasePanel from '@/components/knowledge/KnowledgeBasePanel'
-import { knowledgeBaseApi } from '@/services/knowledgeBaseApi'
-import type { KnowledgeBaseStats, ModelLoadRequest, RAGStatus } from '@/types/rag'
-
-const defaultRagStatus: RAGStatus = {
-  engine_loaded: false,
-  model_key: '',
-  model_name: '',
-  reranker_enabled: false,
-  reranker_model: '',
-  knowledge_base_ready: false,
-  available_models: {},
-  available_rerankers: {},
-}
+import type { KnowledgeBaseStats, ModelLoadRequest } from '@/types/rag'
 
 const SettingsPage: React.FC = () => {
   const { ragStatus, isModelLoading, loadModel, unloadModel, refreshStatus } = useRAGStatus()
-  const [kbStats, setKbStats] = React.useState<KnowledgeBaseStats | null>(null)
+  const [kbStats, setKbStats] = useState<KnowledgeBaseStats | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     knowledgeBaseApi
       .getStats()
       .then(setKbStats)
@@ -38,7 +27,7 @@ const SettingsPage: React.FC = () => {
           rerankerTopK: request.reranker_top_k,
           initialRetrievalK: request.initial_retrieval_k,
         })
-        message.success('模型加载请求已发送')
+        message.success('模型加载请求已发送，请等待加载完成')
       } catch (error) {
         message.error((error as Error).message)
       }
@@ -68,10 +57,21 @@ const SettingsPage: React.FC = () => {
   }, [])
 
   return (
-    <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 112px)', overflowY: 'auto' }}>
+    <div style={{ display: 'flex', gap: 20, maxHeight: 'calc(100vh - 112px)', overflowY: 'auto' }}>
       <div style={{ flex: 1 }}>
         <EngineControl
-          ragStatus={ragStatus ?? defaultRagStatus}
+          ragStatus={
+            ragStatus ?? {
+              engine_loaded: false,
+              model_key: '',
+              model_name: '',
+              reranker_enabled: false,
+              reranker_model: '',
+              knowledge_base_ready: false,
+              available_models: {},
+              available_rerankers: {},
+            }
+          }
           isModelLoading={isModelLoading}
           onLoad={handleLoad}
           onUnload={handleUnload}

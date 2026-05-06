@@ -1,4 +1,6 @@
 import React, { useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useChatStore } from '@/stores/chatStore'
 import MessageBubble from './MessageBubble'
 import ThinkingIndicator from './ThinkingIndicator'
@@ -71,7 +73,11 @@ const ChatWindow: React.FC = () => {
                   fontSize: 14,
                 }}
               >
-                {currentStreamingContent}
+                <div className="markdown-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {currentStreamingContent}
+                  </ReactMarkdown>
+                </div>
                 <span className="cursor-blink">▊</span>
               </div>
               {!isStreaming && currentSources.length > 0 && (

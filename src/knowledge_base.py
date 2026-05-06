@@ -395,12 +395,13 @@ class KnowledgeBase:
 
         return final_chunks
 
-    def ingest(self, file_path: str, doc_type: Optional[str] = None) -> bool:
+    def ingest(self, file_path: str, doc_type: Optional[str] = None, display_source: Optional[str] = None) -> bool:
         """
         导入文档到知识库
         Args:
             file_path: 文档路径
             doc_type: 文档类型（可选，不指定则自动判断）
+            display_source: 显示用的来源路径（可选，覆盖 file_path 作为 source 元数据）
         Returns:
             导入成功返回True，失败返回False
         """
@@ -437,7 +438,8 @@ class KnowledgeBase:
                 raise ValueError(f"不支持的文件格式: {file_path}")
 
             # 3. 切分文档
-            chunks = self.split_document(text, doc_type, file_path)
+            source_for_metadata = display_source or file_path
+            chunks = self.split_document(text, doc_type, source_for_metadata)
 
             # 4. 添加到向量数据库
             self.db.add_documents(chunks)

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { PoweroffOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import ModelSelector from './ModelSelector'
 import RerankerConfig from './RerankerConfig'
@@ -17,21 +17,41 @@ const EngineControl: React.FC<EngineControlProps> = ({
   onLoad,
   onUnload,
 }) => {
-  const [selectedModel, setSelectedModel] = useState(ragStatus.model_key || '')
-  const [useReranker, setUseReranker] = useState(ragStatus.reranker_enabled)
-  const [rerankerModel, setRerankerModel] = useState(ragStatus.reranker_model || '')
+  const [selectedModel, setSelectedModel] = useState<string>('')
+  const [useReranker, setUseReranker] = useState(false)
+  const [rerankerModel, setRerankerModel] = useState<string>('')
   const [rerankerTopK, setRerankerTopK] = useState(3)
   const [initialRetrievalK, setInitialRetrievalK] = useState(10)
 
+  const modelKeys = useMemo(
+    () => Object.keys(ragStatus.available_models || {}),
+    [ragStatus.available_models],
+  )
+  const rerankerKeys = useMemo(
+    () => Object.keys(ragStatus.available_rerankers || {}),
+    [ragStatus.available_rerankers],
+  )
+
+  const effectiveSelectedModel = selectedModel || modelKeys[0] || ''
+  const effectiveRerankerModel = rerankerModel || rerankerKeys[0] || ''
+
   const handleLoad = useCallback(async () => {
+    if (!effectiveSelectedModel) return
     await onLoad({
-      model_key: selectedModel,
+      model_key: effectiveSelectedModel,
       use_reranker: useReranker,
-      reranker_model: useReranker ? rerankerModel : undefined,
+      reranker_model: useReranker ? effectiveRerankerModel : undefined,
       reranker_top_k: useReranker ? rerankerTopK : undefined,
       initial_retrieval_k: initialRetrievalK,
     })
-  }, [selectedModel, useReranker, rerankerModel, rerankerTopK, initialRetrievalK, onLoad])
+  }, [
+    effectiveSelectedModel,
+    useReranker,
+    effectiveRerankerModel,
+    rerankerTopK,
+    initialRetrievalK,
+    onLoad,
+  ])
 
   const handleUnload = useCallback(async () => {
     await onUnload()
@@ -172,11 +192,14 @@ const EngineControl: React.FC<EngineControlProps> = ({
                 fontWeight: 500,
               }}
             >
-              选择模型
+              选择模型{' '}
+              {effectiveSelectedModel && (
+                <span style={{ color: 'var(--neon-blue)' }}>✓ 已选择</span>
+              )}
             </div>
             <ModelSelector
-              availableModels={ragStatus.available_models}
-              value={selectedModel}
+              availableModels={ragStatus.available_models || {}}
+              value={effectiveSelectedModel}
               onChange={setSelectedModel}
             />
           </div>
@@ -193,9 +216,9 @@ const EngineControl: React.FC<EngineControlProps> = ({
               重排序配置
             </div>
             <RerankerConfig
-              availableRerankers={ragStatus.available_rerankers}
+              availableRerankers={ragStatus.available_rerankers || {}}
               enabled={useReranker}
-              model={rerankerModel}
+              model={effectiveRerankerModel}
               topK={rerankerTopK}
               onEnabledChange={setUseReranker}
               onModelChange={setRerankerModel}
@@ -237,15 +260,15 @@ const EngineControl: React.FC<EngineControlProps> = ({
 
           <button
             onClick={() => void handleLoad()}
-            disabled={!selectedModel}
+            disabled={!effectiveSelectedModel}
             style={{
               width: '100%',
               padding: '12px 16px',
               borderRadius: 'var(--radius-sm)',
-              background: selectedModel ? 'var(--gradient-primary)' : 'var(--bg-tertiary)',
+              background: effectiveSelectedModel ? 'var(--gradient-primary)' : 'var(--bg-tertiary)',
               border: 'none',
-              color: selectedModel ? '#fff' : 'var(--text-tertiary)',
-              cursor: selectedModel ? 'pointer' : 'not-allowed',
+              color: effectiveSelectedModel ? '#fff' : 'var(--text-tertiary)',
+              cursor: effectiveSelectedModel ? 'pointer' : 'not-allowed',
               fontSize: 14,
               fontWeight: 600,
               display: 'flex',
@@ -253,16 +276,16 @@ const EngineControl: React.FC<EngineControlProps> = ({
               justifyContent: 'center',
               gap: 6,
               transition: 'all var(--transition-normal)',
-              boxShadow: selectedModel ? '0 4px 15px rgba(0, 212, 255, 0.25)' : 'none',
+              boxShadow: effectiveSelectedModel ? '0 4px 15px rgba(0, 212, 255, 0.25)' : 'none',
             }}
             onMouseEnter={(e) => {
-              if (selectedModel) {
+              if (effectiveSelectedModel) {
                 e.currentTarget.style.boxShadow = '0 6px 25px rgba(0, 212, 255, 0.4)'
                 e.currentTarget.style.transform = 'translateY(-1px)'
               }
             }}
             onMouseLeave={(e) => {
-              if (selectedModel) {
+              if (effectiveSelectedModel) {
                 e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 212, 255, 0.25)'
                 e.currentTarget.style.transform = 'translateY(0)'
               }

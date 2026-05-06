@@ -1,24 +1,105 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ApartmentOutlined, PlusOutlined } from '@ant-design/icons'
-import { useSkillTreeStore } from '@/stores/skillTreeStore'
+import { message, Modal } from 'antd'
+import { useSkillTree } from '@/hooks/useSkillTree'
 import SkillTreeList from '@/components/skilltree/SkillTreeList'
-import SkillGraph from '@/components/skilltree/SkillGraph'
-import SkillNodeCard from '@/components/skilltree/SkillNodeCard'
-import type { SkillNode } from '@/types/skillTree'
+import SkillTreeDetail from '@/components/skilltree/SkillTreeDetail'
+import type { AddSkillRequest, AddRelationRequest } from '@/types/skillTree'
 
 const SkillTreePage: React.FC = () => {
-  const skillTreeList = useSkillTreeStore((s) => s.skillTreeList)
-  const currentSkillTree = useSkillTreeStore((s) => s.currentSkillTree)
-  const isLoading = useSkillTreeStore((s) => s.isLoading)
-  const setCurrentSkillTree = useSkillTreeStore((s) => s.setCurrentSkillTree)
-  const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null)
+  const {
+    skillTreeList,
+    currentSkillTree,
+    isLoading,
+    fetchList,
+    fetchDetail,
+    create,
+    remove,
+    addSkill,
+    addRelation,
+    generatePaths,
+    setCurrentSkillTree,
+  } = useSkillTree()
 
-  const handleSelect = (_id: string) => {
-    setCurrentSkillTree(null)
-    setSelectedNode(null)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [createName, setCreateName] = useState('')
+  const [createDesc, setCreateDesc] = useState('')
+
+  useEffect(() => {
+    void fetchList()
+  }, [fetchList])
+
+  const handleSelect = (id: string) => {
+    void fetchDetail(id)
   }
 
-  const hasNodes = currentSkillTree && Object.keys(currentSkillTree.skill_nodes).length > 0
+  const handleCreate = async () => {
+    if (!createName.trim() || !createDesc.trim()) {
+      message.warning('请填写名称和描述')
+      return
+    }
+    try {
+      await create({ name: createName.trim(), description: createDesc.trim() })
+      setCreateModalOpen(false)
+      setCreateName('')
+      setCreateDesc('')
+      message.success('技能树创建成功')
+    } catch (error) {
+      message.error((error as Error).message)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!currentSkillTree) return
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定要删除技能树「${currentSkillTree.name}」吗？此操作不可撤销。`,
+      okText: '删除',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await remove(currentSkillTree.id)
+          setCurrentSkillTree(null)
+          message.success('技能树删除成功')
+        } catch (error) {
+          message.error((error as Error).message)
+        }
+      },
+    })
+  }
+
+  const handleAddSkill = async (request: AddSkillRequest) => {
+    if (!currentSkillTree) return
+    try {
+      await addSkill(currentSkillTree.id, request)
+      message.success('技能添加成功')
+    } catch (error) {
+      message.error((error as Error).message)
+      throw error
+    }
+  }
+
+  const handleAddRelation = async (request: AddRelationRequest) => {
+    if (!currentSkillTree) return
+    try {
+      await addRelation(currentSkillTree.id, request)
+      message.success('技能关系建立成功')
+    } catch (error) {
+      message.error((error as Error).message)
+      throw error
+    }
+  }
+
+  const handleGeneratePaths = async () => {
+    if (!currentSkillTree) return
+    try {
+      await generatePaths(currentSkillTree.id)
+      message.success('学习路径生成成功')
+    } catch (error) {
+      message.error((error as Error).message)
+    }
+  }
 
   return (
     <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 112px)' }}>
@@ -55,6 +136,7 @@ const SkillTreePage: React.FC = () => {
             <ApartmentOutlined /> 技能树列表
           </h3>
           <button
+            onClick={() => setCreateModalOpen(true)}
             style={{
               padding: '4px 12px',
               borderRadius: 'var(--radius-sm)',
@@ -84,80 +166,14 @@ const SkillTreePage: React.FC = () => {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
         {currentSkillTree ? (
-          <>
-            <div
-              className="glass-card-static"
-              style={{
-                padding: '16px 20px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    margin: '0 0 4px',
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  {currentSkillTree.name}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    color: 'var(--text-tertiary)',
-                    fontSize: 13,
-                  }}
-                >
-                  {currentSkillTree.description}
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <span className="neon-tag">
-                  {Object.keys(currentSkillTree.skill_nodes).length} 个节点
-                </span>
-                <span className="neon-tag-green neon-tag">
-                  完成率 {currentSkillTree.completion_rate.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-            {hasNodes ? (
-              <>
-                <SkillGraph skillTree={currentSkillTree} onNodeClick={setSelectedNode} />
-                {selectedNode && (
-                  <div className="animate-slide-up">
-                    <SkillNodeCard node={selectedNode} />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div
-                className="glass-card-static"
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--text-tertiary)',
-                }}
-              >
-                <ApartmentOutlined
-                  style={{
-                    fontSize: 48,
-                    marginBottom: 16,
-                    color: 'var(--neon-blue)',
-                    opacity: 0.3,
-                  }}
-                />
-                <p style={{ fontSize: 14, marginBottom: 8 }}>技能树暂无节点数据</p>
-                <p style={{ fontSize: 12 }}>请通过API添加技能节点后查看可视化图</p>
-              </div>
-            )}
-          </>
+          <SkillTreeDetail
+            skillTree={currentSkillTree}
+            isLoading={isLoading}
+            onAddSkill={handleAddSkill}
+            onAddRelation={handleAddRelation}
+            onDelete={handleDelete}
+            onGeneratePaths={handleGeneratePaths}
+          />
         ) : (
           <div
             style={{
@@ -181,6 +197,73 @@ const SkillTreePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <Modal
+        title={
+          <span
+            style={{
+              background: 'var(--gradient-primary)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontWeight: 700,
+            }}
+          >
+            创建技能树
+          </span>
+        }
+        open={createModalOpen}
+        onCancel={() => setCreateModalOpen(false)}
+        onOk={handleCreate}
+        okText="创建"
+        cancelText="取消"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+          <div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: 12, marginBottom: 6 }}>
+              技能树名称
+            </div>
+            <input
+              value={createName}
+              onChange={(e) => setCreateName(e.target.value)}
+              placeholder="请输入技能树名称"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-glass)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-primary)',
+                fontSize: 14,
+                outline: 'none',
+              }}
+            />
+          </div>
+          <div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: 12, marginBottom: 6 }}>
+              技能树描述
+            </div>
+            <textarea
+              value={createDesc}
+              onChange={(e) => setCreateDesc(e.target.value)}
+              placeholder="请输入技能树描述"
+              rows={3}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-glass)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-primary)',
+                fontSize: 14,
+                outline: 'none',
+                resize: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

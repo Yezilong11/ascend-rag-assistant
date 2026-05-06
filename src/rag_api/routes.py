@@ -318,7 +318,7 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
             f.write(content)
 
         kb = get_knowledge_base()
-        success = kb.ingest(temp_path)
+        success = kb.ingest(temp_path, display_source=filename)
 
         if success:
             doc_type = kb.detect_doc_type(temp_path)

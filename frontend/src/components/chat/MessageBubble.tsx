@@ -1,4 +1,6 @@
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { UserOutlined } from '@ant-design/icons'
 import type { Message } from '@/types/chat'
 import SourcePanel from './SourcePanel'
@@ -64,7 +66,13 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               fontSize: 14,
             }}
           >
-            {message.content}
+            {isUser ? (
+              message.content
+            ) : (
+              <div className="markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+              </div>
+            )}
           </div>
           {message.sources && message.sources.length > 0 && (
             <SourcePanel sources={message.sources} />
