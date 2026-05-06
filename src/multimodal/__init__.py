@@ -32,7 +32,7 @@ from .application import (
 
 from .infrastructure import (
     DeviceManager,
-    PaddleOCREngine,
+    EasyOCREngine,
     QwenVLEngine,
     PDFImageExtractor,
     ChromaImageChunkRepository,
@@ -70,7 +70,7 @@ __all__ = [
     "ImageQueryDTO",
     "ImageQueryResultDTO",
     "DeviceManager",
-    "PaddleOCREngine",
+    "EasyOCREngine",
     "QwenVLEngine",
     "PDFImageExtractor",
     "ChromaImageChunkRepository",

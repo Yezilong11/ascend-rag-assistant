@@ -2,6 +2,6 @@
 OCR Infrastructure
 """
 
-from .paddleocr_engine import PaddleOCREngine
+from .easyocr_engine import EasyOCREngine
 
-__all__ = ["PaddleOCREngine"]
+__all__ = ["EasyOCREngine"]

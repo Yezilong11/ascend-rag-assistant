@@ -13,7 +13,7 @@ from ...domain.value_objects.processing_status import ProcessingStatus, Processi
 from ...domain.services.multimodal_processing_service import MultimodalProcessingService
 
 
-class PaddleOCREngine(MultimodalProcessingService):
+class EasyOCREngine(MultimodalProcessingService):
     """
     OCR引擎实现
     使用 EasyOCR 进行文字识别

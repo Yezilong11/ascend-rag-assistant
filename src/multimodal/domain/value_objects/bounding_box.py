@@ -92,16 +92,16 @@ class BoundingBox:
         )
 
     @classmethod
-    def from_paddleocr(cls, bbox_data) -> "BoundingBox":
+    def from_points(cls, points) -> "BoundingBox":
         """
-        从PaddleOCR格式创建边界框
-        PaddleOCR返回格式: [[x1,y1], [x2,y2], [x3,y3], [x4,y4]]
-        取左上(x1,y1)和右下(x3,y3)
+        从点列表创建边界框
+        格式: [[x1,y1], [x2,y2], [x3,y3], [x4,y4]] 或 [(x1,y1), (x2,y2), ...]
+        取所有点的最小外接矩形
         """
-        if not bbox_data or len(bbox_data) < 4:
-            raise ValueError(f"Invalid PaddleOCR bbox data: {bbox_data}")
-        x_coords = [p[0] for p in bbox_data]
-        y_coords = [p[1] for p in bbox_data]
+        if not points or len(points) < 4:
+            raise ValueError(f"Invalid points data: {points}")
+        x_coords = [p[0] for p in points]
+        y_coords = [p[1] for p in points]
         return cls(
             x1=min(x_coords),
             y1=min(y_coords),
@@ -112,7 +112,7 @@ class BoundingBox:
     @classmethod
     def from_easyocr(cls, bbox_data) -> "BoundingBox":
         """从EasyOCR格式创建边界框"""
-        return cls.from_paddleocr(bbox_data)
+        return cls.from_points(bbox_data)
 
     def __repr__(self) -> str:
         return f"BoundingBox(x1={self.x1}, y1={self.y1}, x2={self.x2}, y2={self.y2})"

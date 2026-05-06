@@ -124,13 +124,13 @@ def create_multimodal_service(vlm_enabled: bool = False):
     """创建多模态服务实例"""
     from ...application.services import MultimodalIngestServiceImpl
     from ...infrastructure import (
-        PaddleOCREngine,
+        EasyOCREngine,
         QwenVLEngine,
         PDFImageExtractor,
         ChromaImageChunkRepository,
     )
 
-    ocr_engine = PaddleOCREngine()
+    ocr_engine = EasyOCREngine()
     vlm_engine = QwenVLEngine(vlm_enabled=vlm_enabled)
     pdf_extractor = PDFImageExtractor()
     repository = ChromaImageChunkRepository()
