@@ -10,6 +10,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.skill_tree.api.routes import router as skill_tree_router
 
+try:
+    from src.multimodal.interface.api.routes import router as multimodal_router
+    MULTIMODAL_AVAILABLE = True
+except ImportError as e:
+    MULTIMODAL_AVAILABLE = False
+    print(f"⚠️ 多模态模块未安装: {e}")
+
 # 读取配置文件
 config_path = "./config/config.yaml"
 with open(config_path, 'r', encoding='utf-8') as f:
@@ -42,6 +49,10 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(skill_tree_router)
+
+if MULTIMODAL_AVAILABLE:
+    app.include_router(multimodal_router)
+    print("✅ 多模态RAG API路由已注册")
 
 # 添加根路由
 @app.get("/")
