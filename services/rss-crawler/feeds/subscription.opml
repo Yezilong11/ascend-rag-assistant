@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>RSS知识库 - 我的订阅源</title>
+    <dateCreated>2026-04-25T12:00:00+08:00</dateCreated>
+    <dateModified>2026-04-25T12:00:00+08:00</dateModified>
+    <ownerName>RSS Knowledge Base</ownerName>
+    <ownerEmail>admin@localhost</ownerEmail>
+  </head>
+  <body>
+    <!-- 国际新闻 -->
+    <outline text="🌍 国际新闻" title="国际新闻">
+      <outline type="rss" text="BBC World News" title="BBC World News" xmlUrl="http://feeds.bbci.co.uk/news/world/rss.xml" htmlUrl="https://www.bbc.com/news/world" description="BBC国际新闻"/>
+      <outline type="rss" text="BBC Business" title="BBC Business" xmlUrl="http://feeds.bbci.co.uk/news/business/rss.xml" htmlUrl="https://www.bbc.com/news/business" description="BBC商业财经新闻"/>
+      <outline type="rss" text="Reuters World" title="Reuters World" xmlUrl="https://feeds.reuters.com/reuters/worldnews" htmlUrl="https://www.reuters.com/world" description="路透社国际新闻"/>
+    </outline>
+
+    <!-- 国家经济 -->
+    <outline text="💰 国家经济" title="国家经济">
+      <outline type="rss" text="36氪" title="36氪" xmlUrl="https://36kr.com/feed" htmlUrl="https://36kr.com/" description="科技财经创新创业"/>
+      <outline type="rss" text="21世纪经济报道" title="21世纪经济报道" xmlUrl="https://www.21jingji.com/feed/" htmlUrl="https://www.21jingji.com/" description="深度经济报道"/>
+      <outline type="rss" text="钛媒体" title="钛媒体" xmlUrl="http://www.tmtpost.com/feed" htmlUrl="https://www.tmtpost.com/" description="TMT科技财经"/>
+    </outline>
+
+    <!-- 马拉松赛事 -->
+    <outline text="🏃 马拉松赛事" title="马拉松赛事">
+      <outline type="rss" text="中国马拉松" title="中国马拉松" xmlUrl="http://www.runchina.org.cn/feed.php" htmlUrl="http://www.runchina.org.cn/" description="中国田径协会官方"/>
+      <outline type="rss" text="马拉松跑步网" title="马拉松跑步网" xmlUrl="https://cnmarathon.com/feed" htmlUrl="https://cnmarathon.com/" description="赛事新闻与跑者社区"/>
+    </outline>
+
+    <!-- 三角洲行动游戏 -->
+    <outline text="🎮 三角洲行动游戏" title="三角洲行动游戏">
+      <outline type="rss" text="腾讯游戏-三角洲行动" title="腾讯游戏-三角洲行动" xmlUrl="https://df.qq.com/index.shtml" htmlUrl="https://df.qq.com/" description="官方公告资讯"/>
+      <outline type="rss" text="Soren游戏资讯" title="Soren游戏资讯" xmlUrl="https://soren.com/zh-CN/news/delta-force--1/feed/" htmlUrl="https://soren.com/zh-CN/news/delta-force--1/" description="三角洲行动每日资讯"/>
+    </outline>
+
+  </body>
+</opml>

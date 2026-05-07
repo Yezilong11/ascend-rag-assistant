@@ -15,18 +15,12 @@ from typing import Optional, Dict, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from src.rag_engine import PREDEFINED_MODELS as MODEL_OPTIONS
+from src.rag_engine import PREDEFINED_RERANKERS as RERANKER_OPTIONS
 
-PREDEFINED_MODELS = {
-    "qwen2-1.5b": "Qwen2-1.5B",
-    "qwen2-0.5b": "Qwen2-0.5B",
-    "chatglm3-6b": "ChatGLM3-6B",
-}
 
-PREDEFINED_RERANKERS = {
-    "bge-reranker-v2-m3": "BGE-Reranker-v2-m3",
-    "bge-reranker-large": "BGE-Reranker-Large",
-    "bge-reranker-base": "BGE-Reranker-Base",
-}
+PREDEFINED_MODELS = {k: v["name"] for k, v in MODEL_OPTIONS.items()}
+PREDEFINED_RERANKERS = {k: v["name"] for k, v in RERANKER_OPTIONS.items()}
 
 
 class ChatRequest(BaseModel):

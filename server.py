@@ -9,6 +9,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.skill_tree.api.routes import router as skill_tree_router
+from src.rag_api.routes import router as rag_router
 
 try:
     from src.multimodal.interface.api.routes import router as multimodal_router
@@ -16,6 +17,13 @@ try:
 except ImportError as e:
     MULTIMODAL_AVAILABLE = False
     print(f"⚠️ 多模态模块未安装: {e}")
+
+try:
+    from src.rss_gateway.routes import router as rss_router
+    RSS_AVAILABLE = True
+except Exception as e:
+    RSS_AVAILABLE = False
+    print(f"⚠️ RSS网关模块未安装: {e}")
 
 # 读取配置文件
 config_path = "./config/config.yaml"
@@ -49,10 +57,15 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(skill_tree_router)
+app.include_router(rag_router)
 
 if MULTIMODAL_AVAILABLE:
     app.include_router(multimodal_router)
     print("✅ 多模态RAG API路由已注册")
+
+if RSS_AVAILABLE:
+    app.include_router(rss_router)
+    print("✅ RSS网关API路由已注册")
 
 # 添加根路由
 @app.get("/")

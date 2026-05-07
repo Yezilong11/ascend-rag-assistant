@@ -33,3 +33,9 @@ server:
   api_port: 8000
   rag_port: 8001
   host: "0.0.0.0"
+
+rss:
+  enabled: true
+  service_url: "http://localhost:8081"
+  timeout: 30
+  auto_ingest: false

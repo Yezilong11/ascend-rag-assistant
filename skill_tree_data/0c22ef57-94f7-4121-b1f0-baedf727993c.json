@@ -1,0 +1,72 @@
+{
+  "id": "0c22ef57-94f7-4121-b1f0-baedf727993c",
+  "name": "111",
+  "description": "1",
+  "version": "1.0",
+  "created_at": "2024-01-01",
+  "updated_at": "2024-01-01",
+  "root_nodes": [
+    "a31a1d12-974e-4d73-858f-9571f589ee28",
+    "838620cc-e0a4-4597-b32d-f6cea4861068"
+  ],
+  "skill_nodes": {
+    "a31a1d12-974e-4d73-858f-9571f589ee28": {
+      "id": "a31a1d12-974e-4d73-858f-9571f589ee28",
+      "name": "1",
+      "description": "1",
+      "level": "beginner",
+      "skill_type": "theoretical",
+      "parent_ids": [],
+      "child_ids": [
+        "838620cc-e0a4-4597-b32d-f6cea4861068"
+      ],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [],
+      "learning_time": 1,
+      "completion_rate": 0.0
+    },
+    "838620cc-e0a4-4597-b32d-f6cea4861068": {
+      "id": "838620cc-e0a4-4597-b32d-f6cea4861068",
+      "name": "2",
+      "description": "2",
+      "level": "intermediate",
+      "skill_type": "theoretical",
+      "parent_ids": [
+        "a31a1d12-974e-4d73-858f-9571f589ee28"
+      ],
+      "child_ids": [],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [
+        {
+          "source_skill_id": "a31a1d12-974e-4d73-858f-9571f589ee28",
+          "target_skill_id": "838620cc-e0a4-4597-b32d-f6cea4861068",
+          "relation_type": "prerequisite",
+          "weight": 1
+        }
+      ],
+      "learning_time": 3,
+      "completion_rate": 0.0
+    }
+  },
+  "learning_paths": {
+    "6731f491-76c7-432b-91cd-5450f5ba83ee": {
+      "path_id": "6731f491-76c7-432b-91cd-5450f5ba83ee",
+      "skill_ids": [
+        "838620cc-e0a4-4597-b32d-f6cea4861068"
+      ],
+      "estimated_time": 3,
+      "difficulty": "intermediate"
+    },
+    "0e917895-18cb-49c8-b767-8446ec548a9f": {
+      "path_id": "0e917895-18cb-49c8-b767-8446ec548a9f",
+      "skill_ids": [
+        "a31a1d12-974e-4d73-858f-9571f589ee28",
+        "838620cc-e0a4-4597-b32d-f6cea4861068"
+      ],
+      "estimated_time": 4,
+      "difficulty": "intermediate"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import AppLayout from '@/components/layout/AppLayout'
 import ChatPage from '@/pages/ChatPage'
 import SkillTreePage from '@/pages/SkillTreePage'
 import SettingsPage from '@/pages/SettingsPage'
+import RSSPage from '@/pages/RSSPage'
 
 const antTheme = {
   algorithm: theme.darkAlgorithm,
@@ -49,6 +50,7 @@ const App: React.FC = () => {
             <Route index element={<Navigate to="/chat" replace />} />
             <Route path="chat" element={<ChatPage />} />
             <Route path="skill-tree" element={<SkillTreePage />} />
+            <Route path="rss" element={<RSSPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

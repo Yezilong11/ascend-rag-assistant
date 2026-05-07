@@ -81,3 +81,6 @@ src/__pycache__/knowledge_base.cpython-310.pyc
 src/__pycache__/knowledge_base.cpython-313.pyc
 src/__pycache__/rag_engine.cpython-310.pyc
 src/__pycache__/rag_engine.cpython-313.pyc
+
+services/rss-crawler/data/
+services/rss-crawler/*.db

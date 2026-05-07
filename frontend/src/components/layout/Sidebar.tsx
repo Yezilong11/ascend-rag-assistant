@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { MessageOutlined, ApartmentOutlined, SettingOutlined } from '@ant-design/icons'
+import { MessageOutlined, ApartmentOutlined, SettingOutlined, GlobalOutlined } from '@ant-design/icons'
 
 const menuItems = [
   {
@@ -12,6 +12,11 @@ const menuItems = [
     key: '/skill-tree',
     icon: <ApartmentOutlined />,
     label: '技能树',
+  },
+  {
+    key: '/rss',
+    icon: <GlobalOutlined />,
+    label: 'RSS 资讯',
   },
   {
     key: '/settings',

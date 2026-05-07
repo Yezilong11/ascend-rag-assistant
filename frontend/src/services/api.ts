@@ -18,6 +18,14 @@ export const ragApiClient = axios.create({
   },
 })
 
+export const rssApiClient = axios.create({
+  baseURL: `${API_BASE_URL}/api/rss`,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 skillTreeApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,6 +35,14 @@ skillTreeApiClient.interceptors.response.use(
 )
 
 ragApiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.detail || error.response?.data?.message || '请求失败'
+    return Promise.reject(new Error(message))
+  },
+)
+
+rssApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const message = error.response?.data?.detail || error.response?.data?.message || '请求失败'

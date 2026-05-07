@@ -1,0 +1,26 @@
+server:
+  host: "0.0.0.0"
+  port: 8081
+
+database:
+  path: "./data/rss.db"
+
+meilisearch:
+  host: "http://localhost:7700"
+  api_key: ""
+  index_name: "articles"
+
+ollama:
+  host: "http://localhost:11434"
+  model: "llama2:latest"
+  timeout: 120
+
+crawler:
+  concurrent: 3
+  timeout: 30
+  retry: 3
+  user_agent: "RSS-Crawler/1.0"
+
+ai:
+  enabled: false
+  batch_size: 5

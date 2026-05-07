@@ -12,12 +12,8 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api/skill-tree': {
-        target: 'http://localhost:8001',
-        changeOrigin: true,
-      },
-      '/api/rag': {
-        target: 'http://localhost:8002',
+      '/api': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },

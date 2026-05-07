@@ -1,20 +1,33 @@
 @echo off
 chcp 65001 >nul
 echo ========================================
-echo    Ascend RAG Assistant 一键启动
+echo    Ascend RAG Assistant - Starting All Services
 echo ========================================
 echo.
-echo 设置环境变量解决OMP冲突...
+echo Setting environment to avoid OMP conflict...
 set KMP_DUPLICATE_LIB_OK=TRUE
 echo.
-echo 启动技能树API服务器...
-start "FastAPI Server" python server.py
+
+echo Starting Go RSS service...
+start "Go RSS Server" cmd /k "cd /d %~dp0services\rss-crawler && go run cmd/server/main.go"
 echo.
-echo 等待API服务器启动...
+
+echo Starting FastAPI server...
+start "FastAPI Server" cmd /k "cd /d %~dp0 && python server.py"
+echo.
+
+echo Waiting for API server to start...
 timeout /t 3 /nobreak >nul
 echo.
-echo 启动Streamlit前端...
-echo 前端启动后请在浏览器访问: http://localhost:8501
+
+echo Starting frontend dev server...
+start "Frontend Dev Server" cmd /k "cd /d %~dp0frontend && npm run dev"
 echo.
-streamlit run app.py
+
+echo ========================================
+echo    All services started
+echo    - Go RSS service: http://localhost:8081
+echo    - FastAPI service: http://localhost:8000
+echo    - Frontend dev server: http://localhost:3000
+echo ========================================
 pause
