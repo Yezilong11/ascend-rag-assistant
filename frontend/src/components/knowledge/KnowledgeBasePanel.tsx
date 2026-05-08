@@ -8,12 +8,14 @@ interface KnowledgeBasePanelProps {
   stats: KnowledgeBaseStats | null
   onAutoIngest: () => Promise<void>
   onUploadSuccess?: () => void
+  imageChunkCount?: number
 }
 
 const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
   stats,
   onAutoIngest,
   onUploadSuccess,
+  imageChunkCount,
 }) => {
   const [autoIngesting, setAutoIngesting] = useState(false)
 
@@ -76,7 +78,7 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr',
             gap: 12,
             marginBottom: 20,
           }}
@@ -143,6 +145,22 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
             </div>
             <div style={{ fontWeight: 700, color: 'var(--neon-purple)', fontSize: 18 }}>
               {stats.chunk_count}
+            </div>
+          </div>
+          <div
+            style={{
+              padding: '12px 14px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(255, 140, 0, 0.06)',
+              border: '1px solid rgba(255, 140, 0, 0.15)',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>
+              图片块数
+            </div>
+            <div style={{ fontWeight: 700, color: '#ff8c00', fontSize: 18 }}>
+              {imageChunkCount ?? '-'}
             </div>
           </div>
         </div>

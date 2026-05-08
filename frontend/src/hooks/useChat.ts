@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { useChatStore } from '@/stores/chatStore'
 import { useAppStore } from '@/stores/appStore'
 import { ragApi } from '@/services/ragApi'
+import { multimodalApi } from '@/services/multimodalApi'
 import { parseSSEStream } from '@/utils/sse'
 import type { Source } from '@/types/chat'
 
@@ -92,13 +93,32 @@ export function useChat() {
 
   const { connect, disconnect } = useSSE()
 
-  const sendMessage = useCallback(
-    (question: string) => {
-      if (!question.trim() || isLoading || isStreaming) return
-      if (!engineLoaded) return
-      void connect(question.trim())
+  const connectWithAttachments = useCallback(
+    async (question: string, attachments: File[]) => {
+      try {
+        const result = await multimodalApi.ingestImage(attachments, 'unknown', false)
+        const imageContext = result.success_count > 0
+          ? `\n\n[用户附加了 ${result.success_count} 张图片，已导入多模态知识库]`
+          : ''
+        connect(question + imageContext)
+      } catch (error) {
+        connect(question + '\n\n[图片上传失败，仅基于文本回答]')
+      }
     },
-    [isLoading, isStreaming, engineLoaded, connect],
+    [connect],
+  )
+
+  const sendMessage = useCallback(
+    (question: string, attachments?: File[]) => {
+      if ((!question.trim() && (!attachments || attachments.length === 0)) || isLoading || isStreaming) return
+      if (!engineLoaded) return
+      if (attachments && attachments.length > 0) {
+        void connectWithAttachments(question.trim(), attachments)
+      } else {
+        void connect(question.trim())
+      }
+    },
+    [isLoading, isStreaming, engineLoaded, connect, connectWithAttachments],
   )
 
   const stopStreaming = useCallback(() => {

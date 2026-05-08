@@ -26,6 +26,14 @@ export const rssApiClient = axios.create({
   },
 })
 
+export const multimodalApiClient = axios.create({
+  baseURL: `${API_BASE_URL}/api/multimodal`,
+  timeout: 120000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 skillTreeApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -43,6 +51,14 @@ ragApiClient.interceptors.response.use(
 )
 
 rssApiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.detail || error.response?.data?.message || '请求失败'
+    return Promise.reject(new Error(message))
+  },
+)
+
+multimodalApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const message = error.response?.data?.detail || error.response?.data?.message || '请求失败'

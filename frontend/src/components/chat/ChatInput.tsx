@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { SendOutlined, StopOutlined } from '@ant-design/icons'
+import { SendOutlined, StopOutlined, PictureOutlined, CloseOutlined } from '@ant-design/icons'
 
 interface ChatInputProps {
-  onSend: (message: string) => void
+  onSend: (message: string, attachments?: File[]) => void
   onStop: () => void
   isLoading: boolean
   isStreaming: boolean
@@ -17,11 +17,31 @@ const ChatInput: React.FC<ChatInputProps> = ({
   engineLoaded,
 }) => {
   const [inputValue, setInputValue] = useState('')
+  const [attachments, setAttachments] = useState<File[]>([])
+
+  const handleImageSelect = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.jpg,.jpeg,.png,.gif,.bmp'
+    input.multiple = true
+    input.onchange = (e) => {
+      const files = Array.from((e.target as HTMLInputElement).files ?? [])
+      if (files.length > 0) {
+        setAttachments((prev) => [...prev, ...files])
+      }
+    }
+    input.click()
+  }
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleSend = () => {
-    if (!inputValue.trim()) return
-    onSend(inputValue)
+    if (!inputValue.trim() && attachments.length === 0) return
+    onSend(inputValue, attachments.length > 0 ? attachments : undefined)
     setInputValue('')
+    setAttachments([])
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -49,6 +69,51 @@ const ChatInput: React.FC<ChatInputProps> = ({
           }}
         >
           ⚠️ AI引擎未启动，请先在设置页面加载模型
+        </div>
+      )}
+      {attachments.length > 0 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+          {attachments.map((file, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'relative',
+                width: 64,
+                height: 64,
+                borderRadius: 'var(--radius-sm)',
+                overflow: 'hidden',
+                border: '1px solid var(--border-glass)',
+              }}
+            >
+              <img
+                src={URL.createObjectURL(file)}
+                alt={file.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <button
+                onClick={() => removeAttachment(index)}
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.6)',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                }}
+              >
+                <CloseOutlined style={{ fontSize: 10 }} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
       <div
@@ -100,6 +165,34 @@ const ChatInput: React.FC<ChatInputProps> = ({
             }}
           />
         </div>
+        <button
+          onClick={handleImageSelect}
+          disabled={isLoading || !engineLoaded}
+          style={{
+            padding: '12px 14px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--bg-glass)',
+            border: '1px solid var(--border-glass)',
+            color: attachments.length > 0 ? 'var(--neon-blue)' : 'var(--text-tertiary)',
+            cursor: isLoading || !engineLoaded ? 'not-allowed' : 'pointer',
+            fontSize: 16,
+            transition: 'all var(--transition-normal)',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          onMouseEnter={(e) => {
+            if (engineLoaded && !isLoading) {
+              e.currentTarget.style.borderColor = 'var(--neon-blue)'
+              e.currentTarget.style.color = 'var(--neon-blue)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-glass)'
+            e.currentTarget.style.color = attachments.length > 0 ? 'var(--neon-blue)' : 'var(--text-tertiary)'
+          }}
+        >
+          <PictureOutlined />
+        </button>
         {isStreaming ? (
           <button
             onClick={onStop}

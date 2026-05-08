@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { MessageOutlined, ApartmentOutlined, SettingOutlined, GlobalOutlined } from '@ant-design/icons'
+import { MessageOutlined, ApartmentOutlined, SettingOutlined, GlobalOutlined, PictureOutlined } from '@ant-design/icons'
 
 const menuItems = [
   {
@@ -17,6 +17,11 @@ const menuItems = [
     key: '/rss',
     icon: <GlobalOutlined />,
     label: 'RSS 资讯',
+  },
+  {
+    key: '/multimodal',
+    icon: <PictureOutlined />,
+    label: '多模态知识库',
   },
   {
     key: '/settings',
