@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SendOutlined, StopOutlined, PictureOutlined, CloseOutlined } from '@ant-design/icons'
+import { SendOutlined, StopOutlined, PlusOutlined, CloseOutlined, FilePdfOutlined, PictureOutlined } from '@ant-design/icons'
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: File[]) => void
@@ -19,10 +19,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [inputValue, setInputValue] = useState('')
   const [attachments, setAttachments] = useState<File[]>([])
 
-  const handleImageSelect = () => {
+  const handleFileSelect = () => {
     const input = document.createElement('input')
     input.type = 'file'
-    input.accept = '.jpg,.jpeg,.png,.gif,.bmp'
+    input.accept = '.jpg,.jpeg,.png,.gif,.bmp,.pdf'
     input.multiple = true
     input.onchange = (e) => {
       const files = Array.from((e.target as HTMLInputElement).files ?? [])
@@ -73,47 +73,63 @@ const ChatInput: React.FC<ChatInputProps> = ({
       )}
       {attachments.length > 0 && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-          {attachments.map((file, index) => (
-            <div
-              key={index}
-              style={{
-                position: 'relative',
-                width: 64,
-                height: 64,
-                borderRadius: 'var(--radius-sm)',
-                overflow: 'hidden',
-                border: '1px solid var(--border-glass)',
-              }}
-            >
-              <img
-                src={URL.createObjectURL(file)}
-                alt={file.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-              <button
-                onClick={() => removeAttachment(index)}
+          {attachments.map((file, index) => {
+            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+            return (
+              <div
+                key={index}
                 style={{
-                  position: 'absolute',
-                  top: 2,
-                  right: 2,
-                  width: 18,
-                  height: 18,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: 'none',
-                  color: '#fff',
-                  fontSize: 10,
-                  cursor: 'pointer',
+                  position: 'relative',
+                  width: 64,
+                  height: 64,
+                  borderRadius: 'var(--radius-sm)',
+                  overflow: 'hidden',
+                  border: '1px solid var(--border-glass)',
+                  background: isPdf ? 'rgba(255, 140, 0, 0.1)' : 'var(--bg-glass)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: 0,
                 }}
               >
-                <CloseOutlined style={{ fontSize: 10 }} />
-              </button>
-            </div>
-          ))}
+                {isPdf ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <FilePdfOutlined style={{ fontSize: 24, color: '#ff8c00' }} />
+                    <div style={{ fontSize: 8, color: 'var(--text-tertiary)', marginTop: 2, maxWidth: 56, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {file.name}
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )}
+                <button
+                  onClick={() => removeAttachment(index)}
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    width: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.6)',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: 10,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                  }}
+                >
+                  <CloseOutlined style={{ fontSize: 10 }} />
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
       <div
@@ -166,7 +182,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           />
         </div>
         <button
-          onClick={handleImageSelect}
+          onClick={handleFileSelect}
           disabled={isLoading || !engineLoaded}
           style={{
             padding: '12px 14px',
@@ -175,10 +191,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
             border: '1px solid var(--border-glass)',
             color: attachments.length > 0 ? 'var(--neon-blue)' : 'var(--text-tertiary)',
             cursor: isLoading || !engineLoaded ? 'not-allowed' : 'pointer',
-            fontSize: 16,
+            fontSize: 18,
             transition: 'all var(--transition-normal)',
             display: 'flex',
             alignItems: 'center',
+            fontWeight: 300,
           }}
           onMouseEnter={(e) => {
             if (engineLoaded && !isLoading) {
@@ -190,8 +207,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
             e.currentTarget.style.borderColor = 'var(--border-glass)'
             e.currentTarget.style.color = attachments.length > 0 ? 'var(--neon-blue)' : 'var(--text-tertiary)'
           }}
+          title="上传图片或PDF"
         >
-          <PictureOutlined />
+          <PlusOutlined />
         </button>
         {isStreaming ? (
           <button

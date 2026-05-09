@@ -277,23 +277,26 @@ async def unload_model() -> dict:
 @router.post("/ingest")
 async def ingest_file(file: UploadFile = File(...)) -> dict:
     """
-    文件上传导入接口
+    统一文件上传导入接口
 
-    上传文档到知识库，支持 PDF、TXT、MD 格式。
-    系统自动检测文档类型并选择合适的切分策略。
+    上传文档到知识库，系统自动检测文件类型并选择合适的处理方式：
+    - 图片文件(.png/.jpg/.jpeg/.gif/.bmp): 自动分流到多模态知识库，进行OCR处理
+    - 文档文件(.pdf/.txt/.md等): 文本切分后存入主知识库
 
     关联接口：API接口文档.md 4.6 上传文档
 
     Args:
-        file: 上传的文件，支持 .pdf / .txt / .md，最大 50MB
+        file: 上传的文件，支持多种格式，最大 50MB
 
     Returns:
-        dict: 统一响应格式，data 包含 filename、doc_type、chunks_count
+        dict: 统一响应格式，data 包含 filename、doc_type、chunks_count、source_type
 
     Raises:
         HTTPException: 400 — 不支持的文件格式或文件过大
     """
-    allowed_extensions = [".pdf", ".txt", ".md", ".docx", ".doc", ".html", ".htm", ".png", ".jpg", ".jpeg", ".pptx", ".ppt", ".csv", ".xls", ".xlsx", ".json", ".jsonl"]
+    allowed_extensions = [".pdf", ".txt", ".md", ".docx", ".doc", ".html", ".htm", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".pptx", ".ppt", ".csv", ".xls", ".xlsx", ".json", ".jsonl"]
+    image_extensions = [".png", ".jpg", ".jpeg", ".gif", ".bmp"]
+    
     filename = file.filename or ""
     _, ext = os.path.splitext(filename)
     ext = ext.lower()
@@ -312,32 +315,22 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
             detail="文件大小超过50MB限制",
         )
 
+    # 判断是否为图片文件，自动分流处理
+    is_image = ext in image_extensions
+    source_type = "image" if is_image else "document"
+
     temp_fd, temp_path = tempfile.mkstemp(suffix=ext)
     try:
         with os.fdopen(temp_fd, "wb") as f:
             f.write(content)
 
-        kb = get_knowledge_base()
-        success = kb.ingest(temp_path, display_source=filename)
-
-        if success:
-            doc_type = kb.detect_doc_type(temp_path)
-            collection = kb.db._collection
-            chunks_count = collection.count() if hasattr(collection, "count") else 0
-
-            return {
-                "success": True,
-                "data": {
-                    "filename": filename,
-                    "doc_type": doc_type,
-                    "chunks_count": chunks_count,
-                },
-            }
+        if is_image:
+            # 图片文件：分流到多模态知识库，进行OCR处理
+            return await _ingest_image_to_multimodal(temp_path, filename)
         else:
-            return {
-                "success": False,
-                "message": f"文件导入失败: {filename}",
-            }
+            # 文档文件：使用主知识库文本处理
+            return await _ingest_document_to_kb(temp_path, filename)
+
     except Exception as e:
         logger.error(f"文件导入异常: {e}", exc_info=True)
         return {
@@ -347,6 +340,90 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+
+async def _ingest_image_to_multimodal(image_path: str, filename: str) -> dict:
+    """
+    将图片导入多模态知识库（OCR处理）
+    
+    Args:
+        image_path: 图片临时文件路径
+        filename: 原始文件名
+    
+    Returns:
+        dict: 导入结果
+    """
+    try:
+        from src.multimodal.interface.api.routes import create_multimodal_service
+        from src.multimodal.application.dtos import ImageIngestDTO
+        
+        service = create_multimodal_service(vlm_enabled=False)
+        
+        dto = ImageIngestDTO(
+            image_paths=[image_path],
+            source_file=filename,
+            document_type="uploaded",
+        )
+        
+        result = service.ingest_image(dto)
+        
+        if result.success:
+            return {
+                "success": True,
+                "data": {
+                    "filename": filename,
+                    "doc_type": "image",
+                    "source_type": "image",
+                    "chunks_count": result.success_count,
+                    "message": "图片已导入多模态知识库，完成OCR识别",
+                },
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"图片导入失败: {result.message}",
+            }
+    except Exception as e:
+        logger.error(f"多模态知识库导入异常: {e}", exc_info=True)
+        return {
+            "success": False,
+            "message": f"图片OCR处理失败: {str(e)}",
+        }
+
+
+async def _ingest_document_to_kb(doc_path: str, filename: str) -> dict:
+    """
+    将文档导入主知识库（文本处理）
+    
+    Args:
+        doc_path: 文档临时文件路径
+        filename: 原始文件名
+    
+    Returns:
+        dict: 导入结果
+    """
+    kb = get_knowledge_base()
+    success = kb.ingest(doc_path, display_source=filename)
+
+    if success:
+        doc_type = kb.detect_doc_type(doc_path)
+        collection = kb.db._collection
+        chunks_count = collection.count() if hasattr(collection, "count") else 0
+
+        return {
+            "success": True,
+            "data": {
+                "filename": filename,
+                "doc_type": doc_type,
+                "source_type": "document",
+                "chunks_count": chunks_count,
+            },
+        }
+    else:
+        return {
+            "success": False,
+            "message": f"文件导入失败: {filename}",
+        }
 
 
 @router.post("/knowledge-base/auto-ingest")

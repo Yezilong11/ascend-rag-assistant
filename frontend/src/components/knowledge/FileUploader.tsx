@@ -8,9 +8,19 @@ interface FileUploaderProps {
   onUploadSuccess?: () => void
 }
 
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
+
 const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [uploading, setUploading] = React.useState(false)
   const [dragOver, setDragOver] = React.useState(false)
+
+  const getFileTypeLabel = (filename: string): string => {
+    const ext = filename.split('.').pop()?.toLowerCase() || ''
+    if (imageExtensions.includes(ext)) {
+      return '图片'
+    }
+    return '文档'
+  }
 
   const handleUpload = async (files: File[]) => {
     const oversized = files.find(f => f.size > MAX_FILE_SIZE)
@@ -21,8 +31,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     setUploading(true)
     try {
       for (const file of files) {
-        await knowledgeBaseApi.ingest(file)
-        message.success(`${file.name} 导入成功`)
+        const result = await knowledgeBaseApi.ingest(file)
+        const fileType = getFileTypeLabel(file.name)
+        const successMsg = fileType === '图片' 
+          ? `${file.name} 已导入多模态知识库，完成OCR识别`
+          : `${file.name} 导入成功`
+        message.success(successMsg)
       }
       onUploadSuccess?.()
     } catch (error) {
@@ -52,7 +66,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           const input = document.createElement('input')
           input.type = 'file'
           input.multiple = true
-          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl'
+          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl,.jpg,.jpeg,.png,.gif,.bmp'
           input.onchange = (e) => {
             const files = Array.from((e.target as HTMLInputElement).files ?? [])
             if (files.length > 0) void handleUpload(files)
@@ -83,7 +97,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           {uploading ? '上传中...' : '拖拽文件到此处或点击上传'}
         </div>
         <div style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
-          支持 PDF、Word、Excel、PPT、HTML、JSON、CSV 等格式，最大 50MB
+          支持 PDF、Word、Excel、图片 等格式，最大 50MB
+        </div>
+        <div style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 4 }}>
+          <span style={{ color: 'var(--neon-blue)' }}>📄 文档</span> → 主知识库 | <span style={{ color: 'var(--neon-purple)' }}>🖼️ 图片</span> → 多模态知识库(OCR)
         </div>
       </div>
     </div>
