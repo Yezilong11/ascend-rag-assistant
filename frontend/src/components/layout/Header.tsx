@@ -1,5 +1,4 @@
 import React from 'react'
-import ThemeToggle from './ThemeToggle'
 
 const AppHeader: React.FC = () => {
   return (
@@ -58,7 +57,6 @@ const AppHeader: React.FC = () => {
           RAG Powered
         </span>
       </div>
-      <ThemeToggle />
     </header>
   )
 }

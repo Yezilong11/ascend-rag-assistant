@@ -3,14 +3,12 @@ import type { RAGStatus } from '@/types/rag'
 
 interface AppStore {
   sidebarCollapsed: boolean
-  theme: 'light' | 'dark'
   ragStatus: RAGStatus | null
   isModelLoading: boolean
   vlmEnabled: boolean
 
   setSidebarCollapsed: (collapsed: boolean) => void
   toggleSidebar: () => void
-  setTheme: (theme: 'light' | 'dark') => void
   setRagStatus: (status: RAGStatus | null) => void
   setModelLoading: (loading: boolean) => void
   setVlmEnabled: (enabled: boolean) => void
@@ -29,7 +27,6 @@ const initialState: RAGStatus = {
 
 export const useAppStore = create<AppStore>((set) => ({
   sidebarCollapsed: false,
-  theme: 'light',
   ragStatus: initialState,
   isModelLoading: false,
   vlmEnabled: false,
@@ -37,8 +34,6 @@ export const useAppStore = create<AppStore>((set) => ({
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
-
-  setTheme: (theme) => set({ theme }),
 
   setRagStatus: (status) => set({ ragStatus: status }),
 

@@ -1,22 +1,16 @@
 import React from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { knowledgeBaseApi } from '@/services/knowledgeBaseApi'
-import { multimodalApi } from '@/services/multimodalApi'
 import { MAX_FILE_SIZE } from '@/utils/constants'
-import { message, Switch } from 'antd'
+import { message } from 'antd'
 
 interface FileUploaderProps {
   onUploadSuccess?: () => void
 }
 
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
-const isImageFile = (filename: string) => IMAGE_EXTENSIONS.some(ext => filename.toLowerCase().endsWith(ext))
-const isPdfFile = (filename: string) => filename.toLowerCase().endsWith('.pdf')
-
 const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   const [uploading, setUploading] = React.useState(false)
   const [dragOver, setDragOver] = React.useState(false)
-  const [vlmEnabled, setVlmEnabled] = React.useState(false)
 
   const handleUpload = async (files: File[]) => {
     const oversized = files.find(f => f.size > MAX_FILE_SIZE)
@@ -26,26 +20,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     }
     setUploading(true)
     try {
-      const imageFiles = files.filter(f => isImageFile(f.name))
-
-      if (imageFiles.length > 0 && vlmEnabled) {
-        const result = await multimodalApi.ingestImage(imageFiles, 'unknown', vlmEnabled)
-        if (result.success) {
-          message.success(`成功导入 ${result.success_count} 张图片`)
-        } else {
-          message.warning(`导入完成：成功 ${result.success_count}，失败 ${result.failed_count}`)
-        }
-      }
-
-      const nonVlmFiles = vlmEnabled
-        ? files.filter(f => !isImageFile(f.name))
-        : files
-
-      for (const file of nonVlmFiles) {
+      for (const file of files) {
         await knowledgeBaseApi.ingest(file)
         message.success(`${file.name} 导入成功`)
       }
-
       onUploadSuccess?.()
     } catch (error) {
       message.error((error as Error).message)
@@ -74,7 +52,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           const input = document.createElement('input')
           input.type = 'file'
           input.multiple = true
-          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.png,.jpg,.jpeg,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl'
+          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl'
           input.onchange = (e) => {
             const files = Array.from((e.target as HTMLInputElement).files ?? [])
             if (files.length > 0) void handleUpload(files)
@@ -105,12 +83,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           {uploading ? '上传中...' : '拖拽文件到此处或点击上传'}
         </div>
         <div style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
-          支持 PDF、Word、Excel、PPT、HTML、JSON、CSV、图片等格式，最大 50MB
+          支持 PDF、Word、Excel、PPT、HTML、JSON、CSV 等格式，最大 50MB
         </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12 }}>
-        <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>VLM 图片描述</span>
-        <Switch size="small" checked={vlmEnabled} onChange={setVlmEnabled} />
       </div>
     </div>
   )
