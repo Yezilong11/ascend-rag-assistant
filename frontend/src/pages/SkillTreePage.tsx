@@ -18,6 +18,7 @@ const SkillTreePage: React.FC = () => {
     addSkill,
     addRelation,
     generatePaths,
+    updateCompletion,
     setCurrentSkillTree,
   } = useSkillTree()
 
@@ -101,6 +102,15 @@ const SkillTreePage: React.FC = () => {
     }
   }
 
+  const handleUpdateCompletion = async (skillId: string, rate: number) => {
+    if (!currentSkillTree) return
+    try {
+      await updateCompletion(currentSkillTree.id, skillId, rate)
+    } catch (error) {
+      message.error((error as Error).message)
+    }
+  }
+
   return (
     <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 112px)' }}>
       <div
@@ -173,6 +183,7 @@ const SkillTreePage: React.FC = () => {
             onAddRelation={handleAddRelation}
             onDelete={handleDelete}
             onGeneratePaths={handleGeneratePaths}
+            onUpdateCompletion={handleUpdateCompletion}
           />
         ) : (
           <div

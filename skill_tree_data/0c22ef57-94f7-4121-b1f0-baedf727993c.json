@@ -67,6 +67,23 @@
       ],
       "estimated_time": 4,
       "difficulty": "intermediate"
+    },
+    "517d4a29-fac3-411f-b134-33ef646b1ef6": {
+      "path_id": "517d4a29-fac3-411f-b134-33ef646b1ef6",
+      "skill_ids": [
+        "838620cc-e0a4-4597-b32d-f6cea4861068"
+      ],
+      "estimated_time": 3,
+      "difficulty": "intermediate"
+    },
+    "16b682db-2be3-4a24-80a3-ed7a1e4a014c": {
+      "path_id": "16b682db-2be3-4a24-80a3-ed7a1e4a014c",
+      "skill_ids": [
+        "a31a1d12-974e-4d73-858f-9571f589ee28",
+        "838620cc-e0a4-4597-b32d-f6cea4861068"
+      ],
+      "estimated_time": 4,
+      "difficulty": "intermediate"
     }
   }
 }

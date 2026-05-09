@@ -265,6 +265,226 @@ class TestSkillTree(unittest.TestCase):
         get_result = self.service.get_skill_tree(skill_tree_id)
         self.assertFalse(get_result["success"])
 
+    def test_calculate_skill_tree_completion_empty(self):
+        """测试空技能树完成率为0"""
+        create_result = self.service.create_skill_tree(
+            name="空技能树",
+            description="无技能节点"
+        )
+        skill_tree_id = create_result["data"]["id"]
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertEqual(get_result["data"]["completion_rate"], 0.0)
+
+    def test_calculate_skill_tree_completion_single_node(self):
+        """测试单节点完成率计算"""
+        create_result = self.service.create_skill_tree(
+            name="单节点树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+        add_result = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试技能",
+            level="beginner",
+            skill_type="technical"
+        )
+        skill_id = add_result["data"]["id"]
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill_id,
+            completion_rate=50.0
+        )
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 50.0)
+
+    def test_calculate_skill_tree_completion_multiple_nodes(self):
+        """测试多节点完成率计算（算术平均值）"""
+        create_result = self.service.create_skill_tree(
+            name="多节点树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+
+        skill1 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试",
+            level="beginner",
+            skill_type="technical"
+        )
+        skill2 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能B",
+            description="测试",
+            level="intermediate",
+            skill_type="theoretical"
+        )
+        skill3 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能C",
+            description="测试",
+            level="advanced",
+            skill_type="practical"
+        )
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill1["data"]["id"],
+            completion_rate=100.0
+        )
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill2["data"]["id"],
+            completion_rate=50.0
+        )
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill3["data"]["id"],
+            completion_rate=0.0
+        )
+
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 50.0)
+
+    def test_calculate_skill_tree_completion_all_100(self):
+        """测试全部完成时完成率为100%"""
+        create_result = self.service.create_skill_tree(
+            name="全完成树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+
+        skill1 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试",
+            level="beginner",
+            skill_type="technical"
+        )
+        skill2 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能B",
+            description="测试",
+            level="intermediate",
+            skill_type="theoretical"
+        )
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill1["data"]["id"],
+            completion_rate=100.0
+        )
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill2["data"]["id"],
+            completion_rate=100.0
+        )
+
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 100.0)
+
+    def test_calculate_skill_tree_completion_all_zero(self):
+        """测试全部未完成时完成率为0%"""
+        create_result = self.service.create_skill_tree(
+            name="未完成树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+        self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试",
+            level="beginner",
+            skill_type="technical"
+        )
+        self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能B",
+            description="测试",
+            level="intermediate",
+            skill_type="theoretical"
+        )
+
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 0.0)
+
+    def test_completion_rate_boundary(self):
+        """测试完成率边界值约束"""
+        create_result = self.service.create_skill_tree(
+            name="边界测试树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+        add_result = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试",
+            level="beginner",
+            skill_type="technical"
+        )
+        skill_id = add_result["data"]["id"]
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill_id,
+            completion_rate=150.0
+        )
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        node_rate = get_result["data"]["skill_nodes"][skill_id]["completion_rate"]
+        self.assertLessEqual(node_rate, 100.0)
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill_id,
+            completion_rate=-20.0
+        )
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        node_rate = get_result["data"]["skill_nodes"][skill_id]["completion_rate"]
+        self.assertGreaterEqual(node_rate, 0.0)
+
+    def test_update_completion_reflects_in_tree_completion(self):
+        """测试更新节点完成率后技能树整体完成率实时更新"""
+        create_result = self.service.create_skill_tree(
+            name="实时更新树",
+            description="测试"
+        )
+        skill_tree_id = create_result["data"]["id"]
+
+        skill1 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能A",
+            description="测试",
+            level="beginner",
+            skill_type="technical"
+        )
+        skill2 = self.service.add_skill(
+            skill_tree_id=skill_tree_id,
+            name="技能B",
+            description="测试",
+            level="intermediate",
+            skill_type="theoretical"
+        )
+
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 0.0)
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill1["data"]["id"],
+            completion_rate=80.0
+        )
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 40.0)
+
+        self.service.update_skill_completion(
+            skill_tree_id=skill_tree_id,
+            skill_id=skill2["data"]["id"],
+            completion_rate=60.0
+        )
+        get_result = self.service.get_skill_tree(skill_tree_id)
+        self.assertAlmostEqual(get_result["data"]["completion_rate"], 70.0)
+
 
 if __name__ == "__main__":
     unittest.main()
