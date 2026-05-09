@@ -395,6 +395,56 @@ class KnowledgeBase:
 
         return final_chunks
 
+    def csv_to_markdown(self, csv_path: str) -> str:
+        import csv
+        lines = []
+        with open(csv_path, 'r', encoding='utf-8-sig') as f:
+            reader = csv.reader(f)
+            for row_idx, row in enumerate(reader):
+                line = "| " + " | ".join(row) + " |"
+                lines.append(line)
+                if row_idx == 0:
+                    separator = "| " + " | ".join(["---"] * len(row)) + " |"
+                    lines.append(separator)
+        return "\n".join(lines)
+
+    def json_to_text(self, json_path: str) -> str:
+        import json
+        with open(json_path, 'r', encoding='utf-8') as f:
+            obj = json.load(f)
+
+        def flatten(obj, prefix=""):
+            parts = []
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    parts.extend(flatten(v, f"{prefix}{k}: " if prefix else f"{k}: "))
+            elif isinstance(obj, list):
+                for i, item in enumerate(obj):
+                    parts.extend(flatten(item, f"{prefix}[{i}]: "))
+            else:
+                parts.append(f"{prefix}{obj}")
+            return parts
+
+        return "\n".join(flatten(obj))
+
+    def jsonl_to_text(self, jsonl_path: str) -> str:
+        import json
+        lines = []
+        with open(jsonl_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    obj = json.loads(line)
+                    text = json.dumps(obj, ensure_ascii=False)
+                    lines.append(text)
+        return "\n".join(lines)
+
+    def image_ocr_to_text(self, image_path: str) -> str:
+        from src.multimodal.infrastructure.ocr.easyocr_engine import EasyOCREngine
+        ocr = EasyOCREngine()
+        text, _ = ocr.extract_text_from_image(image_path)
+        return text if text else "[图片中未识别到文字]"
+
     def ingest(self, file_path: str, doc_type: Optional[str] = None, display_source: Optional[str] = None) -> bool:
         """
         导入文档到知识库
@@ -416,13 +466,11 @@ class KnowledgeBase:
                     raise ImportError("pdfplumber not installed")
                 text = self.pdf_to_markdown(file_path)
             elif file_path.endswith(('.txt', '.md')):
-                # 尝试多种编码
                 try:
                     loader = TextLoader(file_path, encoding='utf-8')
                     docs = loader.load()
                     text = docs[0].page_content
                 except UnicodeDecodeError:
-                    # 尝试其他常见编码
                     for enc in ['gbk', 'gb2312', 'latin-1']:
                         try:
                             loader = TextLoader(file_path, encoding=enc)
@@ -434,6 +482,34 @@ class KnowledgeBase:
                             continue
                     else:
                         raise UnicodeDecodeError(f"无法解码文件 {file_path}，尝试的编码均失败")
+            elif file_path.endswith(('.docx', '.doc')):
+                from langchain_community.document_loaders import UnstructuredWordDocumentLoader
+                loader = UnstructuredWordDocumentLoader(file_path, mode="elements")
+                docs = loader.load()
+                text = "\n\n".join([doc.page_content for doc in docs])
+            elif file_path.endswith(('.html', '.htm')):
+                from langchain_community.document_loaders import UnstructuredHTMLLoader
+                loader = UnstructuredHTMLLoader(file_path)
+                docs = loader.load()
+                text = docs[0].page_content
+            elif file_path.endswith(('.pptx', '.ppt')):
+                from langchain_community.document_loaders import UnstructuredPowerPointLoader
+                loader = UnstructuredPowerPointLoader(file_path)
+                docs = loader.load()
+                text = "\n\n".join([doc.page_content for doc in docs])
+            elif file_path.endswith(('.xlsx', '.xls')):
+                from langchain_community.document_loaders import UnstructuredExcelLoader
+                loader = UnstructuredExcelLoader(file_path)
+                docs = loader.load()
+                text = "\n\n".join([doc.page_content for doc in docs])
+            elif file_path.endswith('.csv'):
+                text = self.csv_to_markdown(file_path)
+            elif file_path.endswith('.json'):
+                text = self.json_to_text(file_path)
+            elif file_path.endswith('.jsonl'):
+                text = self.jsonl_to_text(file_path)
+            elif file_path.endswith(('.png', '.jpg', '.jpeg')):
+                text = self.image_ocr_to_text(file_path)
             else:
                 raise ValueError(f"不支持的文件格式: {file_path}")
 

@@ -1,0 +1,17 @@
+- [x] `src/rag_api/routes.py` 的 `allowed_extensions` 包含 `.docx, .doc, .html, .htm, .png, .jpg, .jpeg, .pptx, .ppt, .csv, .xls, .xlsx, .json, .jsonl`
+- [x] `src/rag_api/routes.py` 的 `supported_extensions` 包含与 `allowed_extensions` 一致的扩展名
+- [x] `src/knowledge_base.py` 包含 `csv_to_markdown()` 方法，能将 CSV 转为 Markdown 表格文本
+- [x] `src/knowledge_base.py` 包含 `json_to_text()` 方法，能将 JSON 递归展平为可读文本
+- [x] `src/knowledge_base.py` 包含 `jsonl_to_text()` 方法，能逐行解析 JSONL 并拼接文本
+- [x] `src/knowledge_base.py` 包含 `image_ocr_to_text()` 方法，能使用 EasyOCR 提取图片文字
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.docx/.doc` 通过 UnstructuredWordDocumentLoader
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.html/.htm` 通过 UnstructuredHTMLLoader
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.pptx/.ppt` 通过 UnstructuredPowerPointLoader
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.xlsx/.xls` 通过 UnstructuredExcelLoader
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.csv` 通过 csv_to_markdown()
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.json` 通过 json_to_text()
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.jsonl` 通过 jsonl_to_text()
+- [x] `src/knowledge_base.py` 的 `ingest()` 方法支持 `.png/.jpg/.jpeg` 通过 image_ocr_to_text()
+- [x] `frontend/src/components/knowledge/FileUploader.tsx` 的 `input.accept` 包含所有新增文件类型
+- [x] `FileUploader` 的文件路由逻辑将新增文件类型统一走 `knowledgeBaseApi.ingest()`
+- [x] 前端项目可正常编译（npm run build 无错误）

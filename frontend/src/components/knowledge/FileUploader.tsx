@@ -27,10 +27,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
     setUploading(true)
     try {
       const imageFiles = files.filter(f => isImageFile(f.name))
-      const pdfFiles = files.filter(f => isPdfFile(f.name))
-      const textFiles = files.filter(f => !isImageFile(f.name) && !isPdfFile(f.name))
 
-      if (imageFiles.length > 0) {
+      if (imageFiles.length > 0 && vlmEnabled) {
         const result = await multimodalApi.ingestImage(imageFiles, 'unknown', vlmEnabled)
         if (result.success) {
           message.success(`成功导入 ${result.success_count} 张图片`)
@@ -39,18 +37,13 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
         }
       }
 
-      for (const pdfFile of pdfFiles) {
-        const result = await multimodalApi.ingestPdf(pdfFile, 'unknown', true, vlmEnabled)
-        if (result.success) {
-          message.success(`PDF导入成功，提取 ${result.extracted_images_count} 张图片`)
-        } else {
-          message.warning(`PDF导入部分失败`)
-        }
-      }
+      const nonVlmFiles = vlmEnabled
+        ? files.filter(f => !isImageFile(f.name))
+        : files
 
-      for (const textFile of textFiles) {
-        await knowledgeBaseApi.ingest(textFile)
-        message.success('文件导入成功')
+      for (const file of nonVlmFiles) {
+        await knowledgeBaseApi.ingest(file)
+        message.success(`${file.name} 导入成功`)
       }
 
       onUploadSuccess?.()
@@ -81,7 +74,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           const input = document.createElement('input')
           input.type = 'file'
           input.multiple = true
-          input.accept = '.pdf,.txt,.md,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp'
+          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.png,.jpg,.jpeg,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl'
           input.onchange = (e) => {
             const files = Array.from((e.target as HTMLInputElement).files ?? [])
             if (files.length > 0) void handleUpload(files)
@@ -112,7 +105,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           {uploading ? '上传中...' : '拖拽文件到此处或点击上传'}
         </div>
         <div style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
-          支持 PDF、TXT、MD、DOC、DOCX、JPG、PNG 等格式，最大 50MB
+          支持 PDF、Word、Excel、PPT、HTML、JSON、CSV、图片等格式，最大 50MB
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12 }}>

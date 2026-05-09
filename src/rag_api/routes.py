@@ -293,7 +293,7 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
     Raises:
         HTTPException: 400 — 不支持的文件格式或文件过大
     """
-    allowed_extensions = [".pdf", ".txt", ".md"]
+    allowed_extensions = [".pdf", ".txt", ".md", ".docx", ".doc", ".html", ".htm", ".png", ".jpg", ".jpeg", ".pptx", ".ppt", ".csv", ".xls", ".xlsx", ".json", ".jsonl"]
     filename = file.filename or ""
     _, ext = os.path.splitext(filename)
     ext = ext.lower()
@@ -397,7 +397,7 @@ async def auto_ingest() -> dict:
             },
         }
 
-    supported_extensions = (".pdf", ".txt", ".md")
+    supported_extensions = (".pdf", ".txt", ".md", ".docx", ".doc", ".html", ".htm", ".png", ".jpg", ".jpeg", ".pptx", ".ppt", ".csv", ".xls", ".xlsx", ".json", ".jsonl")
     total_files = 0
     success_count = 0
     failed_count = 0
