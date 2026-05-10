@@ -17,15 +17,25 @@ export const knowledgeBaseApi = {
     }
   },
 
-  ingest: async (file: File): Promise<{ filename: string; source_type: string; chunks_count: number }> => {
+  ingest: async (
+    file: File,
+  ): Promise<{
+    filename: string
+    source_type: string
+    chunks_count: number
+    storage_location?: string
+  }> => {
     const formData = new FormData()
     formData.append('file', file)
-    const { data } = await ragApiClient.post<ApiResponse<{
-      filename: string
-      source_type: string
-      chunks_count: number
-      message?: string
-    }>>('/ingest', formData, {
+    const { data } = await ragApiClient.post<
+      ApiResponse<{
+        filename: string
+        source_type: string
+        chunks_count: number
+        storage_location?: string
+        message?: string
+      }>
+    >('/ingest', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (!data.success || !data.data) {

@@ -375,13 +375,15 @@ async def _ingest_image_to_multimodal(image_path: str, filename: str) -> dict:
                     "doc_type": "image",
                     "source_type": "image",
                     "chunks_count": result.success_count,
-                    "message": "图片已导入多模态知识库，完成OCR识别",
+                    "storage_location": "./chroma_db_multimodal",
+                    "message": "图片已导入多模态知识库，完成OCR识别。数据存储位置: ./chroma_db_multimodal",
                 },
             }
         else:
+            error_msg = result.errors[0] if result.errors else "图片导入失败"
             return {
                 "success": False,
-                "message": f"图片导入失败: {result.message}",
+                "message": f"图片导入失败: {error_msg}",
             }
     except Exception as e:
         logger.error(f"多模态知识库导入异常: {e}", exc_info=True)
@@ -509,24 +511,49 @@ async def knowledge_base_stats() -> dict:
     """
     知识库统计接口
 
-    获取知识库的文档片段统计信息。
+    获取知识库的文档片段统计信息，包括主知识库和多模态知识库。
 
     关联接口：API接口文档.md 4.8 知识库统计
 
     Returns:
-        dict: 统一响应格式，data 包含 total_chunks
+        dict: 统一响应格式，data 包含 document_count, chunk_count, image_chunk_count, status
     """
     kb = get_knowledge_base()
+    text_chunk_count = 0
+    document_count = 0
+    multimodal_chunk_count = 0
 
     try:
         collection = kb.db._collection
-        total_chunks = collection.count() if hasattr(collection, "count") else 0
+        text_chunk_count = collection.count() if hasattr(collection, "count") else 0
+
+        try:
+            all_data = collection.get(include=["metadatas"])
+            if all_data and "metadatas" in all_data and all_data["metadatas"]:
+                unique_sources = set()
+                for metadata in all_data["metadatas"]:
+                    if metadata and "source" in metadata:
+                        unique_sources.add(metadata["source"])
+                document_count = len(unique_sources)
+        except Exception:
+            document_count = text_chunk_count
+
     except Exception:
-        total_chunks = 0
+        pass
+
+    try:
+        from src.multimodal.interface.api.routes import create_multimodal_service
+        multimodal_service = create_multimodal_service(vlm_enabled=False)
+        multimodal_chunk_count = multimodal_service.repository.count()
+    except Exception:
+        pass
 
     return {
         "success": True,
         "data": {
-            "total_chunks": total_chunks,
+            "document_count": document_count,
+            "chunk_count": text_chunk_count,
+            "image_chunk_count": multimodal_chunk_count,
+            "status": "ready" if kb else "initializing",
         },
     }

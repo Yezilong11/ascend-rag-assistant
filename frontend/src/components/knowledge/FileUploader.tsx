@@ -23,7 +23,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
   }
 
   const handleUpload = async (files: File[]) => {
-    const oversized = files.find(f => f.size > MAX_FILE_SIZE)
+    const oversized = files.find((f) => f.size > MAX_FILE_SIZE)
     if (oversized) {
       message.error('文件大小不能超过50MB')
       return
@@ -33,9 +33,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
       for (const file of files) {
         const result = await knowledgeBaseApi.ingest(file)
         const fileType = getFileTypeLabel(file.name)
-        const successMsg = fileType === '图片' 
-          ? `${file.name} 已导入多模态知识库，完成OCR识别`
-          : `${file.name} 导入成功`
+        const storageInfo = result.storage_location ? `\n存储位置: ${result.storage_location}` : ''
+        const successMsg =
+          fileType === '图片'
+            ? `${file.name} 已导入多模态知识库，完成OCR识别${storageInfo}`
+            : `${file.name} 导入成功${storageInfo}`
         message.success(successMsg)
       }
       onUploadSuccess?.()
@@ -66,7 +68,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           const input = document.createElement('input')
           input.type = 'file'
           input.multiple = true
-          input.accept = '.pdf,.txt,.md,.doc,.docx,.html,.htm,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl,.jpg,.jpeg,.png,.gif,.bmp'
+          input.accept =
+            '.pdf,.txt,.md,.doc,.docx,.html,.htm,.ppt,.pptx,.csv,.xls,.xlsx,.json,.jsonl,.jpg,.jpeg,.png,.gif,.bmp'
           input.onchange = (e) => {
             const files = Array.from((e.target as HTMLInputElement).files ?? [])
             if (files.length > 0) void handleUpload(files)
@@ -100,7 +103,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess }) => {
           支持 PDF、Word、Excel、图片 等格式，最大 50MB
         </div>
         <div style={{ color: 'var(--text-tertiary)', fontSize: 10, marginTop: 4 }}>
-          <span style={{ color: 'var(--neon-blue)' }}>📄 文档</span> → 主知识库 | <span style={{ color: 'var(--neon-purple)' }}>🖼️ 图片</span> → 多模态知识库(OCR)
+          <span style={{ color: 'var(--neon-blue)' }}>📄 文档</span> → 主知识库 |{' '}
+          <span style={{ color: 'var(--neon-purple)' }}>🖼️ 图片</span> → 多模态知识库(OCR)
         </div>
       </div>
     </div>

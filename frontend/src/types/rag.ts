@@ -46,5 +46,6 @@ export interface SourceData {
 export interface KnowledgeBaseStats {
   document_count: number
   chunk_count: number
+  image_chunk_count: number
   status: string
 }

@@ -61,7 +61,15 @@ const SettingsPage: React.FC = () => {
   }, [])
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, maxHeight: 'calc(100vh - 112px)', overflowY: 'auto' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 20,
+        maxHeight: 'calc(100vh - 112px)',
+        overflowY: 'auto',
+      }}
+    >
       <div style={{ flex: 1, minWidth: 300 }}>
         <EngineControl
           ragStatus={
@@ -126,7 +134,14 @@ const SettingsPage: React.FC = () => {
             }}
           >
             <div>
-              <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
                 VLM 图片描述
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
@@ -142,6 +157,7 @@ const SettingsPage: React.FC = () => {
           stats={kbStats}
           onAutoIngest={handleAutoIngest}
           onUploadSuccess={handleUploadSuccess}
+          imageChunkCount={kbStats?.image_chunk_count}
         />
       </div>
     </div>
