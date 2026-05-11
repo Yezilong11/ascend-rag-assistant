@@ -7,7 +7,6 @@ import ChatPage from '@/pages/ChatPage'
 import SkillTreePage from '@/pages/SkillTreePage'
 import SettingsPage from '@/pages/SettingsPage'
 import RSSPage from '@/pages/RSSPage'
-import MultimodalPage from '@/pages/MultimodalPage'
 
 const antTheme = {
   algorithm: theme.darkAlgorithm,
@@ -52,7 +51,6 @@ const App: React.FC = () => {
             <Route path="chat" element={<ChatPage />} />
             <Route path="skill-tree" element={<SkillTreePage />} />
             <Route path="rss" element={<RSSPage />} />
-            <Route path="multimodal" element={<MultimodalPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

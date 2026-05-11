@@ -75,12 +75,6 @@ Thumbs.db
 __pycache__/app.cpython-313.pyc
 /chroma_db
 skill_tree_data/d47aa73a-79e8-491c-9adb-0562341015b9.json
-src/__pycache__/__init__.cpython-310.pyc
-src/__pycache__/__init__.cpython-313.pyc
-src/__pycache__/knowledge_base.cpython-310.pyc
-src/__pycache__/knowledge_base.cpython-313.pyc
-src/__pycache__/rag_engine.cpython-310.pyc
-src/__pycache__/rag_engine.cpython-313.pyc
 
 services/rss-crawler/data/
 services/rss-crawler/*.db

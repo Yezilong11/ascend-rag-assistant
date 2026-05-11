@@ -34,8 +34,18 @@ class EasyOCREngine(MultimodalProcessingService):
         import logging
         logging.getLogger("easyocr").setLevel(logging.ERROR)
 
-        import easyocr
-        self._easyocr_engine = easyocr.Reader(['ch_sim', 'en'], gpu=False, verbose=False)
+        try:
+            import easyocr
+            self._easyocr_engine = easyocr.Reader(['ch_sim', 'en'], gpu=False, verbose=False)
+            self._engine_type = "easyocr"
+        except ImportError:
+            print("⚠️ easyocr未安装，使用基础OCR回退模式")
+            self._easyocr_engine = None
+            self._engine_type = "fallback"
+        except Exception as e:
+            print(f"⚠️ EasyOCR初始化失败: {e}，使用基础OCR回退模式")
+            self._easyocr_engine = None
+            self._engine_type = "fallback"
 
         self._initialized = True
 
@@ -46,7 +56,10 @@ class EasyOCREngine(MultimodalProcessingService):
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"图片文件不存在: {image_path}")
 
-        return self._extract_easyocr(image_path)
+        if self._easyocr_engine is not None:
+            return self._extract_easyocr(image_path)
+        else:
+            return self._extract_fallback(image_path)
 
     def _extract_easyocr(self, image_path: str) -> Tuple[str, List[Dict]]:
         """使用EasyOCR提取"""
@@ -89,6 +102,17 @@ class EasyOCREngine(MultimodalProcessingService):
 
         full_text = " ".join(full_text_parts)
         return full_text, text_blocks
+
+    def _extract_fallback(self, image_path: str) -> Tuple[str, List[Dict]]:
+        """基础OCR回退：使用Pillow提取图片基本信息"""
+        self._engine_type = "fallback"
+        try:
+            from PIL import Image
+            img = Image.open(image_path)
+            info = f"[图片] {os.path.basename(image_path)} ({img.size[0]}x{img.size[1]}] {img.mode})"
+            return info, []
+        except Exception:
+            return f"[图片] {os.path.basename(image_path)}", []
 
     def generate_image_description(
         self,

@@ -70,7 +70,7 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
             backgroundClip: 'text',
           }}
         >
-          知识库管理
+          多模态知识库管理
         </h3>
       </div>
 
@@ -124,9 +124,7 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>
-              文档数
-            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>文档数</div>
             <div style={{ fontWeight: 700, color: 'var(--neon-blue)', fontSize: 18 }}>
               {stats.document_count}
             </div>
@@ -140,9 +138,7 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>
-              分块数
-            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>分块数</div>
             <div style={{ fontWeight: 700, color: 'var(--neon-purple)', fontSize: 18 }}>
               {stats.chunk_count}
             </div>
@@ -156,9 +152,7 @@ const KnowledgeBasePanel: React.FC<KnowledgeBasePanelProps> = ({
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>
-              图片块数
-            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 4 }}>图片块数</div>
             <div style={{ fontWeight: 700, color: '#ff8c00', fontSize: 18 }}>
               {imageChunkCount ?? '-'}
             </div>

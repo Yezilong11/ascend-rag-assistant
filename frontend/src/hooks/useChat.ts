@@ -95,14 +95,42 @@ export function useChat() {
 
   const connectWithAttachments = useCallback(
     async (question: string, attachments: File[]) => {
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
+      const pdfExtensions = ['pdf']
+      
+      const imageFiles = attachments.filter(file => {
+        const ext = file.name.split('.').pop()?.toLowerCase() || ''
+        return imageExtensions.includes(ext)
+      })
+      
+      const pdfFiles = attachments.filter(file => {
+        const ext = file.name.split('.').pop()?.toLowerCase() || ''
+        return pdfExtensions.includes(ext)
+      })
+      
+      const contextParts: string[] = []
+      
       try {
-        const result = await multimodalApi.ingestImage(attachments, 'unknown', false)
-        const imageContext = result.success_count > 0
-          ? `\n\n[用户附加了 ${result.success_count} 张图片，已导入多模态知识库]`
+        if (imageFiles.length > 0) {
+          const result = await multimodalApi.ingestImage(imageFiles, 'unknown', false)
+          if (result.success_count > 0) {
+            contextParts.push(`${result.success_count} 张图片已导入多模态知识库`)
+          }
+        }
+        
+        if (pdfFiles.length > 0) {
+          for (const pdfFile of pdfFiles) {
+            await ragApi.ingest(pdfFile)
+          }
+          contextParts.push(`${pdfFiles.length} 个PDF文档已导入知识库`)
+        }
+        
+        const context = contextParts.length > 0
+          ? `\n\n[用户附加了：${contextParts.join('；')}，已导入知识库]`
           : ''
-        connect(question + imageContext)
+        connect(question + context)
       } catch (error) {
-        connect(question + '\n\n[图片上传失败，仅基于文本回答]')
+        connect(question + '\n\n[文件上传失败，仅基于文本回答]')
       }
     },
     [connect],
