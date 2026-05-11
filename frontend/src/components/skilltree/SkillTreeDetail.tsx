@@ -21,6 +21,7 @@ interface SkillTreeDetailProps {
   onDelete: () => void
   onGeneratePaths: () => void
   onNodeClick?: (node: SkillNode) => void
+  onUpdateCompletion?: (skillId: string, rate: number) => void
 }
 
 const SkillTreeDetail: React.FC<SkillTreeDetailProps> = ({
@@ -31,6 +32,7 @@ const SkillTreeDetail: React.FC<SkillTreeDetailProps> = ({
   onDelete,
   onGeneratePaths,
   onNodeClick,
+  onUpdateCompletion,
 }) => {
   const [addSkillOpen, setAddSkillOpen] = useState(false)
   const [relationOpen, setRelationOpen] = useState(false)
@@ -89,11 +91,41 @@ const SkillTreeDetail: React.FC<SkillTreeDetailProps> = ({
             {skillTree.description}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <span className="neon-tag">{Object.keys(skillTree.skill_nodes).length} 个节点</span>
-          <span className="neon-tag-green neon-tag">
-            完成率 {skillTree.completion_rate.toFixed(1)}%
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                width: 80,
+                height: 6,
+                borderRadius: 3,
+                background: 'var(--bg-tertiary)',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  borderRadius: 3,
+                  background: 'var(--gradient-primary)',
+                  width: `${skillTree.completion_rate}%`,
+                  transition: 'width 0.5s ease',
+                  boxShadow: '0 0 8px rgba(0, 212, 255, 0.3)',
+                }}
+              />
+            </div>
+            <span
+              style={{
+                color: skillTree.completion_rate >= 100 ? 'var(--neon-green)' : 'var(--neon-blue)',
+                fontSize: 12,
+                fontWeight: 600,
+                minWidth: 42,
+                textAlign: 'right',
+              }}
+            >
+              {skillTree.completion_rate.toFixed(1)}%
+            </span>
+          </div>
         </div>
       </div>
 
@@ -201,7 +233,12 @@ const SkillTreeDetail: React.FC<SkillTreeDetailProps> = ({
           >
             {skillNodeList.length > 0 ? (
               skillNodeList.map((node) => (
-                <SkillNodeCard key={node.id} node={node} onClick={onNodeClick} />
+                <SkillNodeCard
+                  key={node.id}
+                  node={node}
+                  onClick={onNodeClick}
+                  onUpdateCompletion={onUpdateCompletion}
+                />
               ))
             ) : (
               <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>

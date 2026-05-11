@@ -1,0 +1,214 @@
+{
+  "id": "ccc52290-1399-4bce-80f8-9c4e8d75efcf",
+  "name": "1",
+  "description": "测试",
+  "version": "1.0",
+  "created_at": "2024-01-01",
+  "updated_at": "2024-01-01",
+  "root_nodes": [
+    "c58f7766-bd82-4da7-a1db-127d16d2e855",
+    "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44",
+    "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+    "141a3063-9682-4d73-8a11-c0f86e5ab754",
+    "5b18697a-345d-4ef8-bcbc-b87e7c1fb783",
+    "e6284b6f-2b43-4bad-a531-9e1c7fcfbace"
+  ],
+  "skill_nodes": {
+    "c58f7766-bd82-4da7-a1db-127d16d2e855": {
+      "id": "c58f7766-bd82-4da7-a1db-127d16d2e855",
+      "name": "2",
+      "description": "测试",
+      "level": "beginner",
+      "skill_type": "technical",
+      "parent_ids": [],
+      "child_ids": [
+        "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44",
+        "5de5e41b-4d67-41dd-a8d5-2c834cd4a274"
+      ],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [],
+      "learning_time": 2,
+      "completion_rate": 65.0
+    },
+    "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44": {
+      "id": "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44",
+      "name": "3",
+      "description": "测试",
+      "level": "intermediate",
+      "skill_type": "theoretical",
+      "parent_ids": [
+        "c58f7766-bd82-4da7-a1db-127d16d2e855"
+      ],
+      "child_ids": [],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [
+        {
+          "source_skill_id": "c58f7766-bd82-4da7-a1db-127d16d2e855",
+          "target_skill_id": "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44",
+          "relation_type": "prerequisite",
+          "weight": 1
+        },
+        {
+          "source_skill_id": "c58f7766-bd82-4da7-a1db-127d16d2e855",
+          "target_skill_id": "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44",
+          "relation_type": "related",
+          "weight": 1
+        }
+      ],
+      "learning_time": 3,
+      "completion_rate": 65.0
+    },
+    "5de5e41b-4d67-41dd-a8d5-2c834cd4a274": {
+      "id": "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+      "name": "4",
+      "description": "测试",
+      "level": "advanced",
+      "skill_type": "practical",
+      "parent_ids": [
+        "c58f7766-bd82-4da7-a1db-127d16d2e855"
+      ],
+      "child_ids": [
+        "141a3063-9682-4d73-8a11-c0f86e5ab754"
+      ],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [
+        {
+          "source_skill_id": "c58f7766-bd82-4da7-a1db-127d16d2e855",
+          "target_skill_id": "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+          "relation_type": "advanced",
+          "weight": 1
+        }
+      ],
+      "learning_time": 4,
+      "completion_rate": 3.0
+    },
+    "141a3063-9682-4d73-8a11-c0f86e5ab754": {
+      "id": "141a3063-9682-4d73-8a11-c0f86e5ab754",
+      "name": "5",
+      "description": "测试",
+      "level": "beginner",
+      "skill_type": "technical",
+      "parent_ids": [
+        "5de5e41b-4d67-41dd-a8d5-2c834cd4a274"
+      ],
+      "child_ids": [
+        "5b18697a-345d-4ef8-bcbc-b87e7c1fb783"
+      ],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [
+        {
+          "source_skill_id": "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+          "target_skill_id": "141a3063-9682-4d73-8a11-c0f86e5ab754",
+          "relation_type": "advanced",
+          "weight": 1
+        }
+      ],
+      "learning_time": 3,
+      "completion_rate": 0.0
+    },
+    "5b18697a-345d-4ef8-bcbc-b87e7c1fb783": {
+      "id": "5b18697a-345d-4ef8-bcbc-b87e7c1fb783",
+      "name": "6",
+      "description": "测试",
+      "level": "expert",
+      "skill_type": "competition",
+      "parent_ids": [
+        "141a3063-9682-4d73-8a11-c0f86e5ab754"
+      ],
+      "child_ids": [],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [
+        {
+          "source_skill_id": "141a3063-9682-4d73-8a11-c0f86e5ab754",
+          "target_skill_id": "5b18697a-345d-4ef8-bcbc-b87e7c1fb783",
+          "relation_type": "related",
+          "weight": 1
+        }
+      ],
+      "learning_time": 1,
+      "completion_rate": 42.0
+    },
+    "e6284b6f-2b43-4bad-a531-9e1c7fcfbace": {
+      "id": "e6284b6f-2b43-4bad-a531-9e1c7fcfbace",
+      "name": "7",
+      "description": "测试",
+      "level": "beginner",
+      "skill_type": "practical",
+      "parent_ids": [],
+      "child_ids": [],
+      "related_ids": [],
+      "resources": [],
+      "prerequisites": [],
+      "learning_time": 4,
+      "completion_rate": 15.0
+    }
+  },
+  "learning_paths": {
+    "8c113025-24d3-4f5d-993d-fde4fd445127": {
+      "path_id": "8c113025-24d3-4f5d-993d-fde4fd445127",
+      "skill_ids": [
+        "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44"
+      ],
+      "estimated_time": 3,
+      "difficulty": "intermediate"
+    },
+    "cfcabc46-48b6-45d0-bfc7-e98bb2787685": {
+      "path_id": "cfcabc46-48b6-45d0-bfc7-e98bb2787685",
+      "skill_ids": [
+        "c58f7766-bd82-4da7-a1db-127d16d2e855",
+        "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44"
+      ],
+      "estimated_time": 5,
+      "difficulty": "intermediate"
+    },
+    "ba83f29d-ca69-4666-9bc9-fe2529b8a5fa": {
+      "path_id": "ba83f29d-ca69-4666-9bc9-fe2529b8a5fa",
+      "skill_ids": [
+        "141a3063-9682-4d73-8a11-c0f86e5ab754"
+      ],
+      "estimated_time": 3,
+      "difficulty": "beginner"
+    },
+    "a07d1937-0926-49c4-a460-ea889864680d": {
+      "path_id": "a07d1937-0926-49c4-a460-ea889864680d",
+      "skill_ids": [
+        "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+        "141a3063-9682-4d73-8a11-c0f86e5ab754"
+      ],
+      "estimated_time": 7,
+      "difficulty": "advanced"
+    },
+    "9a7575a6-86b4-44fa-b3ec-b21f08bfa6ea": {
+      "path_id": "9a7575a6-86b4-44fa-b3ec-b21f08bfa6ea",
+      "skill_ids": [
+        "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44"
+      ],
+      "estimated_time": 3,
+      "difficulty": "intermediate"
+    },
+    "2b6d7efa-ca4c-422a-8d35-599fd20e6ee1": {
+      "path_id": "2b6d7efa-ca4c-422a-8d35-599fd20e6ee1",
+      "skill_ids": [
+        "c58f7766-bd82-4da7-a1db-127d16d2e855",
+        "a5f1e53c-d62a-4a7e-a9f2-e8d3058b4c44"
+      ],
+      "estimated_time": 5,
+      "difficulty": "intermediate"
+    },
+    "baf07cce-81ea-446b-8961-85ab617a42b0": {
+      "path_id": "baf07cce-81ea-446b-8961-85ab617a42b0",
+      "skill_ids": [
+        "c58f7766-bd82-4da7-a1db-127d16d2e855",
+        "5de5e41b-4d67-41dd-a8d5-2c834cd4a274",
+        "141a3063-9682-4d73-8a11-c0f86e5ab754"
+      ],
+      "estimated_time": 9,
+      "difficulty": "advanced"
+    }
+  }
+}

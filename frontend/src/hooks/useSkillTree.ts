@@ -91,9 +91,13 @@ export function useSkillTree() {
   const updateCompletion = useCallback(
     async (skillTreeId: string, skillId: string, rate: number) => {
       await skillTreeApi.updateCompletion(skillTreeId, skillId, rate)
-      await fetchDetail(skillTreeId)
+      try {
+        const tree = await skillTreeApi.get(skillTreeId)
+        setCurrentSkillTree(tree)
+        setLearningPaths(Object.values(tree.learning_paths))
+      } catch {}
     },
-    [fetchDetail],
+    [setCurrentSkillTree, setLearningPaths],
   )
 
   const generatePaths = useCallback(

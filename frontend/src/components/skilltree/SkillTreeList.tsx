@@ -110,11 +110,32 @@ const SkillTreeList: React.FC<SkillTreeListProps> = ({
             >
               {item.description}
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <span className="neon-tag">{item.skill_count} 个技能</span>
-              <span className="neon-tag-green neon-tag">
-                完成率 {item.completion_rate.toFixed(1)}%
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 4,
+                    borderRadius: 2,
+                    background: 'var(--bg-tertiary)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      borderRadius: 2,
+                      background: 'var(--gradient-primary)',
+                      width: `${item.completion_rate}%`,
+                      transition: 'width 0.3s ease',
+                    }}
+                  />
+                </div>
+                <span style={{ color: 'var(--neon-blue)', fontSize: 10, fontWeight: 500 }}>
+                  {item.completion_rate.toFixed(1)}%
+                </span>
+              </div>
             </div>
           </div>
         )
