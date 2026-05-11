@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SendOutlined, StopOutlined, PlusOutlined, CloseOutlined, FilePdfOutlined, PictureOutlined } from '@ant-design/icons'
+import { SendOutlined, StopOutlined, PlusOutlined, CloseOutlined, FilePdfOutlined } from '@ant-design/icons'
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: File[]) => void

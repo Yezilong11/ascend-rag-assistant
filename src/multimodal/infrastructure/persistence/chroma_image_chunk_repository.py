@@ -12,6 +12,12 @@ from ...domain.value_objects.bounding_box import BoundingBox
 from ...domain.value_objects.processing_status import ProcessingStatus
 from ...domain.repositories.image_chunk_repository import ImageChunkRepository
 
+try:
+    from modelscope import snapshot_download
+    MODELSCOPE_AVAILABLE = True
+except ImportError:
+    MODELSCOPE_AVAILABLE = False
+
 
 class ChromaImageChunkRepository(ImageChunkRepository):
     """
@@ -49,8 +55,27 @@ class ChromaImageChunkRepository(ImageChunkRepository):
                 "向量数据库依赖未安装。请运行: pip install langchain langchain-huggingface langchain-chroma chromadb"
             )
 
+        # 优先使用本地模型，其次ModelScope下载，最后HuggingFace在线加载
+        embedding_model = self._embedding_model
+        if not os.path.exists(embedding_model):
+            if MODELSCOPE_AVAILABLE:
+                print(f"[INFO] 本地Embedding模型未找到，正在从ModelScope下载 bge-large-zh-v1.5...")
+                try:
+                    os.makedirs(embedding_model, exist_ok=True)
+                    snapshot_download(
+                        "BAAI/bge-large-zh-v1.5",
+                        local_dir=embedding_model
+                    )
+                    print(f"[OK] ModelScope下载完成，保存到: {embedding_model}")
+                except Exception as e:
+                    print(f"[WARN] ModelScope下载失败: {e}，尝试从HuggingFace加载")
+                    embedding_model = "BAAI/bge-large-zh-v1.5"
+            else:
+                print("[INFO] 本地Embedding模型未找到，正在从HuggingFace下载 BAAI/bge-large-zh-v1.5...")
+                embedding_model = "BAAI/bge-large-zh-v1.5"
+
         self._embeddings = HuggingFaceEmbeddings(
-            model_name=self._embedding_model,
+            model_name=embedding_model,
             model_kwargs={"device": "cpu"}
         )
 

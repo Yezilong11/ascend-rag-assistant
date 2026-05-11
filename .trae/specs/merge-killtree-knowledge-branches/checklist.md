@@ -1,0 +1,14 @@
+- [x] 本地 feature/front_back 分支引用已修复，HEAD 可解析
+- [x] git status 显示工作区干净
+- [x] git fsck --full 无错误
+- [x] killtree 分支已成功合并，技能树组件代码完整
+- [x] knowledge 分支已成功合并，知识库统一API代码完整
+- [x] .pyc 冲突已解决，冲突文件已删除
+- [x] .gitignore 已清理冗余 .pyc 条目
+- [x] 技术文档去同存异处理完成：同名文档保留一份，不同名文档全部保留
+- [x] ThemeToggle 组件已按 knowledge 分支版本移除
+- [x] 无残留冲突标记（无 <<<<<<< HEAD）
+- [x] 关键项目文件完好（server.py, requirements.txt, src/, frontend/ 等）
+- [x] 未修改远程仓库内容（未执行 git push）
+- [x] 未删除项目主要文件
+- [x] 未重新初始化仓库

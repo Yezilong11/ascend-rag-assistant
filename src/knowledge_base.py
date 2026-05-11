@@ -7,17 +7,21 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
 
-# 兼容不同版本的 Document 导入
 try:
     from langchain_core.documents import Document
 except ImportError:
     from langchain.schema import Document
 
-# PDF解析依赖，请确保已安装：pip install pdfplumber
 try:
     import pdfplumber
 except ImportError:
     pdfplumber = None
+
+try:
+    from modelscope import snapshot_download
+    MODELSCOPE_AVAILABLE = True
+except ImportError:
+    MODELSCOPE_AVAILABLE = False
 
 
 class KnowledgeBase:
@@ -113,17 +117,40 @@ class KnowledgeBase:
         if pdfplumber is None:
             raise ImportError("pdfplumber is required for PDF processing. Install with: pip install pdfplumber")
 
-        # 优先使用本地模型，否则从HuggingFace下载
+        # 优先使用本地模型，其次ModelScope下载，最后HuggingFace在线加载
         embedding_model_path = os.path.join(model_dir, "bge-large-zh-v1.5")
+        model_kwargs = {'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
+
         if os.path.exists(embedding_model_path):
+            print(f"正在加载本地Embedding模型: {embedding_model_path}...")
             self.embeddings = HuggingFaceEmbeddings(
                 model_name=embedding_model_path,
-                model_kwargs={'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
+                model_kwargs=model_kwargs
             )
+        elif MODELSCOPE_AVAILABLE:
+            print("[INFO] 本地Embedding模型未找到，正在从ModelScope下载 bge-large-zh-v1.5...")
+            try:
+                os.makedirs(embedding_model_path, exist_ok=True)
+                snapshot_download(
+                    "BAAI/bge-large-zh-v1.5",
+                    local_dir=embedding_model_path
+                )
+                print(f"[OK] ModelScope下载完成，保存到: {embedding_model_path}")
+                self.embeddings = HuggingFaceEmbeddings(
+                    model_name=embedding_model_path,
+                    model_kwargs=model_kwargs
+                )
+            except Exception as e:
+                print(f"[WARN] ModelScope下载失败: {e}，尝试从HuggingFace加载")
+                self.embeddings = HuggingFaceEmbeddings(
+                    model_name="BAAI/bge-large-zh-v1.5",
+                    model_kwargs=model_kwargs
+                )
         else:
+            print("[INFO] 本地Embedding模型未找到，正在从HuggingFace下载 BAAI/bge-large-zh-v1.5...")
             self.embeddings = HuggingFaceEmbeddings(
                 model_name="BAAI/bge-large-zh-v1.5",
-                model_kwargs={'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
+                model_kwargs=model_kwargs
             )
 
         # 确保持久化目录存在
