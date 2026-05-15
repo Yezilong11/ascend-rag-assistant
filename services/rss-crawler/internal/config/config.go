@@ -11,9 +11,7 @@ type Config struct {
 	Server      ServerConfig      `yaml:"server"`
 	Database    DatabaseConfig    `yaml:"database"`
 	Meilisearch MeilisearchConfig `yaml:"meilisearch"`
-	Ollama      OllamaConfig      `yaml:"ollama"`
 	Crawler     CrawlerConfig     `yaml:"crawler"`
-	AI          AIConfig          `yaml:"ai"`
 }
 
 type ServerConfig struct {
@@ -31,22 +29,11 @@ type MeilisearchConfig struct {
 	IndexName string `yaml:"index_name"`
 }
 
-type OllamaConfig struct {
-	Host    string `yaml:"host"`
-	Model   string `yaml:"model"`
-	Timeout int    `yaml:"timeout"`
-}
-
 type CrawlerConfig struct {
 	Concurrent int    `yaml:"concurrent"`
 	Timeout    int    `yaml:"timeout"`
 	Retry      int    `yaml:"retry"`
 	UserAgent  string `yaml:"user_agent"`
-}
-
-type AIConfig struct {
-	Enabled   bool `yaml:"enabled"`
-	BatchSize int  `yaml:"batch_size"`
 }
 
 func (c *Config) Address() string {

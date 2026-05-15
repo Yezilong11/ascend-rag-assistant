@@ -1,20 +1,22 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { Card, Form, Input, InputNumber, Switch, Button, message, Divider, Descriptions } from 'antd'
+import { Card, Button, message, Descriptions, Tag, Alert, Space } from 'antd'
 import {
   RobotOutlined,
   ApiOutlined,
   ThunderboltOutlined,
-  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  LinkOutlined,
 } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import { rssApi } from '@/services/rssApi'
 import type { AIConfig, SystemStatus } from '@/types/rss'
 
 const RSSSettings: React.FC = () => {
   const [aiConfig, setAiConfig] = useState<AIConfig | null>(null)
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
-  const [form] = Form.useForm()
   const [testing, setTesting] = useState(false)
-  const [saving, setSaving] = useState(false)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const load = async () => {
@@ -25,22 +27,21 @@ const RSSSettings: React.FC = () => {
         ])
         setAiConfig(config)
         setSystemStatus(status)
-        form.setFieldsValue(config)
       } catch (error) {
         message.error((error as Error).message)
       }
     }
     void load()
-  }, [form])
+  }, [])
 
-  const handleTestConnection = useCallback(async () => {
+  const handleTestAvailability = useCallback(async () => {
     setTesting(true)
     try {
-      const connected = await rssApi.ai.testConnection()
-      if (connected) {
-        message.success('AI连接测试成功')
+      const available = await rssApi.ai.testConnection()
+      if (available) {
+        message.success('本地模型可用')
       } else {
-        message.warning('AI连接测试失败')
+        message.warning('本地模型不可用，请先在智能问答页面加载模型')
       }
     } catch (error) {
       message.error((error as Error).message)
@@ -49,29 +50,13 @@ const RSSSettings: React.FC = () => {
     }
   }, [])
 
-  const handleSave = useCallback(async () => {
-    setSaving(true)
-    try {
-      const values = await form.validateFields()
-      const updated = await rssApi.ai.updateConfig(values)
-      setAiConfig(updated)
-      message.success('AI配置保存成功')
-    } catch (error) {
-      if (error instanceof Error) {
-        message.error(error.message)
-      }
-    } finally {
-      setSaving(false)
-    }
-  }, [form])
-
   return (
     <div style={{ display: 'flex', gap: 20 }}>
       <div style={{ flex: 1 }}>
         <Card
           title={
             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <RobotOutlined style={{ color: 'var(--neon-blue)' }} /> AI 配置
+              <RobotOutlined style={{ color: 'var(--neon-blue)' }} /> AI 分析配置
             </span>
           }
           style={{
@@ -79,49 +64,74 @@ const RSSSettings: React.FC = () => {
             border: '1px solid var(--border-glass)',
           }}
         >
-          <Form form={form} layout="vertical">
-            <Form.Item name="enabled" label="启用AI" valuePropName="checked">
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              name="host"
-              label="AI 服务地址"
-              rules={[{ required: true, message: '请输入AI服务地址' }]}
-            >
-              <Input placeholder="如 http://localhost:11434" />
-            </Form.Item>
-            <Form.Item
-              name="model"
-              label="模型名称"
-              rules={[{ required: true, message: '请输入模型名称' }]}
-            >
-              <Input placeholder="如 qwen2.5:7b" />
-            </Form.Item>
-            <Form.Item name="timeout" label="超时时间（秒）">
-              <InputNumber min={10} max={300} style={{ width: '100%' }} />
-            </Form.Item>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <Button
-                type="primary"
-                icon={<CheckCircleOutlined />}
-                loading={saving}
-                onClick={() => void handleSave()}
-                style={{
-                  background: 'var(--gradient-primary)',
-                  border: 'none',
-                }}
-              >
-                保存配置
-              </Button>
-              <Button
-                icon={<ThunderboltOutlined />}
-                loading={testing}
-                onClick={() => void handleTestConnection()}
-              >
-                测试连接
-              </Button>
-            </div>
-          </Form>
+          {aiConfig && (
+            <>
+              <Descriptions column={1} size="small" bordered>
+                <Descriptions.Item label="当前模型">
+                  {aiConfig.model_name || '-'}
+                </Descriptions.Item>
+                <Descriptions.Item label="模型标识">
+                  <Tag>{aiConfig.model_key || '-'}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="引擎状态">
+                  {aiConfig.engine_loaded ? (
+                    <Tag color="success">已加载</Tag>
+                  ) : (
+                    <Tag color="error">未加载</Tag>
+                  )}
+                </Descriptions.Item>
+              </Descriptions>
+
+              {!aiConfig.engine_loaded && (
+                <Alert
+                  style={{ marginTop: 16 }}
+                  type="warning"
+                  icon={<ExclamationCircleOutlined />}
+                  showIcon
+                  message="RAG引擎未加载"
+                  description="AI分析功能需要先加载本地模型。请前往智能问答页面加载模型后再使用。"
+                  action={
+                    <Button
+                      size="small"
+                      type="link"
+                      icon={<LinkOutlined />}
+                      onClick={() => navigate('/')}
+                    >
+                      前往加载
+                    </Button>
+                  }
+                />
+              )}
+
+              {aiConfig.available_models && Object.keys(aiConfig.available_models).length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 12, marginBottom: 8 }}>
+                    可用模型
+                  </div>
+                  <Space wrap>
+                    {Object.entries(aiConfig.available_models).map(([key, info]) => (
+                      <Tag
+                        key={key}
+                        color={key === aiConfig.model_key ? 'processing' : 'default'}
+                      >
+                        {info.name} - {info.description}
+                      </Tag>
+                    ))}
+                  </Space>
+                </div>
+              )}
+
+              <div style={{ marginTop: 16 }}>
+                <Button
+                  icon={<ThunderboltOutlined />}
+                  loading={testing}
+                  onClick={() => void handleTestAvailability()}
+                >
+                  测试可用性
+                </Button>
+              </div>
+            </>
+          )}
         </Card>
       </div>
 

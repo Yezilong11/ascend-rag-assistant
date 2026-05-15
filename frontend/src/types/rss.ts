@@ -68,10 +68,10 @@ export interface ArticleListResponse {
 }
 
 export interface AIConfig {
-  host: string
-  model: string
-  timeout: number
-  enabled: boolean
+  model_key: string
+  model_name: string
+  engine_loaded: boolean
+  available_models?: Record<string, { name: string; description: string }>
 }
 
 export interface BridgeIngestResult {

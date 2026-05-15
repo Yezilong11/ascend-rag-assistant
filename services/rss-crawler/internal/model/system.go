@@ -15,20 +15,6 @@ func (Tag) TableName() string {
 	return "tags"
 }
 
-type AIAnalysisCache struct {
-	ID          int64     `gorm:"primaryKey;autoIncrement" json:"id"`
-	ContentHash string    `gorm:"size:64;uniqueIndex" json:"content_hash"`
-	Summary     string    `gorm:"type:text" json:"summary"`
-	Keywords    string    `gorm:"type:text" json:"keywords"`
-	Sentiment   string    `gorm:"size:50" json:"sentiment"`
-	Theme       string    `gorm:"size:100" json:"theme"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-func (AIAnalysisCache) TableName() string {
-	return "ai_analysis_cache"
-}
-
 type SystemConfig struct {
 	Key       string    `gorm:"primaryKey;size:100" json:"key"`
 	Value     string    `gorm:"type:text" json:"value"`

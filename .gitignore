@@ -78,3 +78,4 @@ skill_tree_data/d47aa73a-79e8-491c-9adb-0562341015b9.json
 
 services/rss-crawler/data/
 services/rss-crawler/*.db
+chroma_db/chroma.sqlite3

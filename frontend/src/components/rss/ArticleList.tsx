@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Table, Tag, Select, Button, Space, message, Modal } from 'antd'
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  CheckCircleOutlined,
-  ImportOutlined,
-} from '@ant-design/icons'
+import { Table, Tag, Select, Button, Space, Modal } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { useRSSStore } from '@/stores/rssStore'
 import ArticleDetail from './ArticleDetail'
 import IngestToKBButton from './IngestToKBButton'
@@ -91,7 +86,7 @@ const ArticleList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 180,
+      width: 150,
       render: (_: unknown, record: Article) => (
         <Space size="small">
           <Button

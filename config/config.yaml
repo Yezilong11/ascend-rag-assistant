@@ -39,3 +39,6 @@ rss:
   service_url: "http://localhost:8081"
   timeout: 30
   auto_ingest: false
+  ai:
+    enabled: true
+    cache_path: "data/rss_ai_cache.json"

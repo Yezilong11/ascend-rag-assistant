@@ -27,7 +27,6 @@ func InitDatabase(dsn string) error {
 		&Category{},
 		&Article{},
 		&Tag{},
-		&AIAnalysisCache{},
 		&SystemConfig{},
 	)
 	if err != nil {

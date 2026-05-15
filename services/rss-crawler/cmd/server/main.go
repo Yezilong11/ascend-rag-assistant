@@ -56,8 +56,7 @@ func main() {
 		systemHandler := handler.NewSystemHandler()
 		systemHandler.RegisterRoutes(api)
 
-		aiHandler := handler.NewAIHandler(cfg)
-		aiHandler.RegisterRoutes(api)
+
 	}
 
 	r.GET("/ws", func(c *gin.Context) {

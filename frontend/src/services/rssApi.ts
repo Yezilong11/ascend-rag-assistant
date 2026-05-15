@@ -123,31 +123,30 @@ export const rssApi = {
   },
 
   ai: {
-    // AI config 代理路由：Go 服务直接返回裸数据
+    // AI config 代理路由：后端现在使用 { success, data } 包装格式
     getConfig: async (): Promise<AIConfig> => {
-      const { data } = await rssApiClient.get<AIConfig>('/ai/config')
-      return data
+      const { data } = await rssApiClient.get<{ success: boolean; data: AIConfig }>('/ai/config')
+      return data.data
     },
 
     updateConfig: async (config: Partial<AIConfig>): Promise<AIConfig> => {
-      const { data } = await rssApiClient.put<AIConfig>('/ai/config', config)
-      return data
+      const { data } = await rssApiClient.put<{ success: boolean; data: AIConfig }>('/ai/config', config)
+      return data.data
     },
 
-    // 修复路径：/ai/test-connection → /ai/test（与 Python 后端 routes.py 一致）
     testConnection: async (): Promise<boolean> => {
-      const { data } = await rssApiClient.post<{ connected: boolean }>('/ai/test')
-      return data.connected
+      const { data } = await rssApiClient.post<{ success: boolean; data: { available: boolean } }>('/ai/test')
+      return data.data.available
     },
 
-    // 修复路径：/ai/analyze/${articleId} → /articles/${articleId}/analyze（与 Python 后端 routes.py 一致）
-    analyzeArticle: async (articleId: number): Promise<void> => {
-      await rssApiClient.post(`/articles/${articleId}/analyze`)
+    analyzeArticle: async (articleId: number): Promise<{ summary: string; keywords: string; sentiment: string }> => {
+      const { data } = await rssApiClient.post<{ success: boolean; data: { summary: string; keywords: string; sentiment: string } }>(`/articles/${articleId}/analyze`)
+      return data.data
     },
 
-    // 修复路径：/ai/analyze-all → /articles/analyze-all（与 Python 后端 routes.py 一致）
-    analyzeAll: async (): Promise<void> => {
-      await rssApiClient.post('/articles/analyze-all')
+    analyzeAll: async (): Promise<{ message: string; count: number }> => {
+      const { data } = await rssApiClient.post<{ success: boolean; data: { message: string; count: number } }>('/articles/analyze-all')
+      return data.data
     },
   },
 

@@ -1,14 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Tag, Divider } from 'antd'
 import { UserOutlined, ClockCircleOutlined, LinkOutlined, GlobalOutlined } from '@ant-design/icons'
 import IngestToKBButton from './IngestToKBButton'
+import AnalyzeButton from './AnalyzeButton'
 import type { Article } from '@/types/rss'
+
+interface AIAnalysisResult {
+  summary: string
+  keywords: string
+  sentiment: string
+}
 
 interface ArticleDetailProps {
   article: Article
 }
 
+const sentimentConfig: Record<string, { color: string; label: string }> = {
+  '正面': { color: 'success', label: '正面' },
+  '中性': { color: 'default', label: '中性' },
+  '负面': { color: 'error', label: '负面' },
+}
+
 const ArticleDetail: React.FC<ArticleDetailProps> = ({ article }) => {
+  const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null)
+
+  const displaySummary = analysis?.summary || article.summary
+  const displayKeywords = analysis?.keywords
+  const displaySentiment = analysis?.sentiment
+
   return (
     <div>
       <h2
@@ -58,25 +77,52 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ article }) => {
         </div>
       )}
 
-      {article.summary && (
-        <>
-          <div
-            style={{
-              padding: 12,
-              borderRadius: 8,
-              background: 'rgba(0, 212, 255, 0.06)',
-              border: '1px solid rgba(0, 212, 255, 0.15)',
-              marginBottom: 16,
-              fontSize: 13,
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--neon-blue)', fontSize: 12 }}>
-              AI 摘要
-            </div>
-            {article.summary}
+      {displaySummary && (
+        <div
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            background: 'rgba(0, 212, 255, 0.06)',
+            border: '1px solid rgba(0, 212, 255, 0.15)',
+            marginBottom: 16,
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--neon-blue)', fontSize: 12 }}>
+            AI 摘要
           </div>
-        </>
+          {displaySummary}
+        </div>
+      )}
+
+      {(displayKeywords || displaySentiment) && (
+        <div
+          style={{
+            padding: 12,
+            borderRadius: 8,
+            background: 'rgba(0, 255, 136, 0.04)',
+            border: '1px solid rgba(0, 255, 136, 0.12)',
+            marginBottom: 16,
+            fontSize: 13,
+          }}
+        >
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+            {displayKeywords && (
+              <span style={{ color: 'var(--text-secondary)' }}>
+                关键词：{displayKeywords}
+              </span>
+            )}
+            {displaySentiment && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                情感：
+                <Tag color={sentimentConfig[displaySentiment]?.color || 'default'}>
+                  {sentimentConfig[displaySentiment]?.label || displaySentiment}
+                </Tag>
+              </span>
+            )}
+          </div>
+        </div>
       )}
 
       <Divider style={{ margin: '12px 0' }} />
@@ -94,7 +140,8 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ article }) => {
 
       <Divider style={{ margin: '16px 0' }} />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        <AnalyzeButton articleId={article.id} onAnalyzed={setAnalysis} />
         <IngestToKBButton articleId={article.id} />
       </div>
     </div>

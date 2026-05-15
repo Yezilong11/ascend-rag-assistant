@@ -39,10 +39,10 @@ RSS 网关代理路由模块
         GET    /api/rss/tags/{id}                    — 获取单个标签
         DELETE /api/rss/tags/{id}                    — 删除标签
 
-    AI 代理:
+    AI 本地服务:
         GET    /api/rss/ai/config                    — 获取 AI 配置
         PUT    /api/rss/ai/config                    — 更新 AI 配置
-        POST   /api/rss/ai/test                      — 测试 AI 连接
+        POST   /api/rss/ai/test                      — 测试 AI 可用性
         POST   /api/rss/articles/{id}/analyze        — AI 分析单篇文章
         POST   /api/rss/articles/analyze-all         — AI 分析所有文章
 
@@ -63,6 +63,7 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
+from .ai_service import RSSAIService
 from .client import RSSClient, RSSServiceUnavailableError
 from .models import (
     RSSCategoryCreate,
@@ -86,6 +87,18 @@ def get_rss_client() -> RSSClient:
     if _rss_client is None:
         _rss_client = RSSClient()
     return _rss_client
+
+
+# 模块级 RSSAIService 单例
+_ai_service: Optional[RSSAIService] = None
+
+
+def get_ai_service() -> RSSAIService:
+    """获取 RSSAIService 单例实例"""
+    global _ai_service
+    if _ai_service is None:
+        _ai_service = RSSAIService()
+    return _ai_service
 
 
 # ---------------------------------------------------------------------------
@@ -278,38 +291,56 @@ async def delete_tag(tag_id: int):
 
 
 # ===========================================================================
-# AI 代理
+# AI 本地服务
 # ===========================================================================
 
 @router.get("/ai/config")
 async def get_ai_config():
     """获取 AI 配置"""
-    return await _proxy("GET", "/ai/config")
+    ai = get_ai_service()
+    return {"success": True, "data": ai.get_config()}
 
 
 @router.put("/ai/config")
 async def update_ai_config(request: Request):
-    """更新 AI 配置"""
-    body = await request.json()
-    return await _proxy("PUT", "/ai/config", json=body)
+    ai = get_ai_service()
+    return {"success": True, "data": ai.get_config()}
 
 
 @router.post("/ai/test")
 async def test_ai_connection():
-    """测试 AI 连接"""
-    return await _proxy("POST", "/ai/test")
+    """测试 AI 可用性"""
+    ai = get_ai_service()
+    result = ai.test_availability()
+    return {"success": True, "data": result}
 
 
 @router.post("/articles/{article_id}/analyze")
 async def analyze_article(article_id: int):
     """AI 分析单篇文章"""
-    return await _proxy("POST", f"/articles/{article_id}/analyze")
+    ai = get_ai_service()
+    client = get_rss_client()
+    try:
+        result = await ai.analyze_article(article_id, client)
+        return {"success": True, "data": result}
+    except RuntimeError as e:
+        if "RAG引擎未加载" in str(e):
+            raise HTTPException(status_code=503, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/articles/analyze-all")
 async def analyze_all_articles():
     """AI 分析所有文章"""
-    return await _proxy("POST", "/articles/analyze-all")
+    ai = get_ai_service()
+    client = get_rss_client()
+    try:
+        result = await ai.analyze_all_articles(client)
+        return {"success": True, "data": result}
+    except RuntimeError as e:
+        if "RAG引擎未加载" in str(e):
+            raise HTTPException(status_code=503, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ===========================================================================
