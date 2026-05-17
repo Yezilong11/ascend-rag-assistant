@@ -7,9 +7,15 @@ interface IngestToKBButtonProps {
   articleId: number
   size?: 'small' | 'middle' | 'large'
   type?: 'link' | 'default' | 'primary' | 'dashed' | 'text'
+  shortText?: boolean
 }
 
-const IngestToKBButton: React.FC<IngestToKBButtonProps> = ({ articleId, size = 'middle', type = 'default' }) => {
+const IngestToKBButton: React.FC<IngestToKBButtonProps> = ({
+  articleId,
+  size = 'middle',
+  type = 'default',
+  shortText = false,
+}) => {
   const [loading, setLoading] = useState(false)
   const [ingested, setIngested] = useState(false)
 
@@ -28,8 +34,15 @@ const IngestToKBButton: React.FC<IngestToKBButtonProps> = ({ articleId, size = '
 
   if (ingested) {
     return (
-      <Button type={type} size={size} icon={<CheckCircleOutlined />} disabled>
-        已导入
+      <Button
+        type={type}
+        size={size}
+        icon={<CheckCircleOutlined />}
+        disabled
+        style={{ whiteSpace: 'nowrap' }}
+        title={shortText ? '已导入知识库' : undefined}
+      >
+        {shortText ? '已导入' : '已导入知识库'}
       </Button>
     )
   }
@@ -41,8 +54,10 @@ const IngestToKBButton: React.FC<IngestToKBButtonProps> = ({ articleId, size = '
       icon={<ImportOutlined />}
       loading={loading}
       onClick={() => void handleIngest()}
+      style={{ whiteSpace: 'nowrap' }}
+      title={shortText ? '导入知识库' : undefined}
     >
-      导入知识库
+      {shortText ? '导入' : '导入知识库'}
     </Button>
   )
 }

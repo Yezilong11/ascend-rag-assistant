@@ -24,12 +24,9 @@ const ArticleList: React.FC = () => {
     void fetchArticles(filter)
   }, [filter, fetchArticles])
 
-  const handleFilterChange = useCallback(
-    (key: keyof ArticleFilter, value: number | undefined) => {
-      setFilter((prev) => ({ ...prev, [key]: value, page: 1 }))
-    },
-    [],
-  )
+  const handleFilterChange = useCallback((key: keyof ArticleFilter, value: number | undefined) => {
+    setFilter((prev) => ({ ...prev, [key]: value, page: 1 }))
+  }, [])
 
   const handlePageChange = useCallback((page: number, pageSize: number) => {
     setFilter((prev) => ({ ...prev, page, limit: pageSize }))
@@ -86,18 +83,20 @@ const ArticleList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 160,
       render: (_: unknown, record: Article) => (
-        <Space size="small">
+        <Space size={4} style={{ display: 'flex', flexWrap: 'nowrap' }}>
           <Button
             type="link"
             size="small"
             icon={<EyeOutlined />}
             onClick={() => handleViewDetail(record)}
+            style={{ whiteSpace: 'nowrap', paddingRight: 8 }}
+            title="查看文章"
           >
             查看
           </Button>
-          <IngestToKBButton articleId={record.id} size="small" type="link" />
+          <IngestToKBButton articleId={record.id} size="small" type="link" shortText={true} />
         </Space>
       ),
     },
