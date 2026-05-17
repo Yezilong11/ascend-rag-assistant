@@ -10,6 +10,7 @@
 [![Ant Design](https://img.shields.io/badge/Ant%20Design-6-1890FF.svg)](https://ant.design/)
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-1.5.0-purple.svg)](https://trychroma.com/)
 [![Go](https://img.shields.io/badge/Go-1.20+-00ADD8.svg)](https://golang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
 </div>
 
@@ -28,6 +29,7 @@
 - 🏠 **完全本地部署** - 支持全流程本地运行，保护数据隐私
 - 🔄 **易于扩展** - 模块化设计，方便添加新的数据源和模型
 - 📡 **RSS资讯订阅** - 集成RSS抓取模块，自动获取竞赛相关资讯并导入知识库
+- 🐳 **Docker容器化** - 一键部署，开箱即用
 
 ## 🏗️ 系统架构
 
@@ -67,57 +69,109 @@
 - Go 1.20+
 - Node.js 18+
 - PyTorch 2.0+
+- Docker & Docker Compose
 - (可选) 华为昇腾NPU + CANN工具链
 
-### 安装步骤
+### 方式一：Docker 部署（推荐）
 
-1. **克隆项目**
+使用 Docker 一键部署，自动完成前端构建和服务编排。
+
+**1. 克隆项目**
 ```bash
 git clone https://github.com/your-username/ascend-rag-assistant.git
 cd ascend-rag-assistant
 ```
 
-2. **创建Python虚拟环境**
+**2. 下载模型**
+
+```bash
+pip install modelscope
+
+# 创建模型目录
+mkdir -p models
+
+# 下载 BGE 嵌入模型
+modelscope download --model BAAI/bge-large-zh-v1.5 --local_dir ./models/bge-large-zh-v1.5
+
+# 下载 Qwen2 大语言模型
+modelscope download --model qwen/Qwen2-1.5B-Instruct --local_dir ./models/Qwen2-1.5B-Instruct
+```
+
+**3. 启动服务**
+
+```bash
+# 构建并启动
+docker compose up -d --build
+
+# 查看日志
+docker compose logs -f
+
+# 停止服务
+docker compose down
+```
+
+**4. 访问应用**
+
+- 前端界面：`http://localhost:8080`
+- API 文档：`http://localhost:8080/docs`
+
+**自定义配置**
+
+```bash
+# 修改端口
+HOST_PORT=3000 docker compose up -d
+
+# 配置 CORS 允许的域名
+CORS_ORIGINS="http://example.com,http://another.com" docker compose up -d
+```
+
+**数据持久化**
+
+Docker 部署会自动挂载以下目录：
+- `models/` - AI模型文件
+- `data/` - 上传文件和数据
+- `skill_tree_data/` - 技能树数据
+- `chroma_db/` - 向量数据库
+
+### 方式二：本地开发部署
+
+**1. 克隆项目**
+```bash
+git clone https://github.com/your-username/ascend-rag-assistant.git
+cd ascend-rag-assistant
+```
+
+**2. 创建Python虚拟环境**
 ```bash
 conda create -n ascend-rag python=3.10
 conda activate ascend-rag
 ```
 
-3. **安装Python依赖**
+**3. 安装Python依赖**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **安装前端依赖**
+**4. 安装前端依赖**
 ```bash
 cd frontend
 npm install
 cd ..
 ```
 
-5. **下载模型**
-
-推荐使用 **ModelScope（魔搭社区）** 下载，国内访问更快：
+**5. 下载模型**
 
 ```bash
-# 安装modelscope
 pip install modelscope
 
 # 下载 BGE 嵌入模型
 modelscope download --model BAAI/bge-large-zh-v1.5 --local_dir ./models/bge-large-zh-v1.5
 
-# 下载 Qwen2 大语言模型（推荐）
+# 下载 Qwen2 大语言模型
 modelscope download --model qwen/Qwen2-1.5B-Instruct --local_dir ./models/Qwen2-1.5B-Instruct
 ```
 
-**目录结构：**
-```
-models/
-├── bge-large-zh-v1.5/
-└── Qwen2-1.5B-Instruct/  # 推荐
-```
-
-6. **一键启动**
+**6. 一键启动**
 
 项目需要同时启动三个服务：Go RSS 服务、FastAPI 后端、React 前端。
 
@@ -271,10 +325,10 @@ npm run dev
 ## 🛠️ 开发计划
 
 - [x] RSS资讯订阅模块集成
+- [x] Docker容器化支持
 - [ ] 支持更多LLM模型（百川、灵犀等）
 - [ ] Parent-document检索优化
 - [ ] 支持多模态文档（图片中的文字提取）
-- [ ] Docker容器化支持
 
 ## 🤝 贡献指南
 

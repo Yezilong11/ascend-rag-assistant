@@ -1,5 +1,6 @@
 .git
 .trae
+.github
 node_modules
 frontend/node_modules
 __pycache__
@@ -15,3 +16,9 @@ doc
 tests
 *.md
 !README.md
+frontend/dist
+.env
+.env.*
+*.log
+.vscode
+.idea
