@@ -9,6 +9,8 @@ API 文档：http://localhost:8000/docs
 可通过 config/config.yaml 配置服务参数
 """
 
+import os
+
 import yaml
 import uvicorn
 from src.rag_api.app import create_app
@@ -18,8 +20,8 @@ with open(config_path, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
 server_config = config.get("server", {})
-port = server_config.get("api_port", 8000)
-host = server_config.get("host", "127.0.0.1")
+port = int(os.environ.get("API_PORT", server_config.get("api_port", 8000)))
+host = os.environ.get("API_HOST", server_config.get("host", "127.0.0.1"))
 
 app = create_app(include_skill_tree=True, include_multimodal=True)
 

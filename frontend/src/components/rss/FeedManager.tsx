@@ -24,7 +24,7 @@ const statusMap: Record<string, { color: string; text: string; icon: React.React
 }
 
 const FeedManager: React.FC = () => {
-  const { feeds, categories, loading, fetchFeeds, crawlFeed, deleteFeed, updateFeed } =
+  const { feeds, categories, loading, fetchFeeds, crawlFeed, deleteFeed } =
     useRSSStore()
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editFeed, setEditFeed] = useState<Feed | null>(null)
@@ -140,7 +140,7 @@ const FeedManager: React.FC = () => {
       ) : (
         <Row gutter={[16, 16]}>
           {feeds.map((feed) => {
-            const status = statusMap[feed.status] ?? statusMap.idle
+            const status = statusMap[feed.status ?? 'idle'] ?? statusMap.idle
             return (
               <Col key={feed.id} span={8}>
                 <Card
@@ -155,8 +155,8 @@ const FeedManager: React.FC = () => {
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {feed.name}
                       </span>
-                      <Tag color={status.color} icon={status.icon} style={{ marginLeft: 'auto' }}>
-                        {status.text}
+                      <Tag color={status!.color} icon={status!.icon} style={{ marginLeft: 'auto' }}>
+                        {status!.text}
                       </Tag>
                     </div>
                   }

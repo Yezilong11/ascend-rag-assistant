@@ -14,6 +14,7 @@ RAG API 应用工厂模块
 """
 
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,11 +27,19 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 
-CORS_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:8501",
-    "http://localhost:3000",
-]
+
+def _get_cors_origins():
+    env_origins = os.environ.get("CORS_ORIGINS", "")
+    if env_origins:
+        return [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+    return [
+        "http://localhost:5173",
+        "http://localhost:8501",
+        "http://localhost:3000",
+    ]
+
+
+CORS_ORIGINS = _get_cors_origins()
 
 
 def create_app(include_skill_tree: bool = True, include_multimodal: bool = True, include_rss: bool = True) -> FastAPI:

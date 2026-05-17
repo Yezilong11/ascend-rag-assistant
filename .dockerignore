@@ -1,0 +1,17 @@
+.git
+.trae
+node_modules
+frontend/node_modules
+__pycache__
+*.pyc
+.pytest_cache
+chroma_db
+chroma_db_multimodal
+*.db
+*.egg-info
+rss-server
+offline_packages
+doc
+tests
+*.md
+!README.md

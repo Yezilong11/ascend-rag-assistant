@@ -106,6 +106,7 @@ interface SkillNodeData {
   skillType: SkillType
   skillTypeLabel: string
   completionRate: number
+  [key: string]: unknown
 }
 
 type SkillNodeType = Node<SkillNodeData, 'skill'>

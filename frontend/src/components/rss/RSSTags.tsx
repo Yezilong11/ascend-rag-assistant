@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
-import { Card, Button, List, Modal, Form, Input, message, Empty, Tag } from 'antd'
-import { PlusOutlined, DeleteOutlined, TagsOutlined } from '@ant-design/icons'
+import { Button, Modal, Form, Input, message, Empty, Tag } from 'antd'
+import { PlusOutlined, TagsOutlined } from '@ant-design/icons'
 import { useRSSStore } from '@/stores/rssStore'
 import { rssApi } from '@/services/rssApi'
 

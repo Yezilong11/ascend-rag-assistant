@@ -109,7 +109,7 @@ const RSSCategories: React.FC = () => {
         <Empty description="暂无分类" />
       ) : (
         <List
-          grid={{ gutter: 16, columns: 3 }}
+          grid={{ gutter: 16, column: 3 }}
           dataSource={categories}
           renderItem={(item) => (
             <List.Item>

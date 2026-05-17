@@ -46,13 +46,20 @@ app = FastAPI(
 )
 
 # 配置CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+def _get_cors_origins():
+    env_origins = os.environ.get("CORS_ORIGINS", "")
+    if env_origins:
+        return [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+    return [
         "http://localhost:5173",
         "http://localhost:8501",
         "http://localhost:3000",
-    ],
+    ]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
