@@ -1,5 +1,6 @@
 import os
 import logging
+import subprocess
 import warnings
 import threading
 from typing import Optional
@@ -61,7 +62,14 @@ PREDEFINED_MODELS = {
         "repo_id": "THUDM/chatglm3-6b",
         "name": "ChatGLM3-6B",
         "description": "大模型，质量更好",
-    }
+    },
+    "zilong-1": {
+        "repo_id": "yzl111/zilong-1",
+        "ms_repo_id": "yzl111/zilong-1",
+        "name": "纸龙一号",
+        "description": "魔搭社区模型，通过CLI下载",
+        "download_method": "cli",
+    },
 }
 
 
@@ -247,29 +255,48 @@ class RAGAssistant:
             model_path = local_model_path
             print(f"正在加载本地模型: {model_path}...")
         else:
-            # 本地不存在，尝试从ModelScope下载
-            if MODELSCOPE_AVAILABLE:
-                print(f"[INFO] 本地模型 {local_model_name} 未找到，正在从ModelScope下载...")
+            download_method = model_config.get("download_method", "sdk")
+            ms_repo_id = model_config.get("ms_repo_id")
+            target_dir = os.path.join(model_dir, local_model_name)
+
+            if not ms_repo_id:
+                if model_id.startswith("Qwen/"):
+                    ms_repo_id = model_id.replace("Qwen/", "qwen/")
+                else:
+                    ms_repo_id = model_id
+
+            model_path = None
+
+            if download_method == "cli":
+                print(f"[INFO] 本地模型 {local_model_name} 未找到，正在通过魔搭CLI下载...")
                 try:
-                    # ModelScope的Qwen命名格式修正
-                    if model_id.startswith("Qwen/"):
-                        modelscope_repo_id = model_id.replace("Qwen/", "qwen/")
-                    else:
-                        modelscope_repo_id = model_id
-                    # 确保下载到项目的models文件夹
-                    target_dir = os.path.join(model_dir, local_model_name)
-                    snapshot_download(
-                        modelscope_repo_id,
-                        local_dir=target_dir
+                    result = subprocess.run(
+                        ["modelscope", "download", "--model", ms_repo_id, "--local_dir", target_dir],
+                        check=True,
+                        capture_output=True,
+                        text=True,
                     )
                     model_path = target_dir
-                    print(f"[OK] ModelScope下载完成，保存到: {model_path}")
+                    print(f"[OK] 魔搭CLI下载完成，保存到: {model_path}")
+                except FileNotFoundError:
+                    print(f"[WARN] 魔搭CLI未安装，回退到ModelScope SDK下载...")
+                except subprocess.CalledProcessError as e:
+                    print(f"[WARN] 魔搭CLI下载失败: {e.stderr.strip() if e.stderr else str(e)}，回退到ModelScope SDK下载...")
                 except Exception as e:
-                    print(f"[WARN] ModelScope下载失败: {str(e)}，回退到HuggingFace")
-                    model_path = model_id
-            else:
+                    print(f"[WARN] 魔搭CLI下载异常: {str(e)}，回退到ModelScope SDK下载...")
+
+            if model_path is None and MODELSCOPE_AVAILABLE:
+                print(f"[INFO] 正在从ModelScope SDK下载...")
+                try:
+                    snapshot_download(ms_repo_id, local_dir=target_dir)
+                    model_path = target_dir
+                    print(f"[OK] ModelScope SDK下载完成，保存到: {model_path}")
+                except Exception as e:
+                    print(f"[WARN] ModelScope SDK下载失败: {str(e)}，回退到HuggingFace")
+
+            if model_path is None:
                 model_path = model_id
-                print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
+                print(f"[INFO] 回退到HuggingFace在线加载: {model_id}...")
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,

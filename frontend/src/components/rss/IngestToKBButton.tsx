@@ -42,7 +42,7 @@ const IngestToKBButton: React.FC<IngestToKBButtonProps> = ({ articleId, size = '
       loading={loading}
       onClick={() => void handleIngest()}
     >
-      导入知识库
+      导入
     </Button>
   )
 }

@@ -21,7 +21,8 @@
 ### ✨ 核心特性
 
 - 🧠 **基于RAG的知识问答** - 结合私域知识库与大语言模型，提供准确可靠的回答
-- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾910B NPU
+- 🐉 **自研微调模型「纸龙一号」** - 团队自研竞赛问答微调模型，针对竞赛场景深度优化，效果显著
+- ⚡ **昇腾NPU原生优化** - 原生支持华为昇腾310B NPU
 - 🎯 **可切换模型** - 侧边栏自由切换不同大小的模型
 - ✨ **流式输出** - 打字机逐字显示效果，大幅改善等待体验
 - 🖥️ **现代化前端界面** - 基于React 19 + Ant Design 6构建
@@ -77,6 +78,7 @@
 使用 Docker 一键部署，自动完成前端构建和服务编排。
 
 **1. 克隆项目**
+
 ```bash
 git clone https://github.com/your-username/ascend-rag-assistant.git
 cd ascend-rag-assistant
@@ -128,6 +130,7 @@ CORS_ORIGINS="http://example.com,http://another.com" docker compose up -d
 **数据持久化**
 
 Docker 部署会自动挂载以下目录：
+
 - `models/` - AI模型文件
 - `data/` - 上传文件和数据
 - `skill_tree_data/` - 技能树数据
@@ -136,23 +139,27 @@ Docker 部署会自动挂载以下目录：
 ### 方式二：本地开发部署
 
 **1. 克隆项目**
+
 ```bash
 git clone https://github.com/your-username/ascend-rag-assistant.git
 cd ascend-rag-assistant
 ```
 
 **2. 创建Python虚拟环境**
+
 ```bash
 conda create -n ascend-rag python=3.10
 conda activate ascend-rag
 ```
 
 **3. 安装Python依赖**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 **4. 安装前端依赖**
+
 ```bash
 cd frontend
 npm install
@@ -176,6 +183,7 @@ modelscope download --model qwen/Qwen2-1.5B-Instruct --local_dir ./models/Qwen2-
 项目需要同时启动三个服务：Go RSS 服务、FastAPI 后端、React 前端。
 
 **方式一：一键启动（Windows）**
+
 ```bash
 start.bat
 ```
@@ -183,23 +191,27 @@ start.bat
 **方式二：手动启动（需要三个终端窗口）**
 
 终端1 - 启动 Go RSS 服务：
+
 ```bash
 cd services/rss-crawler
 go run cmd/server/main.go
 ```
 
 终端2 - 启动 FastAPI 服务器：
+
 ```bash
 python server.py
 ```
 
 终端3 - 启动 React 前端：
+
 ```bash
 cd frontend
 npm run dev
 ```
 
 应用启动后，访问：
+
 - 前端界面：`http://localhost:3000`
 - API文档：`http://localhost:8000/docs`
 
@@ -235,6 +247,7 @@ npm run dev
 ### 预置知识库
 
 本项目已预置了近百场国内大学生竞赛的相关资料，包括：
+
 - 报名须知
 - 竞赛规则
 - 评分标准
@@ -244,6 +257,7 @@ npm run dev
 ### 配置说明
 
 在 `config/` 目录下可以修改系统配置：
+
 - `config.yaml`: 模型路径、超参数、RSS服务配置等
 
 ## 🧩 模块说明
@@ -251,14 +265,16 @@ npm run dev
 ### `src/knowledge_base.py` - 知识库管理
 
 负责文档加载、文本切分、向量化存储和检索：
+
 - 支持多种文档格式（PDF、TXT、MD）
-- 递归字符切分策略，chunk_size=500，chunk_overlap=50
+- 递归字符切分策略，chunk\_size=500，chunk\_overlap=50
 - 使用 BGE-Large-ZH 中文嵌入模型
 - ChromaDB 持久化存储
 
 ### `src/rag_engine.py` - RAG引擎核心
 
 结合检索到的知识和大模型生成能力：
+
 - 支持预定义多模型切换，默认加载 Qwen2-1.5B
 - 自动从ModelScope下载模型到`./models/`文件夹
 - 支持流式输出（打字机效果）
@@ -269,6 +285,7 @@ npm run dev
 ### `src/rss_gateway/` - RSS代理网关模块
 
 将RSS抓取服务集成到主应用：
+
 - **client.py** - httpx异步客户端封装
 - **routes.py** - FastAPI代理路由，34个端点
 - **bridge.py** - 知识库桥接，将RSS文章导入ChromaDB
@@ -277,12 +294,14 @@ npm run dev
 ### `src/skill_tree/` - 竞赛技能树模块
 
 技能树全栈模块，支持学习路径规划：
+
 - **domain/** - 领域模型（SkillTree, SkillNode, LearningPath等）
 - **application/** - 应用服务层，协调业务逻辑
 - **infrastructure/** - 基础设施层，JSON文件持久化存储
 - **api/** - FastAPI REST API接口
 
 功能特性：
+
 - 创建/删除技能树
 - 添加技能节点
 - 建立技能依赖关系
@@ -292,6 +311,7 @@ npm run dev
 ### `services/rss-crawler/` - RSS抓取微服务
 
 独立运行的Go微服务，提供RSS订阅和抓取功能：
+
 - RSS源管理（CRUD + 抓取调度）
 - 文章存储与检索
 - AI摘要生成（通过Ollama）
@@ -307,20 +327,21 @@ npm run dev
 3. **关闭采样** - 设置`do_sample=False`使用贪婪搜索，速度略快但多样性减少
 
 **性能参考（CPU/CUDA）**:
-| 硬件 | 模型 | 平均生成速度 | 300字回答时间 |
-|------|------|-------------|--------------|
-| CPU | Qwen2-0.5B | ~8-12 tokens/s | 25-40秒 |
-| CPU | Qwen2-1.5B | ~3-5 tokens/s | 60-100秒 |
-| CUDA GPU | Qwen2-1.5B | ~15-20 tokens/s | 15-20秒 |
+
+| 硬件       | 模型         | 平均生成速度           | 300字回答时间 |
+| -------- | ---------- | ---------------- | -------- |
+| CPU      | Qwen2-0.5B | \~8-12 tokens/s  | 25-40秒   |
+| CPU      | Qwen2-1.5B | \~3-5 tokens/s   | 60-100秒  |
+| CUDA GPU | Qwen2-1.5B | \~15-20 tokens/s | 15-20秒   |
 
 ## 📊 效果展示
 
-| 功能 | 演示 |
-|------|------|
-| 智能问答 | 支持竞赛报名、规则、日程等各类问题查询 |
-| 来源引用 | 每个回答都标注参考来源，可追溯 |
-| RSS资讯 | 自动抓取竞赛相关资讯并导入知识库 |
-| 文档上传 | 支持随时添加新的竞赛资料 |
+| 功能    | 演示                  |
+| ----- | ------------------- |
+| 智能问答  | 支持竞赛报名、规则、日程等各类问题查询 |
+| 来源引用  | 每个回答都标注参考来源，可追溯     |
+| RSS资讯 | 自动抓取竞赛相关资讯并导入知识库    |
+| 文档上传  | 支持随时添加新的竞赛资料        |
 
 ## 🛠️ 开发计划
 
@@ -355,7 +376,7 @@ npm run dev
 - [Gin](https://github.com/gin-gonic/gin) - Go Web框架
 - [React](https://react.dev/) - 用户界面库
 
----
+***
 
 <div align="center">
 Made with ❤️ for the Ascend AI ecosystem
