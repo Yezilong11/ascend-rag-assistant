@@ -6,6 +6,7 @@ import threading
 from typing import Optional
 
 import torch
+from src.hardware_checker import check_npu_available
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
@@ -69,6 +70,15 @@ PREDEFINED_MODELS = {
         "name": "纸龙一号",
         "description": "魔搭社区模型，通过CLI下载",
         "download_method": "cli",
+    },
+    "qwen3.6-27b": {
+        "repo_id": "Qwen/Qwen3.6-27B",
+        "ms_repo_id": "Qwen/Qwen3.6-27B",
+        "name": "Qwen3.6-27B",
+        "description": "大模型，需NPU加速，通过魔搭CLI下载到指定目录",
+        "download_method": "cli",
+        "custom_local_dir": "D:\\ModelsTemporary\\Qwen3.6-27B",
+        "requires_npu": True,
     },
 }
 
@@ -247,9 +257,22 @@ class RAGAssistant:
         model_config = PREDEFINED_MODELS[model_key]
         model_id = model_config["repo_id"]
 
+        self.npu_available = False
+        if model_config.get("requires_npu", False):
+            self.npu_available = check_npu_available()
+            if self.npu_available:
+                print("[INFO] NPU设备检测通过，将以NPU模式加载模型")
+            else:
+                print("[WARN] 未检测到NPU设备，已降级为CPU模式运行，推理性能将显著下降")
+
+        custom_local_dir = model_config.get("custom_local_dir")
+
         # 优先使用本地模型
         local_model_name = model_id.split("/")[-1]
-        local_model_path = os.path.join(model_dir, local_model_name)
+        if custom_local_dir:
+            local_model_path = custom_local_dir
+        else:
+            local_model_path = os.path.join(model_dir, local_model_name)
 
         if os.path.exists(local_model_path):
             model_path = local_model_path
@@ -257,7 +280,7 @@ class RAGAssistant:
         else:
             download_method = model_config.get("download_method", "sdk")
             ms_repo_id = model_config.get("ms_repo_id")
-            target_dir = os.path.join(model_dir, local_model_name)
+            target_dir = custom_local_dir if custom_local_dir else os.path.join(model_dir, local_model_name)
 
             if not ms_repo_id:
                 if model_id.startswith("Qwen/"):
@@ -315,7 +338,7 @@ class RAGAssistant:
             model_path,
             config=config,
             trust_remote_code=True,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            torch_dtype=torch.float16 if (self.npu_available or torch.cuda.is_available()) else torch.float32,
         )
 
         # 修复模型缺少的属性
@@ -323,11 +346,18 @@ class RAGAssistant:
             self.model.all_tied_weights_keys = set()
 
         # 移动到设备
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if self.npu_available:
+            device = "npu"
+        elif torch.cuda.is_available():
+            device = "cuda"
+        else:
+            device = "cpu"
         self.model = self.model.to(device)
 
         # 修复pipeline的device参数
-        if torch.cuda.is_available():
+        if self.npu_available:
+            device_id = 0
+        elif torch.cuda.is_available():
             device_id = 0
         else:
             device_id = -1
