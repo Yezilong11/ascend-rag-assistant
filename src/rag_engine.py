@@ -3,12 +3,17 @@ import logging
 import subprocess
 import warnings
 import threading
-from typing import Optional
+from typing import Optional, List
+
+logger = logging.getLogger(__name__)
 
 import torch
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline, TextIteratorStreamer
 
 # ModelScope支持
@@ -24,11 +29,9 @@ try:
     RERANKER_AVAILABLE = True
 except ImportError:
     RERANKER_AVAILABLE = False
-    print("[WARN] 未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
+    logger.warning("未安装sentence-transformers，重排序功能不可用。请运行: pip install sentence-transformers")
 
 warnings.filterwarnings("ignore")
-
-logger = logging.getLogger(__name__)
 
 
 def clean_source_path(source: str) -> str:
@@ -127,7 +130,7 @@ class Reranker:
         
         # 获取模型配置
         if model_name not in PREDEFINED_RERANKERS:
-            print(f"[WARN] 未知的重排序模型: {model_name}，使用默认 bge-reranker-v2-m3")
+            logger.warning("未知的重排序模型: %s，使用默认 bge-reranker-v2-m3", model_name)
             model_name = "bge-reranker-v2-m3"
         
         model_config = PREDEFINED_RERANKERS[model_name]
@@ -138,11 +141,11 @@ class Reranker:
         # 检查本地是否存在
         if os.path.exists(local_model_path):
             model_path = local_model_path
-            print(f"正在加载重排序模型: {model_path}...")
+            logger.info("正在加载重排序模型: %s...", model_path)
         else:
             # 本地不存在，尝试从ModelScope下载
             if MODELSCOPE_AVAILABLE:
-                print(f"[INFO] 本地重排序模型 {local_model_name} 未找到，正在从ModelScope下载...")
+                logger.info("本地重排序模型 %s 未找到，正在从ModelScope下载...", local_model_name)
                 try:
                     # ModelScope的BAAI命名格式
                     modelscope_repo_id = model_id  # BAAI/bge-reranker-v2-m3
@@ -152,22 +155,22 @@ class Reranker:
                         local_dir=target_dir
                     )
                     model_path = target_dir
-                    print(f"[OK] ModelScope下载完成，保存到: {model_path}")
+                    logger.info("ModelScope下载完成，保存到: %s", model_path)
                 except Exception as e:
-                    print(f"[WARN] ModelScope下载失败: {str(e)}，尝试从HuggingFace加载")
+                    logger.warning("ModelScope下载失败: %s，尝试从HuggingFace加载", str(e))
                     model_path = model_id
             else:
                 model_path = model_id
-                print(f"本地模型未找到，正在从HuggingFace下载: {model_id}...")
+                logger.info("本地模型未找到，正在从HuggingFace下载: %s...", model_id)
         
         # 加载 Cross-Encoder
-        print(f"正在加载重排序模型到设备: {self.device}")
+        logger.info("正在加载重排序模型到设备: %s", self.device)
         self.cross_encoder = CrossEncoder(
             model_path,
             device=self.device,
             trust_remote_code=True
         )
-        print(f"[OK] 重排序器初始化完成 [{model_config['description']}]")
+        logger.info("重排序器初始化完成 [%s]", model_config['description'])
     
     def rerank(self, query: str, documents: list, top_k: int = 3) -> list:
         """
@@ -200,12 +203,44 @@ class Reranker:
         return reranked_docs
 
 
+class RerankCompatibleRetriever(BaseRetriever):
+    """
+    自定义检索器，兼容 LangChain BaseRetriever，支持重排序。
+    通过构造函数接收 RAGAssistant 实例，委托其 _retrieve_and_rerank 方法完成检索与重排序。
+    """
+
+    def __init__(self, rag_assistant: 'RAGAssistant', **kwargs):
+        super().__init__(**kwargs)
+        object.__setattr__(self, '_rag_assistant', rag_assistant)
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        docs, _ = self._rag_assistant._retrieve_and_rerank(query)
+        return docs
+
+
 class RAGAssistant:
     """
     RAG智能助教核心引擎
     结合知识检索与大模型生成能力
     支持多模型切换、流式输出、重排序
     """
+
+    QA_PROMPT_TEMPLATE = """基于以下检索到的相关信息，回答用户的问题。
+
+【重要规则】
+1. 只使用与问题直接相关的信息
+2. 不要罗列多个不相关的Q&A条目
+3. 如果检索到的信息不足以回答问题，请明确说明
+4. 用中文回答
+
+相关信息：
+{context}
+
+用户问题：{question}
+
+请提供专业、准确的回答："""
 
     @classmethod
     def get_available_models(cls):
@@ -235,7 +270,6 @@ class RAGAssistant:
         self.model_key = model_key
         self.model = None
         self.tokenizer = None
-        self._last_sources = None
         
         # 重排序配置
         self.use_reranker = use_reranker
@@ -244,7 +278,9 @@ class RAGAssistant:
         self.reranker = None
         
         # 获取模型配置
-        model_config = PREDEFINED_MODELS[model_key]
+        model_config = PREDEFINED_MODELS.get(model_key)
+        if model_config is None:
+            raise ValueError(f"不支持的模型: {model_key}，可选模型: {list(PREDEFINED_MODELS.keys())}")
         model_id = model_config["repo_id"]
 
         # 优先使用本地模型
@@ -253,7 +289,7 @@ class RAGAssistant:
 
         if os.path.exists(local_model_path):
             model_path = local_model_path
-            print(f"正在加载本地模型: {model_path}...")
+            logger.info("正在加载本地模型: %s...", model_path)
         else:
             download_method = model_config.get("download_method", "sdk")
             ms_repo_id = model_config.get("ms_repo_id")
@@ -268,7 +304,7 @@ class RAGAssistant:
             model_path = None
 
             if download_method == "cli":
-                print(f"[INFO] 本地模型 {local_model_name} 未找到，正在通过魔搭CLI下载...")
+                logger.info("本地模型 %s 未找到，正在通过魔搭CLI下载...", local_model_name)
                 try:
                     result = subprocess.run(
                         ["modelscope", "download", "--model", ms_repo_id, "--local_dir", target_dir],
@@ -277,26 +313,26 @@ class RAGAssistant:
                         text=True,
                     )
                     model_path = target_dir
-                    print(f"[OK] 魔搭CLI下载完成，保存到: {model_path}")
+                    logger.info("魔搭CLI下载完成，保存到: %s", model_path)
                 except FileNotFoundError:
-                    print(f"[WARN] 魔搭CLI未安装，回退到ModelScope SDK下载...")
+                    logger.warning("魔搭CLI未安装，回退到ModelScope SDK下载...")
                 except subprocess.CalledProcessError as e:
-                    print(f"[WARN] 魔搭CLI下载失败: {e.stderr.strip() if e.stderr else str(e)}，回退到ModelScope SDK下载...")
+                    logger.warning("魔搭CLI下载失败: %s，回退到ModelScope SDK下载...", e.stderr.strip() if e.stderr else str(e))
                 except Exception as e:
-                    print(f"[WARN] 魔搭CLI下载异常: {str(e)}，回退到ModelScope SDK下载...")
+                    logger.warning("魔搭CLI下载异常: %s，回退到ModelScope SDK下载...", str(e))
 
             if model_path is None and MODELSCOPE_AVAILABLE:
-                print(f"[INFO] 正在从ModelScope SDK下载...")
+                logger.info("正在从ModelScope SDK下载...")
                 try:
                     snapshot_download(ms_repo_id, local_dir=target_dir)
                     model_path = target_dir
-                    print(f"[OK] ModelScope SDK下载完成，保存到: {model_path}")
+                    logger.info("ModelScope SDK下载完成，保存到: %s", model_path)
                 except Exception as e:
-                    print(f"[WARN] ModelScope SDK下载失败: {str(e)}，回退到HuggingFace")
+                    logger.warning("ModelScope SDK下载失败: %s，回退到HuggingFace", str(e))
 
             if model_path is None:
                 model_path = model_id
-                print(f"[INFO] 回退到HuggingFace在线加载: {model_id}...")
+                logger.info("回退到HuggingFace在线加载: %s...", model_id)
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
@@ -310,7 +346,7 @@ class RAGAssistant:
         )
 
         # 普通加载
-        print("[INFO] 使用原始模型加载")
+        logger.info("使用原始模型加载")
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             config=config,
@@ -355,85 +391,51 @@ class RAGAssistant:
                     model_dir=model_dir,
                     device=device
                 )
-                print(f"[OK] 已启用重排序功能，模型: {reranker_model}，精排后保留 {reranker_top_k} 个文档")
+                logger.info("已启用重排序功能，模型: %s，精排后保留 %d 个文档", reranker_model, reranker_top_k)
             except Exception as e:
-                print(f"[WARN] 重排序器加载失败: {str(e)}，将不使用重排序")
+                logger.warning("重排序器加载失败: %s，将不使用重排序", str(e))
                 self.use_reranker = False
                 self.reranker = None
         else:
             self.use_reranker = False
             self.reranker = None
 
-        # 自定义Prompt模板
-        template = """基于以下检索到的相关信息，回答用户的问题。
-
-【重要规则】
-1. 只使用与问题直接相关的信息
-2. 不要罗列多个不相关的Q&A条目
-3. 如果信息不足，直接告知用户缺少哪些具体信息
-4. 回答要简洁、直接、不废话
-
-相关信息：
-{context}
-
-用户问题：{question}
-
-请提供专业、准确的回答："""
-
+        # 使用统一的 Prompt 模板
         prompt = PromptTemplate(
-            template=template,
+            template=self.QA_PROMPT_TEMPLATE,
             input_variables=["context", "question"]
         )
 
         # 创建RAG链（使用自定义检索器，支持重排序）
         self._init_qa_chain(llm, prompt)
         
-        print(f"[OK] RAG引擎初始化完成 [{model_config['name']}]")
+        logger.info("RAG引擎初始化完成 [%s]", model_config['name'])
+
+    def _retrieve_and_rerank(self, question: str) -> tuple:
+        """
+        共享的检索与重排序逻辑，供 query() 和 query_stream() 复用
+        Args:
+            question: 用户问题
+        Returns:
+            (docs, sources) 元组：
+              - docs: 重排序后的 Document 对象列表
+              - sources: 包含 content 和 metadata 的字典列表
+        """
+        docs = self.kb.similarity_search(question, k=self.initial_retrieval_k)
+        if self.use_reranker and self.reranker:
+            docs = self.reranker.rerank(question, docs, top_k=self.reranker_top_k)
+        else:
+            docs = docs[:self.reranker_top_k]
+        sources = [{"content": doc.page_content, "metadata": doc.metadata} for doc in docs]
+        return docs, sources
 
     def _init_qa_chain(self, llm, prompt):
         """
         初始化 QA 链，支持重排序
         """
-        from langchain_core.retrievers import BaseRetriever
-        from langchain_core.callbacks import CallbackManagerForRetrieverRun
-        from typing import List
-        from langchain_core.documents import Document
-
-        # 定义一个符合 LangChain 标准的检索器
-        class RerankCompatibleRetriever(BaseRetriever):
-            """自定义检索器，兼容 LangChain BaseRetriever，支持重排序"""
-            rag_assistant: 'RAGAssistant'
-            
-            class Config:
-                arbitrary_types_allowed = True
-
-            def _get_relevant_documents(
-                self, query: str, *, run_manager: CallbackManagerForRetrieverRun
-            ) -> List[Document]:
-                # 1. 初步检索（获取更多候选）
-                docs = self.rag_assistant.kb.similarity_search(
-                    query, 
-                    k=self.rag_assistant.initial_retrieval_k
-                )
-                
-                # 2. 重排序（如果启用）
-                if self.rag_assistant.use_reranker and self.rag_assistant.reranker:
-                    docs = self.rag_assistant.reranker.rerank(
-                        query, 
-                        docs, 
-                        top_k=self.rag_assistant.reranker_top_k
-                    )
-                else:
-                    # 没有重排序，直接取前 top_k
-                    docs = docs[:self.rag_assistant.reranker_top_k]
-                
-                # 保存检索结果，供后续使用
-                self.rag_assistant._last_reranked_docs = docs
-                return docs
-        
-        # 创建自定义检索器实例
+        # 创建自定义检索器实例（模块级类）
         custom_retriever = RerankCompatibleRetriever(rag_assistant=self)
-        
+
         # 创建 QA 链
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
@@ -442,9 +444,6 @@ class RAGAssistant:
             chain_type_kwargs={"prompt": prompt},
             return_source_documents=True
         )
-        
-        # 初始化存储最后检索文档的变量
-        self._last_reranked_docs = []
 
     def query(self, question: str) -> dict:
         """
@@ -453,31 +452,42 @@ class RAGAssistant:
             question: 用户问题
         Returns:
             包含答案和来源的字典
+        Raises:
+            ValueError: 模型配置等参数校验失败
+            RuntimeError: 问答处理过程中发生错误
         """
         try:
-            # 清空上次的检索结果
-            self._last_reranked_docs = []
-            
+            # 通过 _retrieve_and_rerank 获取来源信息
+            _, sources = self._retrieve_and_rerank(question)
+
+            # 空检索结果处理
+            if not sources:
+                return {
+                    "answer": "抱歉，未找到与您问题相关的信息，请尝试换一种方式提问。",
+                    "sources": []
+                }
+
+            # 运行 QA 链（检索器内部也会调用 _retrieve_and_rerank）
             result = self.qa_chain({"query": question})
-            
-            # 获取来源（使用重排序后的文档）
-            source_docs = self._last_reranked_docs if self._last_reranked_docs else result["source_documents"]
-            
+
+            # 格式化来源信息
+            formatted_sources = [
+                {
+                    "content": s["content"][:200],
+                    "source": clean_source_path(s["metadata"].get("source", "未知"))
+                }
+                for s in sources
+            ]
+
             return {
                 "answer": result["result"],
-                "sources": [
-                    {
-                        "content": doc.page_content[:200],
-                        "source": clean_source_path(doc.metadata.get("source", "未知"))
-                    }
-                    for doc in source_docs
-                ]
+                "sources": formatted_sources
             }
+        except ValueError:
+            raise  # Re-raise ValueError (from model_key validation etc.)
         except Exception as e:
-            return {
-                "answer": f"处理问题时出错: {str(e)}",
-                "sources": []
-            }
+            logger.error(f"RAG query failed: {e}", exc_info=True)
+            raise RuntimeError(f"问答处理失败") from e
 
     def query_stream(self, question: str):
         """
@@ -485,45 +495,31 @@ class RAGAssistant:
         Args:
             question: 用户问题
         Yields:
-            逐字生成回答片段
+            逐字生成回答片段，最后以 dict 形式 yield 来源信息
         """
-        # 清空上次的检索结果
-        self._last_reranked_docs = []
-        
-        # 1. 初步检索（获取更多候选）
-        docs = self.kb.similarity_search(question, k=self.initial_retrieval_k)
-        
-        # 2. 重排序（如果启用）
-        if self.use_reranker and self.reranker:
-            docs = self.reranker.rerank(question, docs, top_k=self.reranker_top_k)
-        else:
-            docs = docs[:self.reranker_top_k]
-        
-        # 保存来源信息
-        self._last_reranked_docs = docs
-        self._last_sources = [
+        # 使用共享的检索与重排序逻辑
+        docs, sources = self._retrieve_and_rerank(question)
+
+        # 空检索结果处理
+        if not docs:
+            yield "抱歉，未找到与您问题相关的信息，请尝试换一种方式提问。"
+            yield {"type": "sources", "sources": []}
+            return
+
+        # 格式化来源信息
+        formatted_sources = [
             {
-                "content": doc.page_content[:200],
-                "source": clean_source_path(doc.metadata.get("source", "未知"))
+                "content": s["content"][:200],
+                "source": clean_source_path(s["metadata"].get("source", "未知"))
             }
-            for doc in docs
+            for s in sources
         ]
-        
+
         # 构建上下文
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        # 构建Prompt
-        template = """基于以下检索到的相关信息，回答用户的问题。
-如果无法从信息中找到答案，请明确告知。
-
-相关信息：
-{context}
-
-用户问题：{question}
-
-请提供专业、准确的回答："""
-
-        prompt_text = template.format(context=context, question=question)
+        # 使用统一的 Prompt 模板
+        prompt_text = self.QA_PROMPT_TEMPLATE.format(context=context, question=question)
 
         # Tokenize
         inputs = self.tokenizer([prompt_text], return_tensors="pt")
@@ -553,3 +549,6 @@ class RAGAssistant:
             yield new_text
 
         thread.join()
+
+        # 返回来源信息事件
+        yield {"type": "sources", "sources": formatted_sources}

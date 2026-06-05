@@ -1,7 +1,11 @@
 from typing import List, Optional
 import json
+import logging
 import os
+import threading
 from src.skill_tree.domain.models import SkillTree, SkillNode, SkillLevel, SkillType, LearningPath, SkillRelation
+
+logger = logging.getLogger(__name__)
 
 
 class SkillTreeRepositoryInterface:
@@ -27,62 +31,75 @@ class SkillTreeRepositoryInterface:
 class FileSkillTreeRepository(SkillTreeRepositoryInterface):
     """基于文件的技能树仓储实现"""
 
+    _file_lock = threading.Lock()
+
     def __init__(self, storage_dir: str = "./skill_tree_data"):
         """初始化仓储"""
         self.storage_dir = storage_dir
-        os.makedirs(self.storage_dir, exist_ok=True)
+        with self._file_lock:
+            os.makedirs(self.storage_dir, exist_ok=True)
 
     def save(self, skill_tree: SkillTree) -> bool:
         """保存技能树到文件"""
-        try:
-            file_path = os.path.join(self.storage_dir, f"{skill_tree.id}.json")
-            data = self._serialize_skill_tree(skill_tree)
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            return True
-        except Exception as e:
-            print(f"保存技能树失败: {e}")
-            return False
+        with self._file_lock:
+            try:
+                file_path = os.path.join(self.storage_dir, f"{skill_tree.id}.json")
+                data = self._serialize_skill_tree(skill_tree)
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return True
+            except Exception as e:
+                logger.error(f"保存技能树失败: {e}", exc_info=True)
+                return False
 
     def load(self, skill_tree_id: str) -> Optional[SkillTree]:
         """从文件加载技能树"""
-        try:
-            file_path = os.path.join(self.storage_dir, f"{skill_tree_id}.json")
-            if not os.path.exists(file_path):
+        with self._file_lock:
+            try:
+                file_path = os.path.join(self.storage_dir, f"{skill_tree_id}.json")
+                if not os.path.exists(file_path):
+                    return None
+
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                return self._deserialize_skill_tree(data)
+            except Exception as e:
+                logger.error(f"加载技能树失败: {e}", exc_info=True)
                 return None
-            
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            return self._deserialize_skill_tree(data)
-        except Exception as e:
-            print(f"加载技能树失败: {e}")
-            return None
 
     def delete(self, skill_tree_id: str) -> bool:
         """删除技能树文件"""
-        try:
-            file_path = os.path.join(self.storage_dir, f"{skill_tree_id}.json")
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            return True
-        except Exception as e:
-            print(f"删除技能树失败: {e}")
-            return False
+        with self._file_lock:
+            try:
+                file_path = os.path.join(self.storage_dir, f"{skill_tree_id}.json")
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                return True
+            except Exception as e:
+                logger.error(f"删除技能树失败: {e}", exc_info=True)
+                return False
 
     def list_all(self) -> List[SkillTree]:
         """列出所有技能树"""
-        skill_trees = []
-        try:
-            for filename in os.listdir(self.storage_dir):
-                if filename.endswith('.json'):
-                    skill_tree_id = filename[:-5]  # 去掉 .json 后缀
-                    skill_tree = self.load(skill_tree_id)
-                    if skill_tree:
-                        skill_trees.append(skill_tree)
-        except Exception as e:
-            print(f"列出技能树失败: {e}")
-        return skill_trees
+        with self._file_lock:
+            skill_trees = []
+            try:
+                for filename in os.listdir(self.storage_dir):
+                    if filename.endswith('.json'):
+                        skill_tree_id = filename[:-5]  # 去掉 .json 后缀
+                        try:
+                            file_path = os.path.join(self.storage_dir, f"{skill_tree_id}.json")
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                            skill_tree = self._deserialize_skill_tree(data)
+                            if skill_tree:
+                                skill_trees.append(skill_tree)
+                        except Exception as e:
+                            logger.error(f"加载技能树 {skill_tree_id} 失败: {e}", exc_info=True)
+            except Exception as e:
+                logger.error(f"列出技能树失败: {e}", exc_info=True)
+            return skill_trees
 
     def _serialize_skill_tree(self, skill_tree: SkillTree) -> dict:
         """序列化技能树"""
@@ -140,13 +157,15 @@ class FileSkillTreeRepository(SkillTreeRepositoryInterface):
 
     def _deserialize_skill_tree(self, data: dict) -> SkillTree:
         """反序列化技能树"""
+        from datetime import datetime
+
         skill_tree = SkillTree(
             id=data.get("id"),
             name=data.get("name"),
             description=data.get("description"),
             version=data.get("version", "1.0"),
-            created_at=data.get("created_at", "2024-01-01"),
-            updated_at=data.get("updated_at", "2024-01-01"),
+            created_at=data.get("created_at", datetime.now().isoformat()),
+            updated_at=data.get("updated_at", datetime.now().isoformat()),
             root_nodes=data.get("root_nodes", [])
         )
 

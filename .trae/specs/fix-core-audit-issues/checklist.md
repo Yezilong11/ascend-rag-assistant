@@ -1,0 +1,21 @@
+- [x] query() 和 query_stream() 使用同一个 `_retrieve_and_rerank()` 方法，检索逻辑无冗余
+- [x] query() 和 query_stream() 使用完全相同的 Prompt 模板
+- [x] `_last_reranked_docs` 和 `_last_sources` 不再作为实例属性，改为方法返回值传递
+- [x] RerankCompatibleRetriever 提取为模块级类，无 Pydantic arbitrary_types_allowed 绕过
+- [x] dependencies.py 全局变量有 threading.Lock 保护，并发加载不会竞态
+- [x] ingest_file 端点对文件名进行安全清洗，路径遍历字符被移除
+- [x] CORS 配置中 allow_methods 和 allow_headers 不再使用通配符 `*`
+- [x] 异常处理不向客户端暴露 str(e) 内部细节
+- [x] ChromaDB 初始化不再插入默认文档
+- [x] auto_ingest 的跳过判断不再依赖 `current_count > 1` 隐式前提
+- [x] SimpleMemoryDB 降级时有告警状态和查询提示
+- [x] RSSAIService 使用 Semaphore 替代 Lock，推理有超时机制
+- [x] analyze_all_articles 使用 FastAPI BackgroundTasks
+- [x] update_ai_config PUT 端点实现了实际更新逻辑
+- [x] FileSkillTreeRepository 有文件锁保护并发写入
+- [x] 技能树时间戳使用 datetime.now().isoformat() 而非硬编码
+- [x] 检索结果为空时返回明确提示而非让模型无参考生成
+- [x] model_key 不存在时返回错误而非 KeyError 崩溃
+- [x] query() 异常时抛出类型化异常
+- [x] rag_engine.py 和 knowledge_base.py 使用 logging 替代 print
+- [x] ingest_file 使用流式写入替代全量读入内存

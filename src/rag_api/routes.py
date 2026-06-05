@@ -23,14 +23,18 @@ RAG API 路由模块
 import json
 import logging
 import os
+import re
+import shutil
 import tempfile
 import threading
+from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 
 from src.rag_api.dependencies import (
+    _lock,
     clear_rag_assistant,
     get_is_loading,
     get_knowledge_base,
@@ -84,12 +88,22 @@ async def chat(
                 "sources": result["sources"],
             },
         }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
+    except RuntimeError:
+        raise HTTPException(
+            status_code=500,
+            detail="问答处理失败，请稍后重试",
+        )
     except Exception as e:
         logger.error(f"问答处理失败: {e}", exc_info=True)
-        return {
-            "success": False,
-            "message": f"问答处理失败: {str(e)}",
-        }
+        raise HTTPException(
+            status_code=500,
+            detail="处理请求时发生内部错误",
+        )
 
 
 @router.post("/chat/stream")
@@ -127,11 +141,11 @@ async def chat_stream(
         )
 
     def event_generator() -> str:
-        for token in assistant.query_stream(request.question):
-            yield f"event: token\ndata: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
-
-        sources = getattr(assistant, "_last_sources", []) or []
-        yield f"event: sources\ndata: {json.dumps({'sources': sources}, ensure_ascii=False)}\n\n"
+        for chunk in assistant.query_stream(request.question):
+            if isinstance(chunk, dict) and chunk.get("type") == "sources":
+                yield f"event: sources\ndata: {json.dumps({'sources': chunk['sources']}, ensure_ascii=False)}\n\n"
+            else:
+                yield f"event: token\ndata: {json.dumps({'token': chunk}, ensure_ascii=False)}\n\n"
         yield "event: done\ndata: {}\n\n"
 
     return StreamingResponse(
@@ -176,6 +190,7 @@ async def get_status() -> dict:
             else ""
         ),
         "knowledge_base_ready": kb is not None,
+        "knowledge_base_degraded": kb.is_degraded if kb else False,
         "available_models": {
             k: {"name": v["name"], "description": v["description"]}
             for k, v in PREDEFINED_MODELS.items()
@@ -206,16 +221,15 @@ async def load_model(request: ModelLoadRequest) -> dict:
     Returns:
         dict: 统一响应格式，data 包含 model_key 和 status="loading"
     """
-    if get_is_loading():
-        return {
-            "success": False,
-            "message": "模型正在加载中，请稍候",
-        }
-
-    if get_rag_assistant() is not None:
-        clear_rag_assistant()
-
-    set_is_loading(True)
+    with _lock:
+        if get_is_loading():
+            return {
+                "success": False,
+                "message": "模型正在加载中，请稍候",
+            }
+        if get_rag_assistant() is not None:
+            clear_rag_assistant()
+        set_is_loading(True)
 
     def load_model_task() -> None:
         try:
@@ -298,7 +312,9 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
     image_extensions = [".png", ".jpg", ".jpeg", ".gif", ".bmp"]
     
     filename = file.filename or ""
-    _, ext = os.path.splitext(filename)
+    # Sanitize filename to prevent path traversal
+    safe_filename = re.sub(r'[^\w\s\-.]', '_', Path(filename).name)
+    _, ext = os.path.splitext(safe_filename)
     ext = ext.lower()
 
     if ext not in allowed_extensions:
@@ -307,35 +323,39 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
             detail=f"不支持的文件格式，仅支持 {allowed_extensions}",
         )
 
-    content = await file.read()
-
-    if len(content) > 50 * 1024 * 1024:
-        raise HTTPException(
-            status_code=400,
-            detail="文件大小超过50MB限制",
-        )
-
     # 判断是否为图片文件，自动分流处理
     is_image = ext in image_extensions
-    source_type = "image" if is_image else "document"
 
+    # 流式写入临时文件，避免将整个文件加载到内存
+    max_size = 50 * 1024 * 1024  # 50MB
     temp_fd, temp_path = tempfile.mkstemp(suffix=ext)
     try:
+        total_size = 0
         with os.fdopen(temp_fd, "wb") as f:
-            f.write(content)
+            while True:
+                chunk = await file.read(1024 * 1024)  # 1MB chunks
+                if not chunk:
+                    break
+                total_size += len(chunk)
+                if total_size > max_size:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="文件大小超过50MB限制",
+                    )
+                f.write(chunk)
 
         if is_image:
             # 图片文件：分流到多模态知识库，进行OCR处理
-            return await _ingest_image_to_multimodal(temp_path, filename)
+            return await _ingest_image_to_multimodal(temp_path, safe_filename)
         else:
             # 文档文件：使用主知识库文本处理
-            return await _ingest_document_to_kb(temp_path, filename)
+            return await _ingest_document_to_kb(temp_path, safe_filename)
 
     except Exception as e:
         logger.error(f"文件导入异常: {e}", exc_info=True)
         return {
             "success": False,
-            "message": f"文件导入失败: {str(e)}",
+            "message": "处理请求时发生内部错误",
         }
     finally:
         if os.path.exists(temp_path):
@@ -389,7 +409,7 @@ async def _ingest_image_to_multimodal(image_path: str, filename: str) -> dict:
         logger.error(f"多模态知识库导入异常: {e}", exc_info=True)
         return {
             "success": False,
-            "message": f"图片OCR处理失败: {str(e)}",
+            "message": "处理请求时发生内部错误",
         }
 
 
@@ -447,7 +467,7 @@ async def auto_ingest() -> dict:
         collection = kb.db._collection
         current_count = collection.count() if hasattr(collection, "count") else 0
 
-        if current_count > 1:
+        if current_count > 0:
             return {
                 "success": True,
                 "data": {

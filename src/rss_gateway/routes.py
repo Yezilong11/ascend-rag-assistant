@@ -60,12 +60,13 @@ RSS 网关代理路由模块
 import logging
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from .ai_service import RSSAIService
 from .client import RSSClient, RSSServiceUnavailableError
 from .models import (
+    AIConfigUpdate,
     RSSCategoryCreate,
     RSSFeedCreate,
     RSSFeedUpdate,
@@ -118,7 +119,8 @@ async def _proxy(method: str, path: str, **kwargs) -> JSONResponse:
             content=resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {"data": resp.text},
         )
     except RSSServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+        logger.error(f"RSS服务不可用: {e}")
+        raise HTTPException(status_code=503, detail="RSS服务不可用")
 
 
 # ===========================================================================
@@ -302,9 +304,12 @@ async def get_ai_config():
 
 
 @router.put("/ai/config")
-async def update_ai_config(request: Request):
+async def update_ai_config(config: AIConfigUpdate):
+    """更新 AI 推理配置"""
     ai = get_ai_service()
-    return {"success": True, "data": ai.get_config()}
+    updated = ai.update_config(config.model_dump(exclude_none=True))
+    logger.info("AI 配置已更新: %s", updated)
+    return {"success": True, "data": {"status": "updated", "config": updated}}
 
 
 @router.post("/ai/test")
@@ -325,22 +330,48 @@ async def analyze_article(article_id: int):
         return {"success": True, "data": result}
     except RuntimeError as e:
         if "RAG引擎未加载" in str(e):
-            raise HTTPException(status_code=503, detail=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=503, detail="RAG引擎未加载")
+        logger.error(f"AI分析文章失败: {e}")
+        raise HTTPException(status_code=500, detail="处理请求时发生内部错误")
 
 
 @router.post("/articles/analyze-all")
-async def analyze_all_articles():
-    """AI 分析所有文章"""
+async def analyze_all_articles(background_tasks: BackgroundTasks):
+    """AI 分析所有文章（后台执行）"""
     ai = get_ai_service()
     client = get_rss_client()
+
+    # 先获取文章列表，验证服务可用性
     try:
-        result = await ai.analyze_all_articles(client)
-        return {"success": True, "data": result}
+        resp = await client.proxy_request("GET", "/articles")
+        data = resp.json()
+        articles = data.get("data", []) if isinstance(data, dict) else data
     except RuntimeError as e:
         if "RAG引擎未加载" in str(e):
-            raise HTTPException(status_code=503, detail=str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=503, detail="RAG引擎未加载")
+        logger.error(f"AI分析文章失败: {e}")
+        raise HTTPException(status_code=500, detail="处理请求时发生内部错误")
+
+    count = len(articles)
+
+    async def _analyze_all():
+        """后台逐篇分析文章"""
+        from .client import RSSClient as _RSSClient
+        bg_client = _RSSClient(base_url=client.base_url, timeout=client.timeout)
+        try:
+            for article in articles:
+                article_id = article.get("id")
+                if not article_id:
+                    continue
+                try:
+                    await ai.analyze_article(article_id, bg_client)
+                except Exception as e:
+                    logger.error("分析文章 %d 失败: %s", article_id, e)
+        finally:
+            await bg_client.close()
+
+    background_tasks.add_task(_analyze_all)
+    return {"success": True, "data": {"status": "started", "message": f"正在后台分析 {count} 篇文章", "count": count}}
 
 
 # ===========================================================================

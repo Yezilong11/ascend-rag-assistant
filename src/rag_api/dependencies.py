@@ -22,6 +22,7 @@ RAG API 依赖注入模块
 
 import os
 import logging
+import threading
 from typing import Optional
 
 import torch
@@ -31,6 +32,9 @@ from src.rag_engine import RAGAssistant, PREDEFINED_MODELS, PREDEFINED_RERANKERS
 from src.knowledge_base import KnowledgeBase
 
 logger = logging.getLogger(__name__)
+
+# 模块级锁，保护全局变量的线程安全访问
+_lock = threading.Lock()
 
 _rag_assistant: Optional[RAGAssistant] = None
 _knowledge_base: Optional[KnowledgeBase] = None
@@ -72,8 +76,9 @@ def get_knowledge_base() -> KnowledgeBase:
     """
     global _knowledge_base
 
-    if _knowledge_base is not None:
-        return _knowledge_base
+    with _lock:
+        if _knowledge_base is not None:
+            return _knowledge_base
 
     config = _load_config()
     kb_config = config.get("knowledge_base", {})
@@ -83,10 +88,15 @@ def get_knowledge_base() -> KnowledgeBase:
 
     logger.info(f"正在初始化 KnowledgeBase: persist_dir={persist_dir}, model_dir={model_dir}")
 
-    _knowledge_base = KnowledgeBase(
+    kb = KnowledgeBase(
         persist_dir=persist_dir,
         model_dir=model_dir,
     )
+
+    with _lock:
+        # 双重检查：防止并发初始化
+        if _knowledge_base is None:
+            _knowledge_base = kb
 
     logger.info("KnowledgeBase 初始化完成")
     return _knowledge_base
@@ -102,7 +112,8 @@ def get_rag_assistant() -> Optional[RAGAssistant]:
     Returns:
         Optional[RAGAssistant]: 当前实例，未加载时返回 None
     """
-    return _rag_assistant
+    with _lock:
+        return _rag_assistant
 
 
 def set_rag_assistant(assistant: RAGAssistant) -> None:
@@ -117,17 +128,18 @@ def set_rag_assistant(assistant: RAGAssistant) -> None:
     """
     global _rag_assistant
 
-    if _rag_assistant is not None:
-        logger.warning("检测到已有 RAGAssistant 实例，先释放旧实例资源")
-        clear_rag_assistant()
+    with _lock:
+        if _rag_assistant is not None:
+            logger.warning("检测到已有 RAGAssistant 实例，先释放旧实例资源")
+            _clear_rag_assistant_unlocked()
 
-    _rag_assistant = assistant
-    logger.info(f"RAGAssistant 实例已设置: model_key={assistant.model_key}")
+        _rag_assistant = assistant
+        logger.info(f"RAGAssistant 实例已设置: model_key={assistant.model_key}")
 
 
-def clear_rag_assistant() -> None:
+def _clear_rag_assistant_unlocked() -> None:
     """
-    清除 RAGAssistant 实例并释放 GPU 显存
+    清除 RAGAssistant 实例并释放 GPU 显存（内部方法，调用方需已持有 _lock）
 
     执行以下清理步骤：
     1. 删除模型对象 (assistant.model) 释放模型权重占用的显存
@@ -170,6 +182,16 @@ def clear_rag_assistant() -> None:
     logger.info("RAGAssistant 实例已清除")
 
 
+def clear_rag_assistant() -> None:
+    """
+    清除 RAGAssistant 实例并释放 GPU 显存（线程安全）
+
+    对外接口，内部获取锁后调用 _clear_rag_assistant_unlocked()。
+    """
+    with _lock:
+        _clear_rag_assistant_unlocked()
+
+
 def get_is_loading() -> bool:
     """
     获取模型加载状态标记
@@ -177,7 +199,8 @@ def get_is_loading() -> bool:
     Returns:
         bool: True 表示模型正在加载中，False 表示未在加载
     """
-    return _is_loading
+    with _lock:
+        return _is_loading
 
 
 def set_is_loading(val: bool) -> None:
@@ -191,5 +214,6 @@ def set_is_loading(val: bool) -> None:
         val: 加载状态，True 为正在加载，False 为未在加载
     """
     global _is_loading
-    _is_loading = val
-    logger.info(f"模型加载状态已更新: _is_loading={_is_loading}")
+    with _lock:
+        _is_loading = val
+        logger.info(f"模型加载状态已更新: _is_loading={_is_loading}")

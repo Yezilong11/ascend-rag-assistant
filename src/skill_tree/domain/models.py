@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field
+from datetime import datetime
 from uuid import uuid4
 from enum import Enum
 
@@ -85,8 +86,8 @@ class SkillTree:
     description: str  # 技能树描述
     id: str = field(default_factory=lambda: str(uuid4()))
     version: str = "1.0"  # 技能树版本
-    created_at: str = field(default_factory=lambda: "2024-01-01")  # 创建时间
-    updated_at: str = field(default_factory=lambda: "2024-01-01")  # 更新时间
+    created_at: str = field(default_factory=lambda: datetime.now().isoformat())  # 创建时间
+    updated_at: str = field(default_factory=lambda: datetime.now().isoformat())  # 更新时间
     root_nodes: List[str] = field(default_factory=list)  # 根节点ID列表
     skill_nodes: Dict[str, SkillNode] = field(default_factory=dict)  # 技能节点字典
     learning_paths: Dict[str, LearningPath] = field(default_factory=dict)  # 学习路径字典
@@ -97,6 +98,7 @@ class SkillTree:
         # 如果是根节点，添加到根节点列表
         if not skill_node.parent_ids:
             self.root_nodes.append(skill_node.id)
+        self.updated_at = datetime.now().isoformat()
 
     def get_skill_node(self, skill_id: str) -> Optional[SkillNode]:
         """获取技能节点"""
@@ -105,6 +107,7 @@ class SkillTree:
     def add_learning_path(self, learning_path: LearningPath):
         """添加学习路径"""
         self.learning_paths[learning_path.path_id] = learning_path
+        self.updated_at = datetime.now().isoformat()
 
     def get_learning_path(self, path_id: str) -> Optional[LearningPath]:
         """获取学习路径"""
@@ -125,6 +128,7 @@ class SkillTree:
             self.skill_nodes[target_skill_id].add_parent(source_skill_id)
             # 添加到前置条件
             self.skill_nodes[target_skill_id].prerequisites.append(relation)
+            self.updated_at = datetime.now().isoformat()
 
     def generate_learning_paths(self) -> List[LearningPath]:
         """生成学习路径（迭代实现）"""

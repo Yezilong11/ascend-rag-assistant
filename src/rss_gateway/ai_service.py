@@ -2,6 +2,7 @@ import hashlib
 import logging
 import re
 import threading
+import time
 from typing import Optional, Dict, Any
 
 from .ai_cache import AICache, content_hash
@@ -40,8 +41,14 @@ def _clean_output(text: str) -> str:
 class RSSAIService:
 
     def __init__(self):
-        self._lock = threading.Lock()
+        self._semaphore = threading.Semaphore(2)  # Allow 2 concurrent inference requests
         self._cache = AICache()
+        self._config: Dict[str, Any] = {
+            "max_new_tokens": 256,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "do_sample": True,
+        }
 
     def _get_assistant(self):
         from src.rag_api.dependencies import get_rag_assistant
@@ -50,12 +57,23 @@ class RSSAIService:
             raise RuntimeError("RAG引擎未加载，请先在智能问答页面加载模型")
         return assistant
 
-    def _run_inference(self, prompt: str, max_new_tokens: int = 256) -> str:
+    def _run_inference(self, prompt: str, max_new_tokens: int = 256, timeout: float = 120.0) -> str:
         assistant = self._get_assistant()
-        with self._lock:
+        with self._semaphore:
+            start = time.monotonic()
             result = assistant.pipeline_obj(
-                prompt, max_new_tokens=max_new_tokens, do_sample=True, temperature=0.7, top_p=0.9
+                prompt,
+                max_new_tokens=max_new_tokens,
+                do_sample=self._config.get("do_sample", True),
+                temperature=self._config.get("temperature", 0.7),
+                top_p=self._config.get("top_p", 0.9),
             )
+            elapsed = time.monotonic() - start
+            if elapsed > timeout:
+                logger.warning(
+                    "推理耗时 %.1fs 超过阈值 %.1fs，prompt 长度=%d",
+                    elapsed, timeout, len(prompt),
+                )
         generated = result[0]["generated_text"]
         return generated[len(prompt):].strip()
 
@@ -125,37 +143,6 @@ class RSSAIService:
         self._cache.set(c_hash, result)
         return result
 
-    async def analyze_all_articles(self, client) -> dict:
-        resp = await client.proxy_request("GET", "/articles")
-        data = resp.json()
-        articles = data.get("data", []) if isinstance(data, dict) else data
-        count = len(articles)
-
-        def _background():
-            import asyncio
-            from .client import RSSClient
-            bg_client = RSSClient(base_url=client.base_url, timeout=client.timeout)
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                for article in articles:
-                    article_id = article.get("id")
-                    if not article_id:
-                        continue
-                    try:
-                        loop.run_until_complete(
-                            self.analyze_article(article_id, bg_client)
-                        )
-                    except Exception as e:
-                        logger.error("分析文章 %d 失败: %s", article_id, e)
-            finally:
-                loop.run_until_complete(bg_client.close())
-                loop.close()
-
-        thread = threading.Thread(target=_background, daemon=True)
-        thread.start()
-        return {"message": "analysis started", "count": count}
-
     def test_availability(self) -> dict:
         from src.rag_api.dependencies import get_rag_assistant
         from src.rag_engine import PREDEFINED_MODELS
@@ -183,4 +170,14 @@ class RSSAIService:
             "model_name": model_name,
             "engine_loaded": engine_loaded,
             "available_models": PREDEFINED_MODELS,
+            "inference_config": dict(self._config),
         }
+
+    def update_config(self, updates: Dict[str, Any]) -> Dict[str, Any]:
+        """更新推理配置参数，仅覆盖已提供的字段"""
+        allowed_keys = {"max_new_tokens", "temperature", "top_p", "do_sample"}
+        for key, value in updates.items():
+            if key in allowed_keys and value is not None:
+                self._config[key] = value
+                logger.info("AI 配置更新: %s = %s", key, value)
+        return dict(self._config)

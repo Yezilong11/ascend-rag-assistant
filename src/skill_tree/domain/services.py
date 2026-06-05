@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from .models import SkillTree, SkillNode, SkillLevel, SkillType, LearningPath, SkillRelation
 
 
@@ -41,6 +42,7 @@ class SkillTreeService:
         skill_node = skill_tree.get_skill_node(skill_id)
         if skill_node:
             skill_node.update_completion_rate(completion_rate)
+            skill_tree.updated_at = datetime.now().isoformat()
 
     def generate_learning_paths(self, skill_tree: SkillTree) -> List[LearningPath]:
         """生成学习路径"""
@@ -106,7 +108,7 @@ class SkillEvent:
     def __init__(self, event_type: str, data: Dict[str, Any]):
         self.event_type = event_type
         self.data = data
-        self.timestamp = "2024-01-01"
+        self.timestamp = datetime.now().isoformat()
 
 
 class SkillAddedEvent(SkillEvent):

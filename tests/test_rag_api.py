@@ -321,9 +321,9 @@ class TestChatStreamEndpoint:
         """
         mock_assistant = MagicMock()
         mock_assistant.model_key = "qwen2-1.5b"
-        mock_assistant.query_stream.return_value = ["你好", "，", "世界"]
-        mock_assistant._last_sources = [
-            {"content": "来源摘要", "source": "data/test.md"},
+        mock_assistant.query_stream.return_value = [
+            "你好", "，", "世界",
+            {"type": "sources", "sources": [{"content": "来源摘要", "source": "data/test.md"}]},
         ]
 
         set_rag_assistant(mock_assistant)
@@ -355,8 +355,10 @@ class TestChatStreamEndpoint:
         """
         mock_assistant = MagicMock()
         mock_assistant.model_key = "qwen2-1.5b"
-        mock_assistant.query_stream.return_value = ["测试"]
-        mock_assistant._last_sources = []
+        mock_assistant.query_stream.return_value = [
+            "测试",
+            {"type": "sources", "sources": []},
+        ]
 
         set_rag_assistant(mock_assistant)
 
