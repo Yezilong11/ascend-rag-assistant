@@ -4,6 +4,9 @@
 """
 
 import os
+import sys
+
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
@@ -19,19 +22,23 @@ try:
     MULTIMODAL_AVAILABLE = True
 except ImportError as e:
     MULTIMODAL_AVAILABLE = False
-    print(f"⚠️ 多模态模块未安装: {e}")
+    print(f"[WARN] 多模态模块未安装: {e}")
 
 try:
     from src.rss_gateway.routes import router as rss_router
     RSS_AVAILABLE = True
 except Exception as e:
     RSS_AVAILABLE = False
-    print(f"⚠️ RSS网关模块未安装: {e}")
+    print(f"[WARN] RSS网关模块未安装: {e}")
 
 # 读取配置文件
 config_path = "./config/config.yaml"
-with open(config_path, 'r', encoding='utf-8') as f:
-    config = yaml.safe_load(f)
+try:
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f) or {}
+except FileNotFoundError:
+    print(f"[WARN] 配置文件 {config_path} 不存在，使用默认配置")
+    config = {}
 
 # 获取服务端口配置
 server_config = config.get('server', {})
@@ -71,11 +78,11 @@ app.include_router(rag_router)
 
 if MULTIMODAL_AVAILABLE:
     app.include_router(multimodal_router)
-    print("✅ 多模态RAG API路由已注册")
+    print("[OK] 多模态RAG API路由已注册")
 
 if RSS_AVAILABLE:
     app.include_router(rss_router)
-    print("✅ RSS网关API路由已注册")
+    print("[OK] RSS网关API路由已注册")
 
 # 添加根路由
 @app.get("/")

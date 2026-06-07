@@ -1,0 +1,11 @@
+{
+  "id": "5dbbb253-0952-4103-bfcb-6dc68de143d2",
+  "name": "test_tree",
+  "description": "test description",
+  "version": "1.0",
+  "created_at": "2026-06-07T10:32:17.157233",
+  "updated_at": "2026-06-07T10:32:17.157242",
+  "root_nodes": [],
+  "skill_nodes": {},
+  "learning_paths": {}
+}

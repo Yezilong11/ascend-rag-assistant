@@ -38,8 +38,10 @@ from src.rag_api.dependencies import (
     clear_rag_assistant,
     get_is_loading,
     get_knowledge_base,
+    get_load_error,
     get_rag_assistant,
     set_is_loading,
+    set_load_error,
     set_rag_assistant,
 )
 from src.rag_api.models import ChatRequest, ModelLoadRequest
@@ -48,6 +50,15 @@ from src.rag_engine import PREDEFINED_MODELS, PREDEFINED_RERANKERS, RAGAssistant
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/rag", tags=["rag"])
+
+
+def _safe_collection_count(kb) -> int:
+    """安全获取知识库文档片段计数，降级模式下返回0"""
+    try:
+        collection = kb.db._collection
+        return collection.count() if hasattr(collection, "count") else 0
+    except AttributeError:
+        return 0
 
 
 @router.post("/chat")
@@ -177,6 +188,8 @@ async def get_status() -> dict:
 
     status_data = {
         "engine_loaded": assistant is not None,
+        "is_loading": get_is_loading(),
+        "load_error": get_load_error() or "",
         "model_key": assistant.model_key if assistant else "",
         "model_name": (
             PREDEFINED_MODELS.get(assistant.model_key, {}).get("name", "")
@@ -230,6 +243,7 @@ async def load_model(request: ModelLoadRequest) -> dict:
         if get_rag_assistant() is not None:
             clear_rag_assistant()
         set_is_loading(True)
+        set_load_error(None)
 
     def load_model_task() -> None:
         try:
@@ -246,7 +260,9 @@ async def load_model(request: ModelLoadRequest) -> dict:
             set_rag_assistant(assistant)
             logger.info(f"模型加载完成: model_key={request.model_key}")
         except Exception as e:
-            logger.error(f"模型加载失败: {e}", exc_info=True)
+            error_msg = f"{type(e).__name__}: {e}"
+            logger.error(f"模型加载失败: {error_msg}", exc_info=True)
+            set_load_error(error_msg)
         finally:
             set_is_loading(False)
 
@@ -429,8 +445,7 @@ async def _ingest_document_to_kb(doc_path: str, filename: str) -> dict:
 
     if success:
         doc_type = kb.detect_doc_type(doc_path)
-        collection = kb.db._collection
-        chunks_count = collection.count() if hasattr(collection, "count") else 0
+        chunks_count = _safe_collection_count(kb)
 
         return {
             "success": True,
@@ -464,8 +479,7 @@ async def auto_ingest() -> dict:
     kb = get_knowledge_base()
 
     try:
-        collection = kb.db._collection
-        current_count = collection.count() if hasattr(collection, "count") else 0
+        current_count = _safe_collection_count(kb)
 
         if current_count > 0:
             return {
@@ -557,9 +571,10 @@ async def knowledge_base_stats() -> dict:
                 document_count = len(unique_sources)
         except Exception:
             document_count = text_chunk_count
-
-    except Exception:
-        pass
+    except AttributeError:
+        # 降级模式（SimpleMemoryDB），无法获取详细统计
+        text_chunk_count = 0
+        document_count = 0
 
     try:
         from src.multimodal.interface.api.routes import create_multimodal_service

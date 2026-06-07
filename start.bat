@@ -9,7 +9,11 @@ set KMP_DUPLICATE_LIB_OK=TRUE
 echo.
 
 echo Starting Go RSS service...
-start "Go RSS Server" cmd /k "cd /d %~dp0services\rss-crawler && go run cmd/server/main.go"
+if exist "%~dp0services\rss-crawler\server.exe" (
+    start "Go RSS Server" cmd /k "cd /d %~dp0services\rss-crawler && server.exe"
+) else (
+    start "Go RSS Server" cmd /k "cd /d %~dp0services\rss-crawler && go run cmd/server/main.go"
+)
 echo.
 
 echo Starting FastAPI server...

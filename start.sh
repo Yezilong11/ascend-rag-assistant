@@ -8,8 +8,20 @@ echo ""
 # 设置环境变量解决OMP冲突
 export KMP_DUPLICATE_LIB_OK=TRUE
 
+# 启动Go RSS服务
+echo "启动Go RSS服务..."
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/services/rss-crawler/server" ]; then
+    (cd "$SCRIPT_DIR/services/rss-crawler" && ./server) &
+else
+    (cd "$SCRIPT_DIR/services/rss-crawler" && go run cmd/server/main.go) &
+fi
+RSS_PID=$!
+echo "Go RSS服务 PID: $RSS_PID"
+echo ""
+
 # 启动API服务器
-echo "启动技能树API服务器..."
+echo "启动API服务器..."
 python server.py &
 API_PID=$!
 
@@ -17,11 +29,22 @@ echo "等待API服务器启动..."
 sleep 3
 
 echo ""
-echo "启动Streamlit前端..."
-echo "前端启动后请在浏览器访问: http://localhost:8501"
+echo "启动前端开发服务器..."
 echo ""
 
-streamlit run app.py
+(cd "$SCRIPT_DIR/frontend" && npm run dev) &
+FRONTEND_PID=$!
 
-# 退出时杀死API进程
-kill $API_PID
+echo ""
+echo "========================================"
+echo "    所有服务已启动"
+echo "    - Go RSS服务: http://localhost:8081"
+echo "    - FastAPI服务: http://localhost:8000"
+echo "    - 前端开发服务器: http://localhost:3000"
+echo "========================================"
+
+# 等待任意子进程退出
+wait
+
+# 退出时清理
+kill $RSS_PID $API_PID $FRONTEND_PID 2>/dev/null

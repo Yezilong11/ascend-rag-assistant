@@ -1,10 +1,13 @@
 export interface RAGStatus {
   engine_loaded: boolean
+  is_loading?: boolean
+  load_error?: string
   model_key: string
   model_name: string
   reranker_enabled: boolean
   reranker_model: string
   knowledge_base_ready: boolean
+  knowledge_base_degraded?: boolean
   available_models: Record<string, ModelInfo>
   available_rerankers: Record<string, RerankerInfo>
 }

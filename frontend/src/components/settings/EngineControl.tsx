@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import { PoweroffOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import { PoweroffOutlined, ThunderboltOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import ModelSelector from './ModelSelector'
 import RerankerConfig from './RerankerConfig'
 import type { RAGStatus, ModelLoadRequest } from '@/types/rag'
+import { useAppStore } from '@/stores/appStore'
 
 interface EngineControlProps {
   ragStatus: RAGStatus
@@ -22,6 +23,8 @@ const EngineControl: React.FC<EngineControlProps> = ({
   const [rerankerModel, setRerankerModel] = useState<string>('')
   const [rerankerTopK, setRerankerTopK] = useState(3)
   const [initialRetrievalK, setInitialRetrievalK] = useState(10)
+  const lastLoadError = useAppStore((s) => s.lastLoadError)
+  const setLastLoadError = useAppStore((s) => s.setLastLoadError)
 
   const modelKeys = useMemo(
     () => Object.keys(ragStatus.available_models || {}),
@@ -56,6 +59,13 @@ const EngineControl: React.FC<EngineControlProps> = ({
   const handleUnload = useCallback(async () => {
     await onUnload()
   }, [onUnload])
+
+  // 用户开始新的加载时，清除旧的错误
+  useEffect(() => {
+    if (isModelLoading) {
+      setLastLoadError(null)
+    }
+  }, [isModelLoading, setLastLoadError])
 
   if (isModelLoading) {
     return (
@@ -183,6 +193,44 @@ const EngineControl: React.FC<EngineControlProps> = ({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {lastLoadError && (
+            <div
+              style={{
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(255, 51, 102, 0.08)',
+                border: '1px solid rgba(255, 51, 102, 0.2)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8,
+                color: 'var(--neon-red)',
+                fontSize: 12,
+                lineHeight: 1.5,
+                wordBreak: 'break-word',
+              }}
+            >
+              <ExclamationCircleOutlined style={{ marginTop: 2, flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, marginBottom: 2 }}>模型加载失败</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{lastLoadError}</div>
+              </div>
+              <button
+                onClick={() => setLastLoadError(null)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-tertiary)',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+                aria-label="关闭错误"
+              >
+                ×
+              </button>
+            </div>
+          )}
           <div>
             <div
               style={{

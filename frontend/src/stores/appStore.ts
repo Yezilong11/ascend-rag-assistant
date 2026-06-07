@@ -6,12 +6,14 @@ interface AppStore {
   ragStatus: RAGStatus | null
   isModelLoading: boolean
   vlmEnabled: boolean
+  lastLoadError: string | null
 
   setSidebarCollapsed: (collapsed: boolean) => void
   toggleSidebar: () => void
   setRagStatus: (status: RAGStatus | null) => void
   setModelLoading: (loading: boolean) => void
   setVlmEnabled: (enabled: boolean) => void
+  setLastLoadError: (error: string | null) => void
 }
 
 const initialState: RAGStatus = {
@@ -30,6 +32,7 @@ export const useAppStore = create<AppStore>((set) => ({
   ragStatus: initialState,
   isModelLoading: false,
   vlmEnabled: false,
+  lastLoadError: null,
 
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
@@ -40,4 +43,6 @@ export const useAppStore = create<AppStore>((set) => ({
   setModelLoading: (loading) => set({ isModelLoading: loading }),
 
   setVlmEnabled: (enabled) => set({ vlmEnabled: enabled }),
+
+  setLastLoadError: (error) => set({ lastLoadError: error }),
 }))

@@ -498,7 +498,7 @@ class KnowledgeBase:
                         except UnicodeDecodeError:
                             continue
                     else:
-                        raise UnicodeDecodeError(f"无法解码文件 {file_path}，尝试的编码均失败")
+                        raise ValueError(f"无法解码文件 {file_path}，尝试的编码均失败")
             elif file_path.endswith(('.docx', '.doc')):
                 from langchain_community.document_loaders import UnstructuredWordDocumentLoader
                 loader = UnstructuredWordDocumentLoader(file_path, mode="elements")
@@ -538,10 +538,11 @@ class KnowledgeBase:
             self.db.add_documents(chunks)
             # 只有在非内存模式下才执行persist
             if not hasattr(self, 'use_memory_db') or not self.use_memory_db:
-                try:
-                    self.db.persist()
-                except Exception as e:
-                    logger.error("持久化数据库失败: %s", e)
+                if hasattr(self.db, 'persist'):
+                    try:
+                        self.db.persist()
+                    except Exception as e:
+                        logger.error("持久化数据库失败: %s", e)
 
             logger.info("成功导入 %d 个文档片段（类型：%s）", len(chunks), doc_type)
             return True

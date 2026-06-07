@@ -9,7 +9,10 @@ logger = logging.getLogger(__name__)
 
 import torch
 from langchain_classic.chains.retrieval_qa.base import RetrievalQA
-from langchain_community.llms import HuggingFacePipeline
+try:
+    from langchain_huggingface import HuggingFacePipeline
+except ImportError:
+    from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
@@ -362,12 +365,6 @@ class RAGAssistant:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = self.model.to(device)
 
-        # 修复pipeline的device参数
-        if torch.cuda.is_available():
-            device_id = 0
-        else:
-            device_id = -1
-
         # 创建生成pipeline
         self.pipeline_obj = pipeline(
             "text-generation",
@@ -377,7 +374,6 @@ class RAGAssistant:
             temperature=0.7,
             top_p=0.9,
             repetition_penalty=1.1,
-            device=device_id,
             do_sample=True
         )
 
@@ -457,27 +453,25 @@ class RAGAssistant:
             RuntimeError: 问答处理过程中发生错误
         """
         try:
-            # 通过 _retrieve_and_rerank 获取来源信息
-            _, sources = self._retrieve_and_rerank(question)
+            # 运行 QA 链（检索器内部调用 _retrieve_and_rerank，只执行一次）
+            result = self.qa_chain({"query": question})
+
+            # 从 qa_chain 返回的 source_documents 提取来源信息
+            source_docs = result.get("source_documents", [])
+            formatted_sources = [
+                {
+                    "content": doc.page_content[:200],
+                    "source": clean_source_path(doc.metadata.get("source", "未知"))
+                }
+                for doc in source_docs
+            ]
 
             # 空检索结果处理
-            if not sources:
+            if not source_docs:
                 return {
                     "answer": "抱歉，未找到与您问题相关的信息，请尝试换一种方式提问。",
                     "sources": []
                 }
-
-            # 运行 QA 链（检索器内部也会调用 _retrieve_and_rerank）
-            result = self.qa_chain({"query": question})
-
-            # 格式化来源信息
-            formatted_sources = [
-                {
-                    "content": s["content"][:200],
-                    "source": clean_source_path(s["metadata"].get("source", "未知"))
-                }
-                for s in sources
-            ]
 
             return {
                 "answer": result["result"],

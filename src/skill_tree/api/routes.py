@@ -7,10 +7,14 @@ from src.skill_tree.infrastructure.repositories import FileSkillTreeRepository
 # 创建路由器
 router = APIRouter(prefix="/api/skill-tree", tags=["skill-tree"])
 
-# 依赖注入
-async def get_skill_tree_service() -> SkillTreeApplicationService:
-    repository = FileSkillTreeRepository()
-    return SkillTreeApplicationService(repository)
+# 模块级单例
+_repository = FileSkillTreeRepository()
+_service = SkillTreeApplicationService(_repository)
+
+
+def get_skill_tree_service() -> SkillTreeApplicationService:
+    """获取 SkillTreeApplicationService 单例"""
+    return _service
 
 
 # 请求模型

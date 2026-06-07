@@ -17,6 +17,8 @@ RAG API 依赖注入模块
         clear_rag_assistant,
         get_is_loading,
         set_is_loading,
+        get_load_error,
+        set_load_error,
     )
 """
 
@@ -34,11 +36,12 @@ from src.knowledge_base import KnowledgeBase
 logger = logging.getLogger(__name__)
 
 # 模块级锁，保护全局变量的线程安全访问
-_lock = threading.Lock()
+_lock = threading.RLock()
 
 _rag_assistant: Optional[RAGAssistant] = None
 _knowledge_base: Optional[KnowledgeBase] = None
 _is_loading: bool = False
+_load_error: Optional[str] = None
 
 _CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "config.yaml")
 
@@ -126,7 +129,7 @@ def set_rag_assistant(assistant: RAGAssistant) -> None:
     Args:
         assistant: 已初始化完成的 RAGAssistant 实例
     """
-    global _rag_assistant
+    global _rag_assistant, _load_error
 
     with _lock:
         if _rag_assistant is not None:
@@ -134,6 +137,8 @@ def set_rag_assistant(assistant: RAGAssistant) -> None:
             _clear_rag_assistant_unlocked()
 
         _rag_assistant = assistant
+        # 加载成功，清除错误标记
+        _load_error = None
         logger.info(f"RAGAssistant 实例已设置: model_key={assistant.model_key}")
 
 
@@ -146,10 +151,11 @@ def _clear_rag_assistant_unlocked() -> None:
     2. 删除 pipeline 对象 (assistant.pipeline_obj) 释放推理管线占用的显存
     3. 调用 torch.cuda.empty_cache() 清空 CUDA 缓存池
     4. 将模块级变量设为 None
+    5. 清除加载错误标记
 
     所有步骤均有异常保护，确保即使某步失败也能继续执行后续清理。
     """
-    global _rag_assistant
+    global _rag_assistant, _load_error
 
     if _rag_assistant is None:
         logger.info("无需清除，当前无 RAGAssistant 实例")
@@ -172,6 +178,15 @@ def _clear_rag_assistant_unlocked() -> None:
         logger.error(f"释放 pipeline_obj 时出错: {e}")
 
     try:
+        if hasattr(assistant, "reranker") and assistant.reranker is not None:
+            if hasattr(assistant.reranker, "cross_encoder"):
+                del assistant.reranker.cross_encoder
+            del assistant.reranker
+            logger.info("已释放 RAGAssistant.reranker")
+    except Exception as e:
+        logger.error(f"释放 reranker 时出错: {e}")
+
+    try:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             logger.info("已清空 CUDA 缓存")
@@ -179,6 +194,7 @@ def _clear_rag_assistant_unlocked() -> None:
         logger.error(f"清空 CUDA 缓存时出错: {e}")
 
     _rag_assistant = None
+    _load_error = None
     logger.info("RAGAssistant 实例已清除")
 
 
@@ -217,3 +233,30 @@ def set_is_loading(val: bool) -> None:
     with _lock:
         _is_loading = val
         logger.info(f"模型加载状态已更新: _is_loading={_is_loading}")
+
+
+def get_load_error() -> Optional[str]:
+    """
+    获取最近一次模型加载的错误信息
+
+    Returns:
+        Optional[str]: 错误信息，未发生错误时返回 None
+    """
+    with _lock:
+        return _load_error
+
+
+def set_load_error(msg: Optional[str]) -> None:
+    """
+    设置最近一次模型加载的错误信息
+
+    Args:
+        msg: 错误信息，传 None 表示清除错误
+    """
+    global _load_error
+    with _lock:
+        _load_error = msg
+        if msg:
+            logger.warning(f"模型加载错误已记录: {msg}")
+        else:
+            logger.info("模型加载错误已清除")

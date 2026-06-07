@@ -1,0 +1,12 @@
+- [x] load_model 端点不再死锁，POST /api/rag/model/load 可正常返回 loading 状态
+- [x] query() 只执行一次检索与重排序，不重复调用 _retrieve_and_rerank
+- [x] 降级模式下 /api/rag/ingest、/api/rag/knowledge-base/auto-ingest、/api/rag/knowledge-base/stats 正常工作
+- [x] 文件编码无法识别时抛出 ValueError 而非 TypeError
+- [x] 卸载模型时 Reranker 的 GPU 显存被正确释放
+- [x] ChromaDB persist 调用兼容新版，不产生 AttributeError
+- [x] pipeline() 不传递已弃用的 device 参数
+- [x] HuggingFacePipeline 从 langchain_huggingface 导入
+- [x] Windows 控制台不因 emoji 字符导致 UnicodeEncodeError
+- [x] 配置文件不存在时服务器使用默认值启动
+- [x] Skill Tree Repository 使用单例模式
+- [x] requirements.txt 包含 langchain-classic 依赖
