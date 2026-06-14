@@ -86,7 +86,7 @@ def create_app(include_skill_tree: bool = True, include_multimodal: bool = True,
 
     if include_multimodal:
         try:
-            from src.multimodal.interface.api.routes import router as multimodal_router
+            from src.multimodal.routes import router as multimodal_router
             app.include_router(multimodal_router)
             logging.info("多模态API路由已注册")
         except ImportError as e:

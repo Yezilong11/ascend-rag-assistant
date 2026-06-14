@@ -11,7 +11,7 @@ RAG API 请求/响应模型模块
 - 代码规范.md 第 2.5.2 节 — 请求模型命名规范
 """
 
-from typing import Optional, Dict, Any, Literal
+from typing import Optional, Dict, Any, Literal, Generic, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -21,6 +21,93 @@ from src.rag_engine import PREDEFINED_RERANKERS as RERANKER_OPTIONS
 
 PREDEFINED_MODELS = {k: v["name"] for k, v in MODEL_OPTIONS.items()}
 PREDEFINED_RERANKERS = {k: v["name"] for k, v in RERANKER_OPTIONS.items()}
+
+
+# ============================================================================
+# 统一响应模型
+# ============================================================================
+
+T = TypeVar("T")
+
+
+class ApiResponse(BaseModel, Generic[T]):
+    """
+    统一 API 响应模型
+
+    所有 API 端点统一返回此格式，确保前端处理逻辑一致。
+
+    格式：
+        {
+            "success": bool,      # 操作是否成功
+            "data": T,            # 业务数据（可选，success=True 时存在）
+            "message": str        # 提示信息（可选）
+        }
+
+    示例（成功）：
+        {"success": true, "data": {"answer": "..."}, "message": null}
+
+    示例（失败）：
+        {"success": false, "data": null, "message": "错误描述"}
+
+    关联文档：API接口文档.md 第 2.1 节 — 统一响应格式
+    """
+
+    success: bool = Field(
+        description="操作是否成功",
+    )
+    data: Optional[T] = Field(
+        default=None,
+        description="业务数据，success=True 时存在",
+    )
+    message: Optional[str] = Field(
+        default=None,
+        description="提示信息或错误描述",
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "success": True,
+                "data": {"key": "value"},
+                "message": None,
+            }
+        }
+
+
+def success_response(data: Any = None, message: str = None) -> dict:
+    """
+    创建成功响应
+
+    Args:
+        data: 业务数据
+        message: 提示信息（可选）
+
+    Returns:
+        统一响应字典
+    """
+    response = {"success": True}
+    if data is not None:
+        response["data"] = data
+    if message:
+        response["message"] = message
+    return response
+
+
+def error_response(message: str, data: Any = None) -> dict:
+    """
+    创建错误响应
+
+    Args:
+        message: 错误信息
+        data: 附加数据（可选）
+
+    Returns:
+        统一响应字典
+    """
+    response = {"success": False, "message": message}
+    if data is not None:
+        response["data"] = data
+    return response
 
 
 class ChatRequest(BaseModel):

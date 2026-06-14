@@ -1,44 +1,86 @@
-# 系统配置
+# ============================================================================
+# Ascend RAG Assistant - 主配置文件
+# ============================================================================
+# 本配置文件统一管理整个系统的配置参数
+# 各服务模块应从本文件读取共享配置
+# ============================================================================
+
+# 系统基本信息
 system:
   name: "昇腾AI竞赛智能助教"
   version: "1.0.0"
   debug: false
 
+# ============================================================================
 # 知识库配置
+# ============================================================================
 knowledge_base:
-  persist_dir: "./chroma_db"
-  embedding_model: "BAAI/bge-large-zh-v1.5"
-  chunk_size: 500
-  chunk_overlap: 50
-  top_k: 3
+  # 主知识库（文本文档）
+  main:
+    persist_dir: "./chroma_db"
+    collection_name: "langchain"
+    embedding_model: "BAAI/bge-large-zh-v1.5"
+    chunk_size: 500
+    chunk_overlap: 50
+    top_k: 3
 
+  # 多模态知识库（图片）
+  multimodal:
+    persist_dir: "./chroma_db_multimodal"
+    collection_name: "multimodal_image_chunks"
+    # OCR引擎: easyocr（默认）、tesseract
+    ocr_engine: "easyocr"
+    # VLM模型: qwen-vl（默认）
+    vlm_model: "Qwen/Qwen2-VL-2B-Instruct"
+
+# ============================================================================
 # 大模型配置
+# ============================================================================
 llm:
-  model_id: "Qwen/Qwen2-1.5B-Instruct"  # 推荐配置，需约4GB显存
+  model_id: "Qwen/Qwen2-1.5B-Instruct"
   device: "auto"  # auto, cuda, cpu, npu
   max_new_tokens: 512
   temperature: 0.7
   top_p: 0.9
 
+# ============================================================================
 # 昇腾NPU配置（可选）
+# ============================================================================
 ascend:
   enabled: false
   device_id: 0
   quantization: "int8"  # int8, int4, fp16
   batch_size: 4
 
+# ============================================================================
 # 服务配置
+# ============================================================================
 server:
-  web_port: 8501
-  api_port: 8000
-  rag_port: 8001
-  host: "0.0.0.0"
+  # API服务（Python FastAPI）
+  api:
+    host: "0.0.0.0"
+    port: 8000
+    reload: false
 
+  # RSS抓取服务（Go微服务）
+  rss:
+    host: "0.0.0.0"
+    port: 8081
+    service_url: "http://localhost:8081"
+
+  # 前端服务
+  frontend:
+    host: "0.0.0.0"
+    port: 3000
+
+# ============================================================================
+# RSS功能配置
+# ============================================================================
 rss:
   enabled: true
-  service_url: "http://localhost:8081"
   timeout: 30
   auto_ingest: false
+  # AI增强功能
   ai:
     enabled: true
     cache_path: "data/rss_ai_cache.json"

@@ -6,6 +6,7 @@
 import os
 import sys
 import re
+import pytest
 from typing import List, Dict
 
 # 添加 src 目录到 Python 路径
@@ -279,6 +280,7 @@ A: 本次比赛免收参赛费用。
 
         print("-" * 40)
 
+@pytest.mark.skip(reason="交互式测试，需要手动运行。使用 pytest -s 可按需运行。")
 def test_custom_text():
     """测试自定义文本的切分"""
 

@@ -17,7 +17,7 @@ if exist "%~dp0services\rss-crawler\server.exe" (
 echo.
 
 echo Starting FastAPI server...
-start "FastAPI Server" cmd /k "cd /d %~dp0 && python server.py"
+start "FastAPI Server" cmd /k "cd /d %~dp0 && python rag_server.py"
 echo.
 
 echo Waiting for API server to start...

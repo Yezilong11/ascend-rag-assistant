@@ -7,6 +7,10 @@ API 文档：http://localhost:8000/docs
 默认端口：8000
 
 可通过 config/config.yaml 配置服务参数
+
+配置更新说明 (Phase 1-A):
+- 服务配置已重组为 server.api, server.rss, server.frontend 结构
+- 原 api_port, rag_port, web_port 已合并
 """
 
 import os
@@ -19,9 +23,11 @@ config_path = "./config/config.yaml"
 with open(config_path, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
 
+# 读取API服务配置
 server_config = config.get("server", {})
-port = int(os.environ.get("API_PORT", server_config.get("api_port", 8000)))
-host = os.environ.get("API_HOST", server_config.get("host", "127.0.0.1"))
+api_config = server_config.get("api", {})
+port = int(os.environ.get("API_PORT", api_config.get("port", 8000)))
+host = os.environ.get("API_HOST", api_config.get("host", "127.0.0.1"))
 
 app = create_app(include_skill_tree=True, include_multimodal=True)
 

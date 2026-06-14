@@ -1,13 +1,33 @@
+import os
 import httpx
 import logging
+import yaml
 from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
 
+def _get_rss_service_url() -> str:
+    """
+    从配置文件读取RSS服务地址
+    配置路径: config/config.yaml -> server.rss.service_url
+    """
+    try:
+        config_path = os.environ.get("CONFIG_PATH", "./config/config.yaml")
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        rss_config = config.get("server", {}).get("rss", {})
+        service_url = rss_config.get("service_url")
+        if service_url:
+            return service_url
+    except Exception as e:
+        logger.debug(f"Failed to load RSS service URL from config: {e}")
+    return "http://localhost:8081"
+
+
 class RSSClient:
-    def __init__(self, base_url: str = "http://localhost:8081", timeout: float = 30.0):
-        self.base_url = base_url.rstrip("/")
+    def __init__(self, base_url: str = None, timeout: float = 30.0):
+        self.base_url = (base_url or _get_rss_service_url()).rstrip("/")
         self.timeout = timeout
         self._client: Optional[httpx.AsyncClient] = None
 

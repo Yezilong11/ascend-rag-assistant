@@ -460,7 +460,11 @@ const SettingsPage: React.FC = () => {
           }}
         >
           <span style={{ fontSize: 16, fontWeight: 450, color: '#F0F0F0' }}>启用重排序</span>
-          <Switch checked={useReranker} onChange={setUseReranker} />
+          <Switch
+            checked={isEngineLoaded ? ragStatus?.reranker_enabled ?? false : useReranker}
+            onChange={isEngineLoaded ? undefined : setUseReranker}
+            disabled={isEngineLoaded}
+          />
         </div>
 
         {/* 重排序模型 */}

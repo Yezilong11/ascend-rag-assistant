@@ -1,17 +1,10 @@
 """
-Infrastructure Layer
+Infrastructure Layer - 基础设施层
+保留PDF处理等基础设施组件
 """
 
-from .device.device_manager import DeviceManager
-from .ocr.easyocr_engine import EasyOCREngine
-from .vlm.qwen_vl_engine import QwenVLEngine
 from .pdf.pdf_image_extractor import PDFImageExtractor
-from .persistence.chroma_image_chunk_repository import ChromaImageChunkRepository
 
 __all__ = [
-    "DeviceManager",
-    "EasyOCREngine",
-    "QwenVLEngine",
     "PDFImageExtractor",
-    "ChromaImageChunkRepository",
 ]

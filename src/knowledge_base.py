@@ -120,6 +120,10 @@ class KnowledgeBase:
         if pdfplumber is None:
             raise ImportError("pdfplumber is required for PDF processing. Install with: pip install pdfplumber")
 
+        # 保存配置
+        self.persist_dir = persist_dir
+        self.model_dir = model_dir
+
         # 优先使用本地模型，其次ModelScope下载，最后HuggingFace在线加载
         embedding_model_path = os.path.join(model_dir, "bge-large-zh-v1.5")
         model_kwargs = {'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
@@ -536,13 +540,7 @@ class KnowledgeBase:
 
             # 4. 添加到向量数据库
             self.db.add_documents(chunks)
-            # 只有在非内存模式下才执行persist
-            if not hasattr(self, 'use_memory_db') or not self.use_memory_db:
-                if hasattr(self.db, 'persist'):
-                    try:
-                        self.db.persist()
-                    except Exception as e:
-                        logger.error("持久化数据库失败: %s", e)
+            # 注意：Chroma 0.4+ 已自动持久化，无需手动调用 persist()
 
             logger.info("成功导入 %d 个文档片段（类型：%s）", len(chunks), doc_type)
             return True

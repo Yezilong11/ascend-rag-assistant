@@ -50,3 +50,8 @@ scipy>=1.10.0
 # 配置
 pyyaml>=6.0
 pydantic>=2.7.0
+
+# 测试
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.0.0
