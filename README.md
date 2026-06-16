@@ -200,7 +200,7 @@ go run cmd/server/main.go
 终端2 - 启动 FastAPI 服务器：
 
 ```bash
-python server.py
+python rag_server.py
 ```
 
 终端3 - 启动 React 前端：
